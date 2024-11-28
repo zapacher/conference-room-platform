@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -54,7 +53,7 @@ public interface ConferenceDAO extends JpaRepository<Conference, Integer> {
                     "AND status = 'AVAILABLE' ",
             nativeQuery = true
     )
-    int countOverlappingBookings(UUID roomUUID, LocalDateTime from, LocalDateTime until);
+    int countOverlappingBookingsByRoomUUID(UUID roomUUID, LocalDateTime from, LocalDateTime until);
 
     @Modifying
     @Transactional
@@ -89,4 +88,32 @@ public interface ConferenceDAO extends JpaRepository<Conference, Integer> {
             nativeQuery = true
     )
     int cancelConference(UUID validationUUID);
+
+    @Transactional
+    @Query(
+            value = "WITH update_conference AS ( " +
+                    "   UPDATE backoffice.conferences " +
+                    "   SET booked_from = ?2 , booked_until = ?3 , validation_uuid = ?4 " +
+                    "   WHERE validation_uuid = ?1 " +
+                    "   RETURNING id, validation_uuid, booked_from, booked_until, validation_uuid " +
+                    ") " +
+                    "DELETE FROM backoffice.conference_participants " +
+                    "WHERE conference_id IN (SELECT id FROM update_conference) " +
+                    "RETURNING * ",
+            nativeQuery = true
+    )
+    Conference updateConference(UUID validationUUID, LocalDateTime from, LocalDateTime until, UUID newValidationUUID);
+
+    @Transactional
+    @Query(
+            value = "SELECT COUNT(*) FROM backoffice.conferences " +
+                    "WHERE ?2 < booked_until " +
+                    "AND ?2 > NOW() " +
+                    "AND ?3 > booked_from " +
+                    "AND room_uuid = ( SELECT room_uuid FROM backoffice.conferences WHERE validation_uuid = ?1) " +
+                    "AND validation_uuid != ?1" +
+                    "AND status = 'AVAILABLE' ",
+            nativeQuery = true
+    )
+    int countOverlappingBookingsForUpdate(UUID validationUUID, LocalDateTime from, LocalDateTime until);
 }

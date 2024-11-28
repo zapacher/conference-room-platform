@@ -39,7 +39,7 @@ public class ConferenceService {
                     .build();
         }
 
-        if(conferenceDAO.countOverlappingBookings(conferenceDTO.getRoomUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil())>0) {
+        if(conferenceDAO.countOverlappingBookingsByRoomUUID(conferenceDTO.getRoomUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil())>0) {
             return ConferenceDTO.builder()
                     .info("Chosen time isn't available")
                     .build();
@@ -62,12 +62,53 @@ public class ConferenceService {
                 .bookedUntil(conference.getBookedUntil())
                 .build();
 
-
     }
 
     public ConferenceDTO update(ConferenceDTO conferenceDTO) {
+        if(conferenceDTO.getRoomUUID() != null) {
+            if(conferenceDAO.countOverlappingBookingsByRoomUUID(conferenceDTO.getRoomUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil())==0) {
+                if(conferenceDAO.cancelConference(conferenceDTO.getValidationUUID())==0){
+                    return ConferenceDTO.builder()
+                            .info("Conference doesn't exists")
+                            .build();
+                }
 
+                Conference conference = conferenceDAO.saveAndFlush(Conference.builder()
+                        .roomUUID(conferenceDTO.getRoomUUID())
+                        .conferenceUUID(UUID.randomUUID())
+                        .validationUUID(UUID.randomUUID())
+                        .status(AVAILABLE)
+                        .info(conferenceDTO.getInfo())
+                        .bookedFrom(conferenceDTO.getBookedFrom())
+                        .bookedUntil(conferenceDTO.getBookedUntil())
+                        .build());
+
+                return ConferenceDTO.builder()
+                        .conferenceUUID(conference.getConferenceUUID())
+                        .validationUUID(conference.getValidationUUID())
+                        .bookedFrom(conference.getBookedFrom())
+                        .bookedUntil(conference.getBookedUntil())
+                        .oldValidationUUID(conferenceDTO.getValidationUUID())
+                        .build();
+            }
+        }
+        if(conferenceDAO.countOverlappingBookingsForUpdate(conferenceDTO.getValidationUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil())==0) {
+            Conference conference = conferenceDAO.updateConference(conferenceDTO.getValidationUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil(), UUID.randomUUID());
+            if (conference == null) {
+                return ConferenceDTO.builder()
+                        .info("Conference doesn't exists")
+                        .build();
+            }
+            return ConferenceDTO.builder()
+                    .conferenceUUID(conference.getConferenceUUID())
+                    .validationUUID(conference.getValidationUUID())
+                    .bookedFrom(conference.getBookedFrom())
+                    .bookedUntil(conference.getBookedUntil())
+                    .oldValidationUUID(conferenceDTO.getValidationUUID())
+                    .build();
+        }
         return ConferenceDTO.builder()
+                .info("New values are conflicting with existing conferences")
                 .build();
     }
 
@@ -142,7 +183,7 @@ public class ConferenceService {
     public ConferenceDTO cancel(ConferenceDTO conferenceDTO) {
         if (conferenceDAO.cancelConference(conferenceDTO.getValidationUUID())>0) {
             return ConferenceDTO.builder()
-                    .validationUUID(conferenceDTO.getValidationUUID())
+                    .oldValidationUUID(conferenceDTO.getValidationUUID())
                     .build();
         }
 

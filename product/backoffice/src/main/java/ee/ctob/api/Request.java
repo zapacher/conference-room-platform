@@ -19,7 +19,7 @@ public class Request {
     RoomStatus status;
     @NotNull(groups = ConferenceCreate.class)
     UUID roomUUID;
-    @NotNull(groups = ConferenceCreate.class)
+    @NotNull(groups = {ConferenceCreate.class, ConferenceUpdate.class})
     String description;
     @NotNull(groups = {ConferenceCreate.class, ConferenceUpdate.class})
     LocalDateTime from;

@@ -91,11 +91,11 @@ public class BackofficeController {
                         .roomUUID(request.getRoomUUID())
                         .bookedFrom(request.getFrom())
                         .bookedUntil(request.getUntil())
+                        .info(request.getDescription())
                         .build()
         );
 
         return Response.builder()
-                .validationUUID(UUID.randomUUID())
                 .build();
     }
 
