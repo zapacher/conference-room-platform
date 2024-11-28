@@ -1,12 +1,18 @@
 package ee.ctob.services;
 
 import ee.ctob.api.dto.RoomDTO;
+import ee.ctob.data.Conference;
 import ee.ctob.data.Room;
 import ee.ctob.data.access.ConferenceDAO;
 import ee.ctob.data.access.RoomDAO;
+import ee.ctob.data.enums.ConferenceStatus;
+import org.postgresql.jdbc.UUIDArrayAssistant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
@@ -30,7 +36,6 @@ public class RoomService {
                         .validationUuid(UUID.randomUUID())
                         .build()
         );
-
         return RoomDTO.builder()
                 .validationUUID(room.getValidationUuid())
                 .roomUUID(room.getRoomUUID())

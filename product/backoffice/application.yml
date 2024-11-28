@@ -5,3 +5,5 @@ spring:
     properties:
       hibernate:
         default_schema: backoffice
+      types:
+        type: org.hibernate.type.TextArrayType

@@ -96,19 +96,23 @@ public class ConferenceService {
     }
 
     public ConferenceDTO feedbackList(ConferenceDTO conferenceDTO) {
-        List<UUID> participantUUIDList = conferenceDAO.getParticipantsUUIDByValidationUUID(conferenceDTO.getValidationUUID());
-        if(participantUUIDList.isEmpty()) {
+        Conference conference = conferenceDAO.getConferenceByValidationUUID(conferenceDTO.getValidationUUID());
+        if(conference == null) {
             return  ConferenceDTO.builder()
                     .validationUUID(conferenceDTO.getValidationUUID())
-                    .info("Conference had no participants or conference not exists")
+                    .info("Conference doesn't exists")
                     .build();
         }
 
-        List<Participant> participantList = new ArrayList<>();
-        for(UUID participantUUID: participantUUIDList) {
-            participantList.add(participantDAO.findByParticipantUUID(participantUUID));
+        List<UUID> participantUUIDList = conference.getParticipants();
+        if(participantUUIDList.isEmpty()) {
+            return  ConferenceDTO.builder()
+                    .validationUUID(conferenceDTO.getValidationUUID())
+                    .info("Conference has no participants")
+                    .build();
         }
 
+        List<Participant> participantList = participantDAO.findByParticipantUUIDs(participantUUIDList);
         if(participantList.isEmpty()) {
             return  ConferenceDTO.builder()
                     .validationUUID(conferenceDTO.getValidationUUID())

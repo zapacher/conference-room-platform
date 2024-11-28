@@ -89,13 +89,4 @@ public interface ConferenceDAO extends JpaRepository<Conference, Integer> {
             nativeQuery = true
     )
     int cancelConference(UUID validationUUID);
-
-
-    @Transactional
-    @Query(
-            value = "SELECT participants FROM backoffice.conferences " +
-                    "WHERE validation_uuid = ?1 ",
-            nativeQuery = true
-    )
-    List<UUID> getParticipantsUUIDByValidationUUID(UUID validationUUID);
 }
