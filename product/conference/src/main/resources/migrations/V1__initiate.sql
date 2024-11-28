@@ -2,7 +2,7 @@ CREATE TABLE participants (
     id SERIAL PRIMARY KEY,
     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     participant_uuid UUID UNIQUE NOT NULL,
-    validation_uuid UUID NOT NULL UNIQUE,
+    validation_uuid UUID UNIQUE NOT NULL,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,

@@ -44,15 +44,17 @@ public interface ConferenceDAO extends JpaRepository<Conference, Integer> {
     )
     Conference getConferenceByValidationUUID(UUID validationUUID);
 
-
     @Transactional
     @Query(
             value = "SELECT COUNT(*) FROM backoffice.conferences " +
-                    "WHERE ?2 < booked_until AND ?3 > booked_from " +
-                    "AND room_uuid = ?1 ",
+                    "WHERE ?2 < booked_until " +
+                    "AND ?2 > NOW() " +
+                    "AND ?3 > booked_from " +
+                    "AND room_uuid = ?1 " +
+                    "AND status = 'AVAILABLE' ",
             nativeQuery = true
     )
-    int countOverlappingBookings(UUID roomUUID, LocalDateTime from,LocalDateTime until);
+    int countOverlappingBookings(UUID roomUUID, LocalDateTime from, LocalDateTime until);
 
     @Modifying
     @Transactional
@@ -91,11 +93,8 @@ public interface ConferenceDAO extends JpaRepository<Conference, Integer> {
 
     @Transactional
     @Query(
-            value = "SELECT participant_uuid FROM backoffice.conference_participants " +
-                    "WHERE conference_id = ( " +
-                    "   SELECT id FROM backoffice.conferences " +
-                    "   WHERE validation_uuid = ?1" +
-                    ")",
+            value = "SELECT participants FROM backoffice.conferences " +
+                    "WHERE validation_uuid = ?1 ",
             nativeQuery = true
     )
     List<UUID> getParticipantsUUIDByValidationUUID(UUID validationUUID);

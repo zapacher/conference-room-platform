@@ -33,11 +33,7 @@ public class Conference {
     String info;
     LocalDateTime bookedFrom;
     LocalDateTime bookedUntil;
-    @ElementCollection
-    @CollectionTable(
-            name = "conference_participants", schema = "backoffice",
-            joinColumns = @JoinColumn(name = "conference_id")
-    )
-    @Column(name = "participant_uuid")
-    List<UUID> participants = new ArrayList<>();
+
+    @Column(name = "participants")
+    ArrayList<UUID> participants = new ArrayList<>();
 }

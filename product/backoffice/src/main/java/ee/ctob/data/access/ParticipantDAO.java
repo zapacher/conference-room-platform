@@ -11,14 +11,14 @@ import java.util.UUID;
 
 @Repository
 public interface ParticipantDAO extends JpaRepository<Participant, Integer> {
-    @Transactional
-    @Query(
-            value = "SELECT * FROM conference.participants " +
-                    "WHERE conference_uuid = ?1 " +
-                    "AND feedback IS NOT NULL ",
-            nativeQuery = true
-    )
-    List<Participant> findAllByConferenceUUID(UUID confereneUUID);
+//    @Transactional
+//    @Query(
+//            value = "SELECT * FROM conference.participants " +
+//                    "WHERE conference_uuid = ?1 " +
+//                    "AND feedback IS NOT NULL ",
+//            nativeQuery = true
+//    )
+//    List<Participant> findAllByConferenceUUID(UUID confereneUUID);
 
     @Transactional
     @Query(

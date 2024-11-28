@@ -7,7 +7,6 @@ import ee.ctob.data.Participant;
 import ee.ctob.data.access.ConferenceDAO;
 import ee.ctob.data.access.ParticipantDAO;
 import ee.ctob.data.access.RoomDAO;
-import ee.ctob.data.enums.ConferenceStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static ee.ctob.data.enums.ConferenceStatus.AVAILABLE;
+import static java.time.LocalDateTime.now;
 
 @Service
 public class ConferenceService {
@@ -27,27 +27,42 @@ public class ConferenceService {
     ParticipantDAO participantDAO;
 
     public ConferenceDTO create(ConferenceDTO conferenceDTO) {
-
-        if(isRoomAvailable(conferenceDTO.getRoomUUID()) && isBookingAvailable(conferenceDTO)) {
-            Conference conference = conferenceDAO.saveAndFlush(Conference.builder()
-                    .roomUUID(conferenceDTO.getRoomUUID())
-                    .conferenceUUID(UUID.randomUUID())
-                    .validationUUID(UUID.randomUUID())
-                    .status(AVAILABLE)
-                    .info(conferenceDTO.getInfo())
-                    .bookedFrom(conferenceDTO.getBookedFrom())
-                    .bookedUntil(conferenceDTO.getBookedUntil())
-                    .build());
+        if(now().isAfter(conferenceDTO.getBookedFrom())) {
             return ConferenceDTO.builder()
-                    .conferenceUUID(conference.getConferenceUUID())
-                    .validationUUID(conference.getValidationUUID())
-                    .bookedFrom(conference.getBookedFrom())
-                    .bookedUntil(conference.getBookedUntil())
+                    .info("Conference start time must be in future")
                     .build();
         }
+
+        if(roomDAO.isRoomAvailable(conferenceDTO.getRoomUUID())==0) {
+            return ConferenceDTO.builder()
+                    .info("Chosen room isn't available")
+                    .build();
+        }
+
+        if(conferenceDAO.countOverlappingBookings(conferenceDTO.getRoomUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil())>0) {
+            return ConferenceDTO.builder()
+                    .info("Chosen time isn't available")
+                    .build();
+        }
+
+        Conference conference = conferenceDAO.saveAndFlush(Conference.builder()
+                .roomUUID(conferenceDTO.getRoomUUID())
+                .conferenceUUID(UUID.randomUUID())
+                .validationUUID(UUID.randomUUID())
+                .status(AVAILABLE)
+                .info(conferenceDTO.getInfo())
+                .bookedFrom(conferenceDTO.getBookedFrom())
+                .bookedUntil(conferenceDTO.getBookedUntil())
+                .build());
+
         return ConferenceDTO.builder()
-                .info("Chosen time isn't available")
+                .conferenceUUID(conference.getConferenceUUID())
+                .validationUUID(conference.getValidationUUID())
+                .bookedFrom(conference.getBookedFrom())
+                .bookedUntil(conference.getBookedUntil())
                 .build();
+
+
     }
 
     public ConferenceDTO update(ConferenceDTO conferenceDTO) {
@@ -67,7 +82,10 @@ public class ConferenceService {
         }
 
         Integer roomCapacity = roomDAO.getRoomCapacityByRoomId(conference.getRoomUUID());
-        Integer participantsCount = conference.getParticipants().size();
+        Integer participantsCount = 0;
+        if(!conference.getParticipants().isEmpty()) {
+            participantsCount = conference.getParticipants().size();
+        }
 
         return ConferenceDTO.builder()
                 .validationUUID(conferenceDTO.getValidationUUID())
@@ -123,17 +141,9 @@ public class ConferenceService {
                     .validationUUID(conferenceDTO.getValidationUUID())
                     .build();
         }
+
         return ConferenceDTO.builder()
                 .info("Conference is already canceled or not exists")
                 .build();
-    }
-
-    private boolean isBookingAvailable(ConferenceDTO conferenceDTO) {
-        int overlappingCount = conferenceDAO.countOverlappingBookings(conferenceDTO.getRoomUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil());
-        return overlappingCount == 0;
-    }
-
-    private boolean isRoomAvailable(UUID roomUUID) {
-        return roomDAO.isRoomAvailable(roomUUID)>0;
     }
 }
