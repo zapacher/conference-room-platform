@@ -1,0 +1,7 @@
+spring:
+  flyway:
+    schemas: conference
+  jpa:
+    properties:
+      hibernate:
+        default_schema: conference

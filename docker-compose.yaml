@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+
+  conference:
+    container_name: product-conference
+    build:
+      context: .
+      dockerfile: product/conference/Dockerfile
+    ports:
+      - "8083:8080"
+    networks:
+      - inner_network
+    volumes:
+      - ./config/local.yml:/app/local.yml
+      - ./product/conference/application.yml:/app/product/conference/application.yml
+    environment:
+      - SPRING_CONFIG_LOCATION=file:/app/local.yml,file:/app/product/conference/application.yml
+
+  backoffice:
+    container_name: product-backoffice
+    build:
+      context: .
+      dockerfile: product/backoffice/Dockerfile
+    ports:
+      - "8082:8080"
+    networks:
+      - inner_network
+    depends_on:
+      - conference
+    volumes:
+      - ./config/local.yml:/app/local.yml
+      - ./product/backoffice/application.yml:/app/product/backoffice/application.yml
+    environment:
+      - SPRING_CONFIG_LOCATION=file:/app/local.yml,file:/app/product/backoffice/application.yml
+
+networks:
+  inner_network:
+    name: inner_network
+    ipam:
+      config:
+        - subnet: 172.33.0.0/16
+          gateway: 172.33.0.1

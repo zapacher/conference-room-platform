@@ -1,0 +1,24 @@
+spring:
+  data:
+    jpa:
+      repositories:
+        enabled: true
+  datasource:
+    url: 'jdbc:postgresql://172.17.0.1:5432/ctob'
+    username: ctob
+    password: ctob
+  flyway:
+    enabled: true
+    locations: classpath:migrations
+    baseline-on-migrate: true
+    validate-on-migrate: true
+  jpa:
+    show-sql: false
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+
+logging:
+  level:
+    org.flywaydb: DEBUG

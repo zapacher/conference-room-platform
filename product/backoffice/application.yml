@@ -1,0 +1,7 @@
+spring:
+  flyway:
+    schemas: backoffice
+  jpa:
+    properties:
+      hibernate:
+        default_schema: backoffice
