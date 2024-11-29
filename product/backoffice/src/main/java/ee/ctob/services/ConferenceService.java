@@ -108,6 +108,7 @@ public class ConferenceService {
                     .oldValidationUUID(conferenceDTO.getValidationUUID())
                     .build();
         }
+
         return ConferenceDTO.builder()
                 .info("New values are conflicting with existing conferences")
                 .build();

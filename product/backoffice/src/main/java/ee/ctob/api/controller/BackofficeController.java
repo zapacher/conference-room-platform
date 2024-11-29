@@ -96,6 +96,13 @@ public class BackofficeController {
         );
 
         return Response.builder()
+                .roomUUID(result.getRoomUUID())
+                .conferenceUUID(result.getConferenceUUID())
+                .validationUUID(result.getValidationUUID())
+                .bookedFrom(result.getBookedFrom())
+                .bookedUntil(result.getBookedUntil())
+                .oldValidationUUID(result.getOldValidationUUID())
+                .reason(result.getInfo())
                 .build();
     }
 
