@@ -3,9 +3,6 @@ WORKDIR /app
 
 COPY . .
 
-WORKDIR /app/product
-RUN mvn clean install
-
 WORKDIR /app/product/backoffice
 RUN mvn clean package
 

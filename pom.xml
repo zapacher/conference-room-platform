@@ -18,6 +18,7 @@
 
     <modules>
         <module>product</module>
+        <module>product/data</module>
     </modules>
 
     <properties>
@@ -28,11 +29,10 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Spring Boot dependency management -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-parent</artifactId>
-                <version>2.7.0</version> <!-- Use the version you are working with -->
+                <version>2.7.0</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -42,11 +42,10 @@
     <build>
         <pluginManagement>
             <plugins>
-                <!-- Spring Boot Maven Plugin -->
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>2.7.0</version> <!-- Adjust to your version -->
+                    <version>2.7.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -14,8 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 import static ee.ctob.data.enums.ConferenceStatus.CANCELED;
 
 @Slf4j

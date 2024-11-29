@@ -6,13 +6,9 @@ import ee.ctob.data.Room;
 import ee.ctob.data.access.ConferenceDAO;
 import ee.ctob.data.access.RoomDAO;
 import ee.ctob.data.enums.ConferenceStatus;
-import org.postgresql.jdbc.UUIDArrayAssistant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
