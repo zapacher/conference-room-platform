@@ -2,14 +2,6 @@ version: '3.8'
 
 services:
 
-  data:
-    build:
-      context: .
-      dockerfile: product/data/Dockerfile
-    image: data
-    volumes:
-      - ./product/data:/app
-
   conference:
     container_name: product-conference
     build:
@@ -19,8 +11,6 @@ services:
       - "8083:8080"
     networks:
       - inner_network
-    depends_on:
-      - data
     volumes:
       - ./config/local.yml:/app/local.yml
       - ./product/conference/application.yml:/app/product/conference/application.yml
@@ -37,7 +27,6 @@ services:
     networks:
       - inner_network
     depends_on:
-      - data
       - conference
     volumes:
       - ./config/local.yml:/app/local.yml

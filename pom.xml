@@ -18,7 +18,6 @@
 
     <modules>
         <module>product</module>
-        <module>product/data</module>
     </modules>
 
     <properties>
