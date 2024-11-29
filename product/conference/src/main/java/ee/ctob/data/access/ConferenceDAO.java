@@ -55,8 +55,8 @@ public interface ConferenceDAO extends JpaRepository<Conference, Integer> {
     @Transactional
     @Query(
             value = "SELECT * FROM backoffice.conferences " +
-                    "WHERE booked_from > :1 " +
-                    "AND booked_until < :2 " +
+                    "WHERE booked_from > ?1 " +
+                    "AND booked_until < ?2 " +
                     "AND status = 'AVAILABLE' ",
             nativeQuery = true
     )

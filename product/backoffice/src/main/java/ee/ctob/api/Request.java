@@ -2,6 +2,7 @@ package ee.ctob.api;
 
 import ee.ctob.api.groups.*;
 import ee.ctob.data.enums.RoomStatus;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import javax.validation.constraints.NotNull;
