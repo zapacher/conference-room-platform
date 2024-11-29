@@ -1,6 +1,6 @@
 CREATE TABLE participants (
     id SERIAL PRIMARY KEY,
-    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     participant_uuid UUID UNIQUE NOT NULL,
     validation_uuid UUID UNIQUE NOT NULL,
     first_name VARCHAR(255) NOT NULL,

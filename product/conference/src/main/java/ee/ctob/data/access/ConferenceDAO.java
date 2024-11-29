@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -27,52 +29,37 @@ public interface ConferenceDAO extends JpaRepository<Conference, Integer> {
     @Modifying
     @Transactional
     @Query(
-            value = "UPDATE backoffice.conference_participants " +
-                    "SET conference_id = ( " +
-                    "   SELECT id FROM backoffice.conferences " +
-                    "   WHERE conference_uuid = ?2 " +
-                    ") , participant_uuid = ?1 " +
+            value = "WITH conference AS ( " +
+                    "    SELECT c.id AS conference_id, c.room_uuid, c.booked_from " +
+                    "    FROM backoffice.conferences c " +
+                    "    WHERE c.conference_uuid = ?2 " +
+                    "), " +
+                    "room AS ( " +
+                    "    SELECT r.room_uuid, r.capacity, r.status " +
+                    "    FROM backoffice.rooms r " +
+                    "    WHERE r.room_uuid = (SELECT room_uuid FROM conference) " +
+                    ") " +
+                    "INSERT INTO backoffice.conference_participants (conference_id, participant_uuid) " +
+                    "VALUES ((SELECT conference_id FROM conference), participant_uuid = ?1 ) " +
                     "WHERE ( " +
-                    "   SELECT COUNT(*) FROM backoffice.conference_participants " +
-                    "   WHERE conference_id = ( " +
-                    "       SELECT id FROM backoffice.conferences " +
-                    "       WHERE conference_uuid = ?2 " +
-                    "   ) " +
-                    ") < ( " +
-                    "   SELECT capacity FROM backoffice.rooms " +
-                    "   WHERE room_uuid = ( " +
-                    "       SELECT room_uuid FROM backoffice.conferences " +
-                    "       WHERE conference_uuid = ?2 " +
-                    "   ) " +
-                    ") AND NOW() < ( " +
-                    "   SELECT booked_from FROM backoffice.conferences " +
-                    "   WHERE conference_uuid = ?2 " +
-                    ") AND 'AVAILABLE' = ( " +
-                    "   SELECT status FROM backoffice.rooms " +
-                    "   WHERE room_uuid = ( " +
-                    "       SELECT room_uuid FROM backoffice.conferences " +
-                    "       WHERE conference_uuid = ?2 " +
-                    "   ) " +
-                    ")",
+                    "    SELECT COUNT(*) " +
+                    "    FROM backoffice.conference_participants cp " +
+                    "    WHERE cp.conference_id = (SELECT conference_id FROM conference) " +
+                    ") < (SELECT capacity FROM room) " +
+                    "AND NOW() < (SELECT booked_from FROM conference) " +
+                    "AND 'AVAILABLE' = (SELECT status FROM room)",
             nativeQuery = true
     )
     int registerParticipant(UUID participantUUID, UUID conferenceUUID);
 
-//    @Modifying
-//    @Transactional
-//    @Query(
-//            value = "INSERT INTO backoffice.conference_participants (conference_id, participant_uuid) " +
-//                    "VALUES (?1, ?2) ",
-//            nativeQuery = true
-//    )
-//    void addParticipant(Integer conferenceId, UUID participantUUID);
-//    @Modifying
-//    @Transactional
-//    @Query(
-//            value = "DELETE FROM conference_participants " +
-//                    "WHERE conference_id = ?1 " +
-//                    "AND participant_uuid = ?2 ",
-//            nativeQuery = true
-//    )
-//    void removeParticipant(Integer conferenceId, UUID participantUUID);
+    @Transactional
+    @Query(
+            value = "SELECT * FROM backoffice.conferences " +
+                    "WHERE booked_from > :1 " +
+                    "AND booked_until < :2 " +
+                    "AND status = 'AVAILABLE' ",
+            nativeQuery = true
+    )
+    List<Conference> findAllAvailableBetween(LocalDateTime from, LocalDateTime until);
+
 }

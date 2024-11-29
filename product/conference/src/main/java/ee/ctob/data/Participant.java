@@ -23,7 +23,7 @@ public class Participant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
-    Instant created;
+    LocalDateTime created;
     @Column(name = "validation_uuid",unique = true)
     UUID validationUUID;
     @Column(name = "participant_uuid",unique = true)

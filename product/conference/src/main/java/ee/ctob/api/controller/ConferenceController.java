@@ -76,18 +76,18 @@ public class ConferenceController {
                 .reason(result.getInfo())
                 .build();
     }
-//
-//    @PostMapping("/conference/available")
-//    public Response conferenceAvailable(@Validated(ConferenceAvailable.class) @RequestBody Request request) {
-//        ParticipantDTO result = participantService.availableConferences(
-//                ParticipantDTO.builder()
-//                        .from(request.getFrom())
-//                        .until(request.getUntil())
-//                        .build()
-//        );
-//
-//        return Response.builder()
-//                .conferenceAvailableList(result.getConferenceAvailableList())
-//                .build();
-//    }
+
+    @PostMapping("/conference/available")
+    public Response conferenceAvailable(@Validated(ConferenceAvailable.class) @RequestBody Request request) {
+        ParticipantDTO result = participantService.availableConferences(
+                ParticipantDTO.builder()
+                        .from(request.getFrom())
+                        .until(request.getUntil())
+                        .build()
+        );
+
+        return Response.builder()
+                .conferenceAvailableList(result.getConferenceAvailableList())
+                .build();
+    }
 }

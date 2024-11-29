@@ -1,6 +1,8 @@
 package ee.ctob.service;
 
+import ee.ctob.api.ConferenceAvailable;
 import ee.ctob.api.dto.ParticipantDTO;
+import ee.ctob.data.Conference;
 import ee.ctob.data.Participant;
 import ee.ctob.data.access.ConferenceDAO;
 import ee.ctob.data.access.ParticipantDAO;
@@ -8,9 +10,13 @@ import ee.ctob.data.access.RoomDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.Part;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-import static java.time.Instant.now;
+import static java.time.LocalDateTime.now;
+
 
 @Service
 public class ParticipantService {
@@ -86,18 +92,31 @@ public class ParticipantService {
         return participantDTOBuilder.build();
     }
 
-//    public ParticipantDTO availableConferences(ParticipantDTO participantDTO) {
-//        List<Conference> conferenceList = conferenceDAO.findAllAvailableBetween(participantDTO.getFrom(), participantDTO.getUntil());
-//
-//        List<ConferenceAvailable> conferenceAvailableList = new ArrayList<>();
-//
-//        for(Conference conference : conferenceList) {
-//            conferenceAvailableList.add(ConferenceAvailable.builder()
-//                            .conferenceUUID(conference.getConferenceUUID())
-//                            .location(roomDAO.getRoomLocationByRoomId(conference.getRoomUUID()))
-//                            .participantsAmount(conference.getParticipants().size())
-//                    .build());
-//        }
-//        return null;
-//    }
+    public ParticipantDTO availableConferences(ParticipantDTO participantDTO) {
+        if(now().isAfter(participantDTO.getUntil()) || now().isAfter(participantDTO.getFrom()) || participantDTO.getUntil().isAfter(participantDTO.getFrom())) {
+            return ParticipantDTO.builder()
+                    .info("Requested time isn't logical")
+                    .build();
+        }
+
+        List<Conference> conferenceList = conferenceDAO.findAllAvailableBetween(participantDTO.getFrom(), participantDTO.getUntil());
+        if(conferenceList.isEmpty()) {
+            return  ParticipantDTO.builder()
+                    .info("No conferences is available at this time period")
+                    .build();
+        }
+
+        List<ConferenceAvailable> conferenceAvailableList = new ArrayList<>();
+        for(Conference conference : conferenceList) {
+            conferenceAvailableList.add(ConferenceAvailable.builder()
+                            .conferenceUUID(conference.getConferenceUUID())
+                            .location(roomDAO.getRoomLocationByRoomId(conference.getRoomUUID()))
+                            .participantsAmount(conference.getParticipants().size())
+                    .build());
+        }
+
+        return ParticipantDTO.builder()
+                .conferenceAvailableList(conferenceAvailableList)
+                .build();
+    }
 }
