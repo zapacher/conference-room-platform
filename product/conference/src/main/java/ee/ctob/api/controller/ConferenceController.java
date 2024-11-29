@@ -30,23 +30,24 @@ public class ConferenceController {
     @Autowired
     ParticipantService participantService;
 
-//    @PostMapping("/registration")
-//    public Response registration(@Validated(Registration.class) @RequestBody Request request) {
-//        UUID validationUUID = participantService.registration(
-//                ParticipantDTO.builder()
-//                        .firstName(request.getFirstname().trim())
-//                        .lastName(request.getLastName().trim())
-//                        .gender(request.getGender())
-//                        .email(request.getEmail())
-//                        .dateOfBirth(request.getDateOfBirth())
-//                        .conferenceUUID(request.getConferenceUUID())
-//                        .build()
-//        );
-//
-//        return Response.builder()
-//                .validationUUID(validationUUID)
-//                .build();
-//    }
+    @PostMapping("/registration")
+    public Response registration(@Validated(Registration.class) @RequestBody Request request) {
+        ParticipantDTO result = participantService.registration(
+                ParticipantDTO.builder()
+                        .firstName(request.getFirstname().trim())
+                        .lastName(request.getLastName().trim())
+                        .gender(request.getGender())
+                        .email(request.getEmail())
+                        .dateOfBirth(request.getDateOfBirth())
+                        .conferenceUUID(request.getConferenceUUID())
+                        .build()
+        );
+
+        return Response.builder()
+                .validationUUID(result.getValidationUUID())
+                .reason(result.getInfo())
+                .build();
+    }
 
     @PostMapping("/registration/cancel")
     public Response registrationCancel(@Validated(RegistrationCancel.class) @RequestBody Request request) {

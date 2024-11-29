@@ -24,6 +24,40 @@ public interface ConferenceDAO extends JpaRepository<Conference, Integer> {
     )
     UUID isAvailableForCancel(UUID participantUUID);
 
+    @Modifying
+    @Transactional
+    @Query(
+            value = "UPDATE backoffice.conference_participants " +
+                    "SET conference_id = ( " +
+                    "   SELECT id FROM backoffice.conferences " +
+                    "   WHERE conference_uuid = ?2 " +
+                    ") , participant_uuid = ?1 " +
+                    "WHERE ( " +
+                    "   SELECT COUNT(*) FROM backoffice.conference_participants " +
+                    "   WHERE conference_id = ( " +
+                    "       SELECT id FROM backoffice.conferences " +
+                    "       WHERE conference_uuid = ?2 " +
+                    "   ) " +
+                    ") < ( " +
+                    "   SELECT capacity FROM backoffice.rooms " +
+                    "   WHERE room_uuid = ( " +
+                    "       SELECT room_uuid FROM backoffice.conferences " +
+                    "       WHERE conference_uuid = ?2 " +
+                    "   ) " +
+                    ") AND NOW() < ( " +
+                    "   SELECT booked_from FROM backoffice.conferences " +
+                    "   WHERE conference_uuid = ?2 " +
+                    ") AND 'AVAILABLE' = ( " +
+                    "   SELECT status FROM backoffice.rooms " +
+                    "   WHERE room_uuid = ( " +
+                    "       SELECT room_uuid FROM backoffice.conferences " +
+                    "       WHERE conference_uuid = ?2 " +
+                    "   ) " +
+                    ")",
+            nativeQuery = true
+    )
+    int registerParticipant(UUID participantUUID, UUID conferenceUUID);
+
 //    @Modifying
 //    @Transactional
 //    @Query(

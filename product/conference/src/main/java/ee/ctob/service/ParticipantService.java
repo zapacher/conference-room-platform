@@ -21,11 +21,18 @@ public class ParticipantService {
     @Autowired
     RoomDAO roomDAO;
 
-    public UUID registration(ParticipantDTO participantDTO) {
+    public ParticipantDTO registration(ParticipantDTO participantDTO) {
+        UUID participantUUID = UUID.randomUUID();
+        if(conferenceDAO.registerParticipant(participantUUID, participantDTO.getConferenceUUID())==0) {
+            return ParticipantDTO.builder()
+                    .info("Registration isn't available for this conference")
+                    .build();
+        }
 
         Participant participant = participantDAO.saveAndFlush(
                 Participant.builder()
                         .created(now())
+                        .participantUUID(participantUUID)
                         .validationUUID(UUID.randomUUID())
                         .firstName(participantDTO.getFirstName())
                         .lastName(participantDTO.getLastName())
@@ -34,7 +41,10 @@ public class ParticipantService {
                         .dateOfBirth(participantDTO.getDateOfBirth())
                         .build()
         );
-        return participant.getValidationUUID();
+
+        return ParticipantDTO.builder()
+                .validationUUID(participant.getValidationUUID())
+                .build();
     }
 
     public ParticipantDTO registrationCancel(ParticipantDTO participantDTO) {
