@@ -1,7 +1,7 @@
-package ee.ctob.data.access;
+package ee.ctob.access;
 
 import ee.ctob.data.Conference;
-import org.springframework.data.jpa.repository.JpaRepository;
+import ee.ctob.data.access.BaseConferenceDAO;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

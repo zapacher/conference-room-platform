@@ -1,10 +1,12 @@
 package ee.ctob.services;
 
+import ee.ctob.access.ConferenceDAO;
+import ee.ctob.access.ParticipantDAO;
+import ee.ctob.access.RoomDAO;
 import ee.ctob.api.Response;
 import ee.ctob.api.dto.ConferenceDTO;
 import ee.ctob.data.Conference;
 import ee.ctob.data.Participant;
-import ee.ctob.data.access.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

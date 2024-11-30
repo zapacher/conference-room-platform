@@ -2,8 +2,8 @@ package ee.ctob.services;
 
 import ee.ctob.api.dto.RoomDTO;
 import ee.ctob.data.Room;
-import ee.ctob.data.access.ConferenceDAO;
-import ee.ctob.data.access.RoomDAO;
+import ee.ctob.access.ConferenceDAO;
+import ee.ctob.access.RoomDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

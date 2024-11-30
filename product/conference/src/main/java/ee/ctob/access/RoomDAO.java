@@ -1,8 +1,7 @@
-package ee.ctob.data.access;
+package ee.ctob.access;
 
 import ee.ctob.data.Room;
-import ee.ctob.data.enums.RoomStatus;
-import org.springframework.data.jpa.repository.JpaRepository;
+import ee.ctob.data.access.BaseRoomDAO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

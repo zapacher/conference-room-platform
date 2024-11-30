@@ -1,4 +1,4 @@
-package ee.ctob.data.access;
+package ee.ctob.access;
 
 import ee.ctob.data.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
