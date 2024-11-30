@@ -11,11 +11,9 @@ services:
       - "8082:8080"
     networks:
       - inner_network
-    depends_on:
-      - conference
     volumes:
       - ./config/local.yml:/app/local.yml
-      - ./product/backoffice/application.yml:/app/product/backoffice/application.yml
+      - ./product/backoffice/src/main/resources/application.yml:/app/product/backoffice/application.yml
     environment:
       - SPRING_CONFIG_LOCATION=file:/app/local.yml,file:/app/product/backoffice/application.yml
 
@@ -30,9 +28,11 @@ services:
       - inner_network
     volumes:
       - ./config/local.yml:/app/local.yml
-      - ./product/conference/application.yml:/app/product/conference/application.yml
+      - ./product/conference/src/main/resources/application.yml:/app/product/conference/application.yml
     environment:
       - SPRING_CONFIG_LOCATION=file:/app/local.yml,file:/app/product/conference/application.yml
+    depends_on:
+      - backoffice
 
 networks:
   inner_network:

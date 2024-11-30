@@ -1,4 +1,7 @@
+#!/bin/bash
 set -e
+
+MODE=$1
 
 echo "Checking if PostgreSQL is up..."
 TIMEOUT=10
@@ -16,10 +19,19 @@ done
 
 echo "PostgreSQL is up and running!"
 
-echo "Running Maven clean install..."
-mvn clean install
+if [[ $MODE == "silent" ]]; then
+    echo "Maven install in silent mode..."
+    mvn clean install >  /dev/null 2>&1
+else
+    mvn clean install
+fi
 
-echo "Starting Docker services using docker-compose..."
-docker-compose up --build
+if [[ $MODE == "silent" ]]; then
+    echo "Docker starting  in silent mode..."
+    docker-compose up -d >  /dev/null 2>&1
+else
+    echo "Starting Docker services using docker-compose..."
+    docker-compose up
+fi
 
 echo "All done!"
