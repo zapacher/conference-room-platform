@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import testutils.TestContainer;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
@@ -21,22 +22,27 @@ class TestBackofficeController extends TestContainer {
 
 
     @Autowired
-    BackofficeController controller;
+    private BackofficeController controller;
 
-    UUID roomUUID;
-    UUID roomValidationUUID;
-    UUID conferenceUUID;
-    UUID conferenceValidationUUID;
+    private UUID roomUUID;
+    private UUID roomValidationUUID;
+    private UUID conferenceUUID;
+    private UUID conferenceValidationUUID;
+    private Request request;
+    private Response response;
 
     @Test
     void roomCreate() {
-        Response response = controller.roomCreate(createRoomCreateRequest(true));
+        createRoomCreateRequest(true);
+        response = controller.roomCreate(request);
+
         assertAll(
                 ()-> assertNotNull("Response", response),
                 ()-> assertNotNull("roomUUID", response.getRoomUUID()),
                 ()-> assertNotNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNull("reason", response.getReason())
         );
+
         roomUUID = response.getRoomUUID();
         roomValidationUUID = response.getValidationUUID();
     }
@@ -44,34 +50,38 @@ class TestBackofficeController extends TestContainer {
     @Test
     void roomUpdateFail() {
         roomCreate();
-        Response response1 = controller.roomUpdate(createRoomUpdateRequest(null, CLOSED, 50));
+
+        createRoomUpdateRequest(null, CLOSED, 50);
+        response = controller.roomUpdate(request);
         assertAll("assert response1 of room update",
-                ()-> assertNotNull("Response", response1),
-                ()-> assertNull("roomUUID", response1.getRoomUUID()),
-                ()-> assertNotNull("validationUUID", response1.getValidationUUID()),
-                ()-> assertNull("status", response1.getRoomStatus()),
-                ()-> assertNull("capacity", response1.getRoomCapacity()),
-                ()-> assertEquals("reason", "Please provide new room status OR new capacity", response1.getReason())
+                ()-> assertNotNull("Response", response),
+                ()-> assertNull("roomUUID", response.getRoomUUID()),
+                ()-> assertNotNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNull("status", response.getRoomStatus()),
+                ()-> assertNull("capacity", response.getRoomCapacity()),
+                ()-> assertEquals("reason", "Please provide new room status OR new capacity", response.getReason())
         );
 
-        Response response2 = controller.roomUpdate(createRoomUpdateRequest(UUID.randomUUID(), CLOSED, null));
+        createRoomUpdateRequest(UUID.randomUUID(), CLOSED, null);
+        response = controller.roomUpdate(request);
         assertAll("assert response2 of room update",
-                ()-> assertNotNull("Response", response2),
-                ()-> assertNull("roomUUID", response2.getRoomUUID()),
-                ()-> assertNotNull("validationUUID", response2.getValidationUUID()),
-                ()-> assertNull("status", response2.getRoomStatus()),
-                ()-> assertNull("capacity", response2.getRoomCapacity()),
-                ()-> assertEquals("reason", "Room not found, check validationUUID", response2.getReason())
+                ()-> assertNotNull("Response", response),
+                ()-> assertNull("roomUUID", response.getRoomUUID()),
+                ()-> assertNotNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNull("status", response.getRoomStatus()),
+                ()-> assertNull("capacity", response.getRoomCapacity()),
+                ()-> assertEquals("reason", "Room not found, check validationUUID", response.getReason())
         );
 
-        Response response3 = controller.roomUpdate(createRoomUpdateRequest(null, AVAILABLE, null));
+        createRoomUpdateRequest(null, AVAILABLE, null);
+        response = controller.roomUpdate(request);
         assertAll("assert response3 of room update",
-                ()-> assertNotNull("Response", response3),
-                ()-> assertNull("roomUUID", response3.getRoomUUID()),
-                ()-> assertNotNull("validationUUID", response3.getValidationUUID()),
-                ()-> assertNull("status", response3.getRoomStatus()),
-                ()-> assertNull("capacity", response3.getRoomCapacity()),
-                ()-> assertEquals("reason", "Room status is already : AVAILABLE", response3.getReason())
+                ()-> assertNotNull("Response", response),
+                ()-> assertNull("roomUUID", response.getRoomUUID()),
+                ()-> assertNotNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNull("status", response.getRoomStatus()),
+                ()-> assertNull("capacity", response.getRoomCapacity()),
+                ()-> assertEquals("reason", "Room status is already : AVAILABLE", response.getReason())
         );
     }
 
@@ -79,45 +89,139 @@ class TestBackofficeController extends TestContainer {
     void roomUpdateStatus() {
         roomCreate();
 
-        Request request1 = createRoomUpdateRequest(null, CLOSED, null);
-        Response response1 = controller.roomUpdate(request1);
+        createRoomUpdateRequest(null, CLOSED, null);
+        response = controller.roomUpdate(request);
         assertAll(
-                ()-> assertNotNull("Response", response1),
-                ()-> assertEquals("roomUUID",roomUUID, response1.getRoomUUID()),
-                ()-> assertEquals("validationUUID", roomValidationUUID, response1.getValidationUUID()),
-                ()-> assertNull("reason", response1.getReason())
+                ()-> assertNotNull("Response", response),
+                ()-> assertEquals("roomUUID",roomUUID, response.getRoomUUID()),
+                ()-> assertEquals("validationUUID", roomValidationUUID, response.getValidationUUID()),
+                ()-> assertNull("reason", response.getReason())
         );
 
-        Request request2 = createRoomUpdateRequest(null, AVAILABLE, null);
-        Response response2 = controller.roomUpdate(request2);
+        createRoomUpdateRequest(null, AVAILABLE, null);
+        response = controller.roomUpdate(request);
         assertAll(
-                ()-> assertNotNull("Response", response2),
-                ()-> assertEquals("roomUUID",roomUUID, response2.getRoomUUID()),
-                ()-> assertEquals("validationUUID", roomValidationUUID, response2.getValidationUUID()),
-                ()-> assertNotNull("capacity", response2.getRoomCapacity()),
-                ()-> assertEquals("status", AVAILABLE, response2.getRoomStatus()),
-                ()-> assertNull("reason", response2.getReason())
+                ()-> assertNotNull("Response", response),
+                ()-> assertEquals("roomUUID",roomUUID, response.getRoomUUID()),
+                ()-> assertEquals("validationUUID", roomValidationUUID, response.getValidationUUID()),
+                ()-> assertNotNull("capacity", response.getRoomCapacity()),
+                ()-> assertEquals("status", AVAILABLE, response.getRoomStatus()),
+                ()-> assertNull("reason", response.getReason())
         );
 
-        Request request3 = createRoomUpdateRequest(null,null, 40);
-        Response response3 = controller.roomUpdate(request3);
+        createRoomUpdateRequest(null,null, 40);
+        response= controller.roomUpdate(request);
         assertAll(
-                ()-> assertNotNull("Response", response3),
-                ()-> assertNotNull("roomUUID", response3.getRoomUUID()),
-                ()-> assertNotNull("validationUUID", response3.getValidationUUID()),
-                ()-> assertNotNull("capacity", response3.getRoomCapacity()),
-                ()-> assertEquals("status", AVAILABLE, response3.getRoomStatus()),
-                ()-> assertNull("reason", response3.getReason())
+                ()-> assertNotNull("Response", response),
+                ()-> assertNotNull("roomUUID", response.getRoomUUID()),
+                ()-> assertNotNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNotNull("capacity", response.getRoomCapacity()),
+                ()-> assertEquals("status", AVAILABLE, response.getRoomStatus()),
+                ()-> assertNull("reason", response.getReason())
         );
     }
 
+    @Test
+    void conferenceCreate() {
+        roomCreate();
 
-    private Request createRoomUpdateRequest(UUID failUUID, RoomStatus status, Integer capacity) {
+        createConferenceCreateRequest("2024-12-28T10:00:00", "2024-12-28T15:00:00");
+        response = controller.conferenceCreate(request);
+        assertAll(
+                ()-> assertNotNull("Response", response),
+                ()-> assertNotNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNotNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNotNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNotNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertNull("reason", response.getReason())
+        );
+
+        createConferenceCreateRequest("2024-12-31T10:00:00", "2024-12-31T15:00:00");
+        response = controller.conferenceCreate(request);
+        assertAll(
+                ()-> assertNotNull("Response", response),
+                ()-> assertNotNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNotNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNotNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNotNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertNull("reason", response.getReason())
+        );
+        conferenceUUID = response.getConferenceUUID();
+        conferenceValidationUUID = response.getValidationUUID();
+    }
+
+    @Test
+    void conferenceCreateFail() {
+        roomCreate();
+        conferenceCreate();
+
+        createConferenceCreateRequest("2024-12-31T10:00:00", "2024-12-31T15:00:00");
+        response = controller.conferenceCreate(request);
+        assertAll(
+                ()-> assertNotNull("Response", response),
+                ()-> assertNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("reason","Chosen time isn't available", response.getReason())
+        );
+
+        createConferenceCreateRequest("2024-12-31T09:00:00", "2024-12-31T16:00:00");
+        response = controller.conferenceCreate(request);
+        assertAll(
+                ()-> assertNotNull("Response", response),
+                ()-> assertNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("reason","Chosen time isn't available", response.getReason())
+        );
+
+        createConferenceCreateRequest("2024-12-31T09:00:00", "2024-12-31T10:00:01");
+        response = controller.conferenceCreate(request);
+        assertAll(
+                ()-> assertNotNull("Response", response),
+                ()-> assertNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("reason","Chosen time isn't available", response.getReason())
+        );
+
+        createConferenceCreateRequest("2024-12-31T14:59:59", "2024-12-31T16:00:00");
+        response = controller.conferenceCreate(request);
+        assertAll(
+                ()-> assertNotNull("Response", response),
+                ()-> assertNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("reason","Chosen time isn't available", response.getReason())
+        );
+
+    }
+
+    private void createConferenceCreateRequest(String from, String until) {
+        request = new  Request(
+                null,
+                null,
+                null,
+                null,
+                roomUUID,
+                "Some info as example",
+                LocalDateTime.parse(from),
+                LocalDateTime.parse(until),
+                null,
+                null
+        );
+    }
+
+    private void createRoomUpdateRequest(UUID failUUID, RoomStatus status, Integer capacity) {
         UUID validationUUUID = roomValidationUUID;
         if(failUUID != null) {
             validationUUUID = failUUID;
         }
-        return new Request(
+        request = new Request(
                 null,
                 null,
                 capacity,
@@ -132,7 +236,7 @@ class TestBackofficeController extends TestContainer {
     }
 
 
-    private Request createRoomCreateRequest(boolean legit) {
+    private void createRoomCreateRequest(boolean legit) {
         String roomName = "TestRoom";
         String roomLocation = "Tallinn";
         int roomCapacity = 10;
@@ -142,7 +246,7 @@ class TestBackofficeController extends TestContainer {
             roomLocation = "Tallinn";
         }
 
-        return new Request(
+        request = new  Request(
                 roomName,
                 roomLocation,
                 roomCapacity,

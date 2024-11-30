@@ -37,6 +37,8 @@ public class Response {
         LocalDateTime from;
         @Schema(example = "2024-12-30T17:30:00")
         LocalDateTime until;
+        @Schema(example = "Info about conference")
+        String info;
 
     }
 }
