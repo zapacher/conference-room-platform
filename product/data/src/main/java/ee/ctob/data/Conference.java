@@ -34,7 +34,7 @@ public class Conference {
     String info;
     LocalDateTime bookedFrom;
     LocalDateTime bookedUntil;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "conference_participants", schema = "backoffice",
             joinColumns = @JoinColumn(name = "conference_id")

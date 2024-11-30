@@ -10,6 +10,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import testutils.TestContainer;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
@@ -36,7 +37,7 @@ class TestBackofficeController extends TestContainer {
         createRoomCreateRequest(true);
         response = controller.roomCreate(request);
 
-        assertAll(
+        assertAll( "Room create success",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNotNull("roomUUID", response.getRoomUUID()),
                 ()-> assertNotNull("validationUUID", response.getValidationUUID()),
@@ -53,7 +54,7 @@ class TestBackofficeController extends TestContainer {
 
         createRoomUpdateRequest(null, CLOSED, 50);
         response = controller.roomUpdate(request);
-        assertAll("assert response1 of room update",
+        assertAll("Room update fail, double update",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("roomUUID", response.getRoomUUID()),
                 ()-> assertNotNull("validationUUID", response.getValidationUUID()),
@@ -64,7 +65,7 @@ class TestBackofficeController extends TestContainer {
 
         createRoomUpdateRequest(UUID.randomUUID(), CLOSED, null);
         response = controller.roomUpdate(request);
-        assertAll("assert response2 of room update",
+        assertAll("Room update fail, validation uuid not valid",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("roomUUID", response.getRoomUUID()),
                 ()-> assertNotNull("validationUUID", response.getValidationUUID()),
@@ -75,7 +76,7 @@ class TestBackofficeController extends TestContainer {
 
         createRoomUpdateRequest(null, AVAILABLE, null);
         response = controller.roomUpdate(request);
-        assertAll("assert response3 of room update",
+        assertAll("Room update fail, status is the same",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("roomUUID", response.getRoomUUID()),
                 ()-> assertNotNull("validationUUID", response.getValidationUUID()),
@@ -91,19 +92,21 @@ class TestBackofficeController extends TestContainer {
 
         createRoomUpdateRequest(null, CLOSED, null);
         response = controller.roomUpdate(request);
-        assertAll(
+        assertAll("Room update success status",
                 ()-> assertNotNull("Response", response),
-                ()-> assertEquals("roomUUID",roomUUID, response.getRoomUUID()),
-                ()-> assertEquals("validationUUID", roomValidationUUID, response.getValidationUUID()),
+                ()-> assertEquals("roomUUID", roomUUID, response.getRoomUUID()),
+                ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
+                ()-> assertNotNull("capacity", response.getRoomCapacity()),
+                ()-> assertEquals("status", request.getStatus(), response.getRoomStatus()),
                 ()-> assertNull("reason", response.getReason())
         );
 
         createRoomUpdateRequest(null, AVAILABLE, null);
         response = controller.roomUpdate(request);
-        assertAll(
+        assertAll("Room update success status",
                 ()-> assertNotNull("Response", response),
-                ()-> assertEquals("roomUUID",roomUUID, response.getRoomUUID()),
-                ()-> assertEquals("validationUUID", roomValidationUUID, response.getValidationUUID()),
+                ()-> assertEquals("roomUUID", roomUUID, response.getRoomUUID()),
+                ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
                 ()-> assertNotNull("capacity", response.getRoomCapacity()),
                 ()-> assertEquals("status", AVAILABLE, response.getRoomStatus()),
                 ()-> assertNull("reason", response.getReason())
@@ -111,11 +114,11 @@ class TestBackofficeController extends TestContainer {
 
         createRoomUpdateRequest(null,null, 40);
         response= controller.roomUpdate(request);
-        assertAll(
+        assertAll("Room update success capacity",
                 ()-> assertNotNull("Response", response),
-                ()-> assertNotNull("roomUUID", response.getRoomUUID()),
-                ()-> assertNotNull("validationUUID", response.getValidationUUID()),
-                ()-> assertNotNull("capacity", response.getRoomCapacity()),
+                ()-> assertEquals("roomUUID", roomUUID, response.getRoomUUID()),
+                ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
+                ()-> assertEquals("capacity", request.getCapacity(), response.getRoomCapacity()),
                 ()-> assertEquals("status", AVAILABLE, response.getRoomStatus()),
                 ()-> assertNull("reason", response.getReason())
         );
@@ -127,18 +130,18 @@ class TestBackofficeController extends TestContainer {
 
         createConferenceCreateRequest("2024-12-28T10:00:00", "2024-12-28T15:00:00");
         response = controller.conferenceCreate(request);
-        assertAll(
+        assertAll("Conference create success",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNotNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNotNull("conferenceUUID", response.getConferenceUUID()),
-                ()-> assertNotNull("bookedFrom", response.getBookedFrom()),
-                ()-> assertNotNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("bookedFrom", request.getFrom(), response.getBookedFrom()),
+                ()-> assertEquals("bookedUntil", request.getUntil(), response.getBookedUntil()),
                 ()-> assertNull("reason", response.getReason())
         );
 
         createConferenceCreateRequest("2024-12-31T10:00:00", "2024-12-31T15:00:00");
         response = controller.conferenceCreate(request);
-        assertAll(
+        assertAll("Conference create success with other time",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNotNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNotNull("conferenceUUID", response.getConferenceUUID()),
@@ -157,7 +160,7 @@ class TestBackofficeController extends TestContainer {
 
         createConferenceCreateRequest("2024-12-31T10:00:00", "2024-12-31T15:00:00");
         response = controller.conferenceCreate(request);
-        assertAll(
+        assertAll("create conference fail overlapping time",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
@@ -168,7 +171,7 @@ class TestBackofficeController extends TestContainer {
 
         createConferenceCreateRequest("2024-12-31T09:00:00", "2024-12-31T16:00:00");
         response = controller.conferenceCreate(request);
-        assertAll(
+        assertAll("create conference fail overlapping time",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
@@ -179,7 +182,7 @@ class TestBackofficeController extends TestContainer {
 
         createConferenceCreateRequest("2024-12-31T09:00:00", "2024-12-31T10:00:01");
         response = controller.conferenceCreate(request);
-        assertAll(
+        assertAll("create conference fail overlapping time",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
@@ -190,7 +193,7 @@ class TestBackofficeController extends TestContainer {
 
         createConferenceCreateRequest("2024-12-31T14:59:59", "2024-12-31T16:00:00");
         response = controller.conferenceCreate(request);
-        assertAll(
+        assertAll("create conference fail overlapping time",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
@@ -199,15 +202,166 @@ class TestBackofficeController extends TestContainer {
                 ()-> assertEquals("reason","Chosen time isn't available", response.getReason())
         );
 
+        createConferenceCreateRequest("2024-12-31T14:59:59", "2024-12-31T16:00:00");
+        response = controller.conferenceCreate(request);
+        assertAll("create conference fail overlapping time",
+                ()-> assertNotNull("Response", response),
+                ()-> assertNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("reason","Chosen time isn't available", response.getReason())
+        );
+
+        createConferenceCreateRequest("2024-12-20T10:00:00", "2024-12-20T08:00:00", UUID.randomUUID());
+        response = controller.conferenceCreate(request);
+        assertAll("create conference fail roomUUID not valid",
+                ()-> assertNotNull("Response", response),
+                ()-> assertNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("reason","Chosen room isn't available", response.getReason())
+        );
     }
 
-    private void createConferenceCreateRequest(String from, String until) {
+    @Test
+    void conferenceCancel() {
+        roomCreate();
+        conferenceCreate();
+        createConferenceUUIDRequest(null);
+        response = controller.conferenceCancel(request);
+        assertAll("Conference cancel success",
+                ()-> assertNotNull("Response", response),
+                ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
+                ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertNull("reason", response.getReason())
+        );
+    }
+
+    @Test
+    void conferenceCancelFail() {
+        roomCreate();
+        conferenceCreate();
+
+        createConferenceUUIDRequest(UUID.randomUUID());
+        response = controller.conferenceCancel(request);
+        assertAll("Conference cancel fail, uuid not valid",
+                ()-> assertNotNull("Response", response),
+                ()-> assertNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("reason","Conference is already canceled or not exists", response.getReason())
+        );
+
+        conferenceCancel();
+        createConferenceUUIDRequest(null);
+        response = controller.conferenceCancel(request);
+        assertAll("conference cancel fail, already canceled",
+                ()-> assertNotNull("Response", response),
+                ()-> assertNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("reason","Conference is already canceled or not exists", response.getReason())
+        );
+    }
+
+    @Test
+    void conferenceFeedbackFail() {
+        roomCreate();
+        conferenceCreate();
+
+        createConferenceUUIDRequest(null);
+        response = controller.conferenceFeedbacks(request);
+        assertAll("conference feedbacks fail, no participants",
+                ()-> assertNotNull("Response", response),
+                ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
+                ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("reason","Conference has no participants", response.getReason())
+        );
+
+        createConferenceUUIDRequest(UUID.randomUUID());
+        response = controller.conferenceFeedbacks(request);
+        assertAll("conference cancel fail, already canceled",
+                ()-> assertNotNull("Response", response),
+                ()-> assertNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("reason","Conference doesn't exists", response.getReason())
+        );
+    }
+
+    @Test
+    void conferenceSpace(Integer availableSpace, Integer participantCount, Integer rooCapacity) {
+        roomCreate();
+        conferenceCreate();
+
+        createConferenceUUIDRequest(null);
+        response = controller.conferenceSpace(request);
+        System.out.println(response);
+        assertAll("Conference space success",
+                ()-> assertNotNull("Response", response),
+                ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
+                ()-> assertEquals("availableSpace", (Integer) 100, response.getAvailableSpace()),
+                ()-> assertEquals("rooCapacity", (Integer) 100, response.getRoomCapacity()),
+                ()-> assertEquals("participantCount", (Integer) 0, response.getParticipantsCount()),
+                ()-> assertNull("reason", response.getReason())
+        );
+
+        createConferenceUUIDRequest(UUID.randomUUID());
+        response = controller.conferenceSpace(request);
+        System.out.println(response);
+        assertAll("conference space fail, already canceled",
+                ()-> assertNotNull("Response", response),
+                ()-> assertNull("validationUUID", response.getValidationUUID()),
+                ()-> assertNull("availableSpace", response.getAvailableSpace()),
+                ()-> assertNull("rooCapacity",  response.getRoomCapacity()),
+                ()-> assertNull("participantCount",  response.getParticipantsCount()),
+                ()-> assertEquals("reason","Conference isn't available", response.getReason())
+        );
+    }
+
+    private void createConferenceUUIDRequest(UUID validationUUID) {
+        UUID vUUID = validationUUID;
+        if(vUUID == null) {
+            vUUID = conferenceValidationUUID;
+        }
         request = new  Request(
                 null,
                 null,
                 null,
                 null,
-                roomUUID,
+                null,
+                null,
+                null,
+                null,
+                vUUID,
+                null
+        );
+    }
+
+    private void createConferenceCreateRequest(String from, String until) {
+        createConferenceCreateRequest(from, until, null);
+    }
+
+    private void createConferenceCreateRequest(String from, String until, UUID rUUID) {
+        UUID room = rUUID;
+        if(rUUID == null){
+            room = roomUUID;
+        }
+        request = new  Request(
+                null,
+                null,
+                null,
+                null,
+                room,
                 "Some info as example",
                 LocalDateTime.parse(from),
                 LocalDateTime.parse(until),
@@ -235,17 +389,11 @@ class TestBackofficeController extends TestContainer {
         );
     }
 
-
     private void createRoomCreateRequest(boolean legit) {
         String roomName = "TestRoom";
         String roomLocation = "Tallinn";
-        int roomCapacity = 10;
+        int roomCapacity = 100;
         String roomDescription = "For tet purpose";
-
-        if(legit) {
-            roomLocation = "Tallinn";
-        }
-
         request = new  Request(
                 roomName,
                 roomLocation,
