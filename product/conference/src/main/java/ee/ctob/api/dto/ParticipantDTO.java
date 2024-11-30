@@ -1,6 +1,6 @@
 package ee.ctob.api.dto;
 
-import ee.ctob.api.ConferenceAvailable;
+import ee.ctob.api.Response;
 import ee.ctob.data.enums.Gender;
 import lombok.Builder;
 import lombok.Data;
@@ -27,5 +27,5 @@ public class ParticipantDTO {
     LocalDateTime until;
     boolean feedbackResult;
     boolean registrationCancel;
-    List<ConferenceAvailable> conferenceAvailableList;
+    List<Response.ConferenceAvailable> conferenceAvailableList;
 }

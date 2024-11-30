@@ -38,7 +38,7 @@ public class ConferenceController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "validationUUID will be in response if success"),
     })
-    @PostMapping("/registration")
+    @PostMapping("/registration/create")
     public Response registration(@Validated(Registration.class) @RequestBody Request request) {
         ParticipantDTO result = participantService.registration(
                 ParticipantDTO.builder()
@@ -80,7 +80,7 @@ public class ConferenceController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "feedbackResult = true will be in response if success"),
     })
-    @PostMapping("/feedback")
+    @PostMapping("/feedback/create")
     public Response feedback(@Validated(Feedback.class) @RequestBody Request request) {
         ParticipantDTO result = participantService.feedback(
                 ParticipantDTO.builder()

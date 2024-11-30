@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Value;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import java.time.LocalDateTime;
@@ -23,10 +24,10 @@ public class Request {
     @NotNull(groups = ConferenceAvailable.class)
     LocalDateTime until;
     @Schema(example = "Chuck")
-    @NotNull(groups = Registration.class)
+    @NotEmpty(groups = Registration.class)
     String firstname;
     @Schema(example = "Norris")
-    @NotNull(groups = Registration.class)
+    @NotEmpty(groups = Registration.class)
     String lastName;
     @Schema(example = "MALE")
     @NotNull(groups = Registration.class)
@@ -46,6 +47,6 @@ public class Request {
     @NotNull(groups = {RegistrationCancel.class, Feedback.class})
     UUID validationUUID;
     @Schema(example = "Simple text")
-    @NotNull(groups = Feedback.class)
+    @NotEmpty(groups = Feedback.class)
     String feedback;
 }

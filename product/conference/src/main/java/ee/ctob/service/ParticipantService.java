@@ -1,6 +1,6 @@
 package ee.ctob.service;
 
-import ee.ctob.api.ConferenceAvailable;
+import ee.ctob.api.Response;
 import ee.ctob.api.dto.ParticipantDTO;
 import ee.ctob.data.Conference;
 import ee.ctob.data.Participant;
@@ -105,9 +105,9 @@ public class ParticipantService {
                     .build();
         }
 
-        List<ConferenceAvailable> conferenceAvailableList = new ArrayList<>();
+        List<Response.ConferenceAvailable> conferenceAvailableList = new ArrayList<>();
         for(Conference conference : conferenceList) {
-            conferenceAvailableList.add(ConferenceAvailable.builder()
+            conferenceAvailableList.add(Response.ConferenceAvailable.builder()
                             .conferenceUUID(conference.getConferenceUUID())
                             .location(roomDAO.getRoomLocationByRoomId(conference.getRoomUUID()))
                             .participantsAmount(conference.getParticipants().size())
