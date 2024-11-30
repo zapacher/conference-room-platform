@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Repository
-public interface RoomDAO extends JpaRepository<Room, Integer> {
+public interface RoomDAO extends BaseRoomDAO<Room, Integer> {
     @Transactional
     @Query(
             value = "SELECT location FROM rooms " +

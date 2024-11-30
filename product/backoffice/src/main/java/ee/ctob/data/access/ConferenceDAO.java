@@ -1,7 +1,6 @@
 package ee.ctob.data.access;
 
 import ee.ctob.data.Conference;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Repository
-public interface ConferenceDAO extends JpaRepository<Conference, Integer> {
+public interface ConferenceDAO extends BaseConferenceDAO<Conference, Integer> {
 
     @Modifying
     @Transactional

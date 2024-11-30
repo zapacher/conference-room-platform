@@ -108,11 +108,11 @@ public class ParticipantService {
         List<Response.ConferenceAvailable> conferenceAvailableList = new ArrayList<>();
         for(Conference conference : conferenceList) {
             conferenceAvailableList.add(Response.ConferenceAvailable.builder()
-                            .conferenceUUID(conference.getConferenceUUID())
-                            .location(roomDAO.getRoomLocationByRoomId(conference.getRoomUUID()))
-                            .participantsAmount(conference.getParticipants().size())
-                            .from(conference.getBookedFrom())
-                            .until(conference.getBookedUntil())
+                    .conferenceUUID(conference.getConferenceUUID())
+                    .location(roomDAO.getRoomLocationByRoomId(conference.getRoomUUID()))
+                    .participantsAmount(conference.getParticipants().size())
+                    .from(conference.getBookedFrom())
+                    .until(conference.getBookedUntil())
                     .build());
         }
 

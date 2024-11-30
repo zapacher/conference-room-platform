@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface ConferenceDAO extends JpaRepository<Conference, Integer> {
+public interface ConferenceDAO extends BaseConferenceDAO<Conference, Integer> {
 
     @Transactional
     @Query(

@@ -18,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "conferences")
+@Table(name = "conferences", schema = "backoffice")
 public class Conference {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
