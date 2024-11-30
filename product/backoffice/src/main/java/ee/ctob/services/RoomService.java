@@ -48,7 +48,7 @@ public class RoomService {
 
         if(roomDTO.getStatus() != null) {
             Room roomIf = roomDAO.getRoomByValidationUUID(roomDTO.getValidationUUID());
-            if(roomIf.getValidationUuid() == null) {
+            if(roomIf == null) {
                 return RoomDTO.builder()
                         .description("Room not found, check validationUUID")
                         .validationUUID(roomDTO.getValidationUUID())

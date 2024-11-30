@@ -1,14 +1,9 @@
 package testutils;
 
 import ee.ctob.Application;
-import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -17,15 +12,13 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.junit.Assert.assertNotNull;
-
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest
 @TestPropertySource(properties = {
         "spring.flyway.enabled=true",
         "spring.flyway.locations=classpath:/migration",
         "spring.datasource.driver-class-name=org.postgresql.Driver",
-
+        "junit.jupiter.execution.parallel.enabled=false",
         "spring.jpa.hibernate.ddl-auto=create"
 })
 @Testcontainers

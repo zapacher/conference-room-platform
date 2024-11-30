@@ -30,9 +30,7 @@ class TestBackofficeController extends TestContainer {
 
     @Test
     void roomCreate() {
-        Request request = createRoomCreateRequest(true);
-
-        Response response = controller.roomCreate(request);
+        Response response = controller.roomCreate(createRoomCreateRequest(true));
         assertAll(
                 ()-> assertNotNull("Response", response),
                 ()-> assertNotNull("roomUUID", response.getRoomUUID()),
@@ -45,65 +43,90 @@ class TestBackofficeController extends TestContainer {
 
     @Test
     void roomUpdateFail() {
-        Request request = createRoomUpdateRequest(true, true, null, null);
-        Response response = controller.roomUpdate(request);
-        assertAll("assert response of room update",
-                ()-> assertNotNull("Response", response),
-                ()-> assertNull("roomUUID", response.getRoomUUID()),
-                ()-> assertNull("validationUUID", response.getValidationUUID()),
-                ()-> assertNull("status", response.getRoomStatus()),
-                ()-> assertNull("capacity", response.getRoomCapacity()),
-                ()-> assertEquals("reason", "Please provide new room status OR new capacity", response.getReason())
+        roomCreate();
+        Response response1 = controller.roomUpdate(createRoomUpdateRequest(null, CLOSED, 50));
+        assertAll("assert response1 of room update",
+                ()-> assertNotNull("Response", response1),
+                ()-> assertNull("roomUUID", response1.getRoomUUID()),
+                ()-> assertNotNull("validationUUID", response1.getValidationUUID()),
+                ()-> assertNull("status", response1.getRoomStatus()),
+                ()-> assertNull("capacity", response1.getRoomCapacity()),
+                ()-> assertEquals("reason", "Please provide new room status OR new capacity", response1.getReason())
+        );
+
+        Response response2 = controller.roomUpdate(createRoomUpdateRequest(UUID.randomUUID(), CLOSED, null));
+        assertAll("assert response2 of room update",
+                ()-> assertNotNull("Response", response2),
+                ()-> assertNull("roomUUID", response2.getRoomUUID()),
+                ()-> assertNotNull("validationUUID", response2.getValidationUUID()),
+                ()-> assertNull("status", response2.getRoomStatus()),
+                ()-> assertNull("capacity", response2.getRoomCapacity()),
+                ()-> assertEquals("reason", "Room not found, check validationUUID", response2.getReason())
+        );
+
+        Response response3 = controller.roomUpdate(createRoomUpdateRequest(null, AVAILABLE, null));
+        assertAll("assert response3 of room update",
+                ()-> assertNotNull("Response", response3),
+                ()-> assertNull("roomUUID", response3.getRoomUUID()),
+                ()-> assertNotNull("validationUUID", response3.getValidationUUID()),
+                ()-> assertNull("status", response3.getRoomStatus()),
+                ()-> assertNull("capacity", response3.getRoomCapacity()),
+                ()-> assertEquals("reason", "Room status is already : AVAILABLE", response3.getReason())
         );
     }
 
     @Test
     void roomUpdateStatus() {
-        Request request1 = createRoomUpdateRequest(true, false, CLOSED, null);
+        roomCreate();
+
+        Request request1 = createRoomUpdateRequest(null, CLOSED, null);
         Response response1 = controller.roomUpdate(request1);
         assertAll(
                 ()-> assertNotNull("Response", response1),
-                ()-> assertNotNull("roomUUID", response1.getRoomUUID()),
-                ()-> assertNotNull("validationUUID", response1.getValidationUUID()),
-                ()-> assertNull("reason", response1.getRoomCapacity()),
-                ()-> assertEquals(AVAILABLE, response1.getRoomStatus())
+                ()-> assertEquals("roomUUID",roomUUID, response1.getRoomUUID()),
+                ()-> assertEquals("validationUUID", roomValidationUUID, response1.getValidationUUID()),
+                ()-> assertNull("reason", response1.getReason())
         );
 
-        Request request2 = createRoomUpdateRequest(false, false, null, 5);
+        Request request2 = createRoomUpdateRequest(null, AVAILABLE, null);
         Response response2 = controller.roomUpdate(request2);
         assertAll(
                 ()-> assertNotNull("Response", response2),
-                ()-> assertNotNull("roomUUID", response2.getRoomUUID()),
-                ()-> assertNotNull("validationUUID", response2.getValidationUUID()),
-                ()-> assertNull("reason", response2.getRoomCapacity()),
-                ()-> assertEquals(AVAILABLE, response2.getRoomStatus())
+                ()-> assertEquals("roomUUID",roomUUID, response2.getRoomUUID()),
+                ()-> assertEquals("validationUUID", roomValidationUUID, response2.getValidationUUID()),
+                ()-> assertNotNull("capacity", response2.getRoomCapacity()),
+                ()-> assertEquals("status", AVAILABLE, response2.getRoomStatus()),
+                ()-> assertNull("reason", response2.getReason())
         );
 
+        Request request3 = createRoomUpdateRequest(null,null, 40);
+        Response response3 = controller.roomUpdate(request3);
+        assertAll(
+                ()-> assertNotNull("Response", response3),
+                ()-> assertNotNull("roomUUID", response3.getRoomUUID()),
+                ()-> assertNotNull("validationUUID", response3.getValidationUUID()),
+                ()-> assertNotNull("capacity", response3.getRoomCapacity()),
+                ()-> assertEquals("status", AVAILABLE, response3.getRoomStatus()),
+                ()-> assertNull("reason", response3.getReason())
+        );
     }
 
 
-    private Request createRoomUpdateRequest(boolean forStatus, boolean forFail, RoomStatus newStatus, Integer newCapacity) {
-        RoomStatus status = AVAILABLE;
-        Integer roomCapacity = 20;
-        if(!forFail) {
-            if (forStatus) {
-                roomCapacity = null;
-                status = newStatus;
-            } else {
-                roomCapacity = newCapacity;
-                status = null;
-            }
+    private Request createRoomUpdateRequest(UUID failUUID, RoomStatus status, Integer capacity) {
+        UUID validationUUUID = roomValidationUUID;
+        if(failUUID != null) {
+            validationUUUID = failUUID;
         }
         return new Request(
                 null,
                 null,
-                roomCapacity,
+                capacity,
                 status,
                 null,
                 null,
                 null,
                 null,
-                roomValidationUUID,
+                validationUUUID,
                 null
         );
     }
