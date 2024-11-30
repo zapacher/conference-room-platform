@@ -122,7 +122,7 @@ public class BackofficeController {
                 .build();
     }
 
-    @PostMapping("/conference/feedbacks")
+    @PostMapping("/conference/feedback")
     public Response conferenceFeedbacks(@Validated (ConferenceFeedbacks.class) @RequestBody Request request) {
         ConferenceDTO result = conferenceService.feedbackList(
                 ConferenceDTO.builder()

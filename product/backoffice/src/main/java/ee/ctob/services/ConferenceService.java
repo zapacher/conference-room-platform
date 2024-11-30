@@ -126,7 +126,6 @@ public class ConferenceService {
 
         if(conference == null) {
             return ConferenceDTO.builder()
-                    .validationUUID(conferenceDTO.getValidationUUID())
                     .info("Conference isn't available")
                     .build();
         }
@@ -149,7 +148,6 @@ public class ConferenceService {
         Conference conference = conferenceDAO.getConferenceByValidationUUID(conferenceDTO.getValidationUUID());
         if(conference == null) {
             return  ConferenceDTO.builder()
-                    .validationUUID(conferenceDTO.getValidationUUID())
                     .info("Conference doesn't exists")
                     .build();
         }

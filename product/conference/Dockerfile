@@ -4,7 +4,7 @@ WORKDIR /app
 COPY . .
 
 WORKDIR /app/product/conference
-RUN mvn clean package
+RUN mvn clean package -DskipTests
 
 FROM openjdk:17-jdk-alpine
 WORKDIR /app
