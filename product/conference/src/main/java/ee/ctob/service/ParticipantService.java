@@ -111,6 +111,8 @@ public class ParticipantService {
                             .conferenceUUID(conference.getConferenceUUID())
                             .location(roomDAO.getRoomLocationByRoomId(conference.getRoomUUID()))
                             .participantsAmount(conference.getParticipants().size())
+                            .from(conference.getBookedFrom())
+                            .until(conference.getBookedUntil())
                     .build());
         }
 

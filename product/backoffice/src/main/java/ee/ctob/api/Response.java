@@ -28,4 +28,11 @@ public class Response {
     LocalDateTime bookedUntil;
     ConferenceStatus conferenceStatus;
     String reason;
+
+    @Data
+    @Builder
+    public static class Feedback {
+        String shortName;
+        String feedback;
+    }
 }

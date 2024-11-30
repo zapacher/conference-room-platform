@@ -1,6 +1,6 @@
 package ee.ctob.services;
 
-import ee.ctob.api.Feedback;
+import ee.ctob.api.Response;
 import ee.ctob.api.dto.ConferenceDTO;
 import ee.ctob.data.Conference;
 import ee.ctob.data.Participant;
@@ -10,6 +10,7 @@ import ee.ctob.data.access.RoomDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -65,9 +66,15 @@ public class ConferenceService {
     }
 
     public ConferenceDTO update(ConferenceDTO conferenceDTO) {
+        if(!timeGoodFormat(conferenceDTO)) {
+            return ConferenceDTO.builder()
+                    .info("Booking time is bad formatted")
+                    .build();
+        }
+
         if(conferenceDTO.getRoomUUID() != null) {
             if(conferenceDAO.countOverlappingBookingsByRoomUUID(conferenceDTO.getRoomUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil())==0) {
-                if(conferenceDAO.cancelConference(conferenceDTO.getValidationUUID())==0){
+                if(conferenceDAO.cancelConference(conferenceDTO.getValidationUUID())==0) {
                     return ConferenceDTO.builder()
                             .info("Conference doesn't exists")
                             .build();
@@ -95,7 +102,7 @@ public class ConferenceService {
 
         if(conferenceDAO.countOverlappingBookingsForUpdate(conferenceDTO.getValidationUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil())==0) {
             Conference conference = conferenceDAO.updateConference(conferenceDTO.getValidationUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil(), UUID.randomUUID());
-            if (conference == null) {
+            if(conference == null) {
                 return ConferenceDTO.builder()
                         .info("Conference doesn't exists")
                         .build();
@@ -163,13 +170,13 @@ public class ConferenceService {
                     .build();
         }
 
-        List<Feedback> feedbackList = new ArrayList<>();
+        List<Response.Feedback> feedbackList = new ArrayList<>();
         for(Participant participant : participantList) {
             String shortName = "";
             shortName = shortName + Character.toUpperCase(participant.getFirstName().charAt(0))+".";
             shortName = shortName + Character.toUpperCase(participant.getLastName().charAt(0))+".";
 
-            feedbackList.add(Feedback.builder()
+            feedbackList.add(Response.Feedback.builder()
                     .shortName(shortName)
                     .feedback(participant.getFeedback())
                     .build()
@@ -192,5 +199,12 @@ public class ConferenceService {
         return ConferenceDTO.builder()
                 .info("Conference is already canceled or not exists")
                 .build();
+    }
+
+    private boolean timeGoodFormat(ConferenceDTO conferenceDTO) {
+        LocalDateTime from = conferenceDTO.getBookedFrom();
+        LocalDateTime until = conferenceDTO.getBookedUntil();
+        LocalDateTime current =  now();
+        return !current.isAfter(from) && !from.isAfter(until);
     }
 }

@@ -73,18 +73,23 @@ public interface ConferenceDAO extends JpaRepository<Conference, Integer> {
     )
     void closeConferencesByRoomUUID(UUID roomUUID);
 
-    @Modifying
     @Transactional
     @Query(
-            value = "WITH canceled_conference AS (" +
-                    "   UPDATE backoffice.conferences " +
-                    "   SET status = 'CANCELED' " +
-                    "   WHERE validation_uuid = ?1 " +
-                    "   AND status != 'CANCELED' " +
-                    "   RETURNING id" +
+            value = "WITH canceled_conference AS ( " +
+                    "    UPDATE backoffice.conferences " +
+                    "    SET status = 'CANCELED' " +
+                    "    WHERE validation_uuid = ?1 " +
+                    "    AND status != 'CANCELED' " +
+                    "    RETURNING id " +
+                    "), " +
+                    "delete_participants AS ( " +
+                    "    DELETE FROM backoffice.conference_participants " +
+                    "    WHERE conference_id IN (SELECT id FROM canceled_conference) " +
                     ") " +
-                    "DELETE FROM backoffice.conference_participants " +
-                    "WHERE conference_id IN (SELECT id FROM canceled_conference)",
+                    "SELECT CASE " +
+                    "    WHEN EXISTS (SELECT 1 FROM canceled_conference) THEN 1 " +
+                    "    ELSE 0 " +
+                    "END;",
             nativeQuery = true
     )
     int cancelConference(UUID validationUUID);
@@ -93,13 +98,15 @@ public interface ConferenceDAO extends JpaRepository<Conference, Integer> {
     @Query(
             value = "WITH update_conference AS ( " +
                     "   UPDATE backoffice.conferences " +
-                    "   SET booked_from = ?2 , booked_until = ?3 , validation_uuid = ?4 " +
+                    "   SET booked_from = ?2, booked_until = ?3, validation_uuid = ?4 " +
                     "   WHERE validation_uuid = ?1 " +
-                    "   RETURNING id, validation_uuid, booked_from, booked_until, validation_uuid " +
+                    "   RETURNING * " +
+                    "), " +
+                    "delete_participant AS ( " +
+                    "   DELETE FROM backoffice.conference_participants " +
+                    "   WHERE conference_id IN (SELECT id FROM update_conference) " +
                     ") " +
-                    "DELETE FROM backoffice.conference_participants " +
-                    "WHERE conference_id IN (SELECT id FROM update_conference) " +
-                    "RETURNING * ",
+                    "SELECT * FROM update_conference",
             nativeQuery = true
     )
     Conference updateConference(UUID validationUUID, LocalDateTime from, LocalDateTime until, UUID newValidationUUID);
@@ -108,11 +115,15 @@ public interface ConferenceDAO extends JpaRepository<Conference, Integer> {
     @Query(
             value = "SELECT COUNT(*) FROM backoffice.conferences " +
                     "WHERE ?2 < booked_until " +
-                    "AND ?2 > NOW() " +
                     "AND ?3 > booked_from " +
-                    "AND room_uuid = ( SELECT room_uuid FROM backoffice.conferences WHERE validation_uuid = ?1) " +
-                    "AND validation_uuid != ?1" +
-                    "AND status = 'AVAILABLE' ",
+                    "AND room_uuid = ( " +
+                    "    SELECT room_uuid FROM backoffice.conferences WHERE validation_uuid = ?1) " +
+                    "AND validation_uuid != ?1 " +
+                    "AND 'AVAILABLE' = ( " +
+                    "   SELECT status FROM backoffice.rooms WHERE room_uuid = ( " +
+                    "       SELECT room_uuid FROM backoffice.conferences WHERE validation_uuid = ?1 " +
+                    "   ) " +
+                    ") ",
             nativeQuery = true
     )
     int countOverlappingBookingsForUpdate(UUID validationUUID, LocalDateTime from, LocalDateTime until);

@@ -1,7 +1,7 @@
 package ee.ctob.api.dto;
 
 
-import ee.ctob.api.Feedback;
+import ee.ctob.api.Response;
 import lombok.Builder;
 import lombok.Data;
 
@@ -23,5 +23,5 @@ public class ConferenceDTO {
     Integer availableSpace;
     Integer roomCapacity;
     Integer participantsCount;
-    List<Feedback> feedbackList;
+    List<Response.Feedback> feedbackList;
 }

@@ -8,6 +8,9 @@ import ee.ctob.api.groups.Feedback;
 import ee.ctob.api.groups.Registration;
 import ee.ctob.api.groups.RegistrationCancel;
 import ee.ctob.service.ParticipantService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -17,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
 
 @Slf4j
 @RestController("conference")
@@ -30,6 +32,12 @@ public class ConferenceController {
     @Autowired
     ParticipantService participantService;
 
+
+    @Operation(summary = "Register new participant to conference")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "firstName, lastName, gender, email, dateOfBirth, conferenceUUID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "validationUUID will be in response if success"),
+    })
     @PostMapping("/registration")
     public Response registration(@Validated(Registration.class) @RequestBody Request request) {
         ParticipantDTO result = participantService.registration(
@@ -49,18 +57,29 @@ public class ConferenceController {
                 .build();
     }
 
+    @Operation(summary = "Cancel registration")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "registrationCancel = true will be in response if success"),
+    })
     @PostMapping("/registration/cancel")
     public Response registrationCancel(@Validated(RegistrationCancel.class) @RequestBody Request request) {
         ParticipantDTO result = participantService.registrationCancel(
                 ParticipantDTO.builder()
+                        .validationUUID(request.getValidationUUID())
                         .build()
         );
 
         return Response.builder()
                 .registrationCancel(result.isRegistrationCancel())
+                .reason(result.getInfo())
                 .build();
     }
-
+    @Operation(summary = "Leave feedback after conference")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID, feedback")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "feedbackResult = true will be in response if success"),
+    })
     @PostMapping("/feedback")
     public Response feedback(@Validated(Feedback.class) @RequestBody Request request) {
         ParticipantDTO result = participantService.feedback(
@@ -77,6 +96,11 @@ public class ConferenceController {
                 .build();
     }
 
+    @Operation(summary = "Leave feedback after conference")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "from, until")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of schema ConferenceAvailable response if success"),
+    })
     @PostMapping("/conference/available")
     public Response conferenceAvailable(@Validated(ConferenceAvailable.class) @RequestBody Request request) {
         ParticipantDTO result = participantService.availableConferences(
@@ -88,6 +112,7 @@ public class ConferenceController {
 
         return Response.builder()
                 .conferenceAvailableList(result.getConferenceAvailableList())
+                .reason(result.getInfo())
                 .build();
     }
 }

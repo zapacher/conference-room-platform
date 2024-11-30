@@ -2,25 +2,25 @@ package ee.ctob.api;
 
 import ee.ctob.api.groups.*;
 import ee.ctob.data.enums.RoomStatus;
-import lombok.NoArgsConstructor;
 import lombok.Value;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Value
 public class Request {
-    @NotNull(groups = RoomCreate.class)
+    @NotEmpty(groups = RoomCreate.class)
     String name;
-    @NotNull(groups = RoomCreate.class)
+    @NotEmpty(groups = RoomCreate.class)
     String location;
     @NotNull(groups = RoomCreate.class)
     Integer capacity;
     RoomStatus status;
     @NotNull(groups = ConferenceCreate.class)
     UUID roomUUID;
-    @NotNull(groups = {ConferenceCreate.class, ConferenceUpdate.class})
+    @NotEmpty(groups = {ConferenceCreate.class, ConferenceUpdate.class})
     String description;
     @NotNull(groups = {ConferenceCreate.class, ConferenceUpdate.class})
     LocalDateTime from;
