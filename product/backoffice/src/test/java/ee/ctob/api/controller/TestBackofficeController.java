@@ -3,8 +3,10 @@ package ee.ctob.api.controller;
 
 import ee.ctob.api.Request;
 import ee.ctob.api.Response;
+import ee.ctob.data.Conference;
 import ee.ctob.data.enums.RoomStatus;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.creation.SuspendMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import testutils.TestContainer;
@@ -31,7 +33,7 @@ class TestBackofficeController extends TestContainer {
     private UUID conferenceValidationUUID;
     private Request request;
     private Response response;
-
+    private boolean withoutRoom = false;
     @Test
     void roomCreate() {
         createRoomCreateRequest(true);
@@ -126,7 +128,9 @@ class TestBackofficeController extends TestContainer {
 
     @Test
     void conferenceCreate() {
-        roomCreate();
+        if(!withoutRoom) {
+            roomCreate();
+        }
 
         createConferenceCreateRequest("2024-12-28T10:00:00", "2024-12-28T15:00:00");
         response = controller.conferenceCreate(request);
@@ -299,7 +303,7 @@ class TestBackofficeController extends TestContainer {
     }
 
     @Test
-    void conferenceSpace(Integer availableSpace, Integer participantCount, Integer rooCapacity) {
+    void conferenceSpace() {
         roomCreate();
         conferenceCreate();
 
@@ -328,6 +332,38 @@ class TestBackofficeController extends TestContainer {
         );
     }
 
+    @Test
+    void conferenceUpdate() {
+        roomCreate();
+        conferenceCreate();
+
+        createConferenceCreateRequest(response.getBookedFrom().toString(), response.getBookedUntil().toString(), null, conferenceValidationUUID);
+        response = controller.conferenceUpdate(request);
+        assertAll("conference update with same roomUUID success",
+                ()-> assertNotNull("Response", response),
+                ()-> assertNotEquals("validationUUID", conferenceValidationUUID, response.getValidationUUID()),
+                ()-> assertEquals("validationUUID", conferenceValidationUUID, response.getOldValidationUUID()),
+                ()-> assertEquals("conferennceUUID", conferenceUUID, response.getConferenceUUID()),
+                ()-> assertEquals("bookedFrom", request.getFrom(), response.getBookedFrom()),
+                ()-> assertEquals("bookedUntil", request.getUntil(), response.getBookedUntil())
+        );
+        Response responseCurrent = response;
+
+        roomCreate();
+        createConferenceCreateRequest(responseCurrent.getBookedFrom().toString(), responseCurrent.getBookedUntil().toString(), roomUUID, responseCurrent.getValidationUUID());
+        response = controller.conferenceUpdate(request);
+        System.out.println(request);
+        System.out.println(response);
+        assertAll("conference update with roomUUID success",
+                ()-> assertNotNull("Response", response),
+                ()-> assertNotEquals("validationUUID", conferenceValidationUUID, response.getValidationUUID()),
+                ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getOldValidationUUID()),
+                ()-> assertNotEquals("conferenceUUID", conferenceUUID, response.getConferenceUUID()),
+                ()-> assertEquals("bookedFrom", request.getFrom(), response.getBookedFrom()),
+                ()-> assertEquals("bookedUntil", request.getUntil(), response.getBookedUntil())
+        );
+    }
+
     private void createConferenceUUIDRequest(UUID validationUUID) {
         UUID vUUID = validationUUID;
         if(vUUID == null) {
@@ -348,10 +384,14 @@ class TestBackofficeController extends TestContainer {
     }
 
     private void createConferenceCreateRequest(String from, String until) {
-        createConferenceCreateRequest(from, until, null);
+        createConferenceCreateRequest(from, until, null, null);
     }
 
     private void createConferenceCreateRequest(String from, String until, UUID rUUID) {
+        createConferenceCreateRequest(from, until, rUUID, null);
+    }
+
+    private void createConferenceCreateRequest(String from, String until, UUID rUUID, UUID validationUUID) {
         UUID room = rUUID;
         if(rUUID == null){
             room = roomUUID;
@@ -365,7 +405,7 @@ class TestBackofficeController extends TestContainer {
                 "Some info as example",
                 LocalDateTime.parse(from),
                 LocalDateTime.parse(until),
-                null,
+                validationUUID,
                 null
         );
     }
