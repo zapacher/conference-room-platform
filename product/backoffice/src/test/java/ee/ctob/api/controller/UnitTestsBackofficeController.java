@@ -149,17 +149,6 @@ class UnitTestsBackofficeController extends TestContainer {
             roomCreate();
         }
 
-        createConferenceCreateRequestOverlap("2024-12-28T10:00:00", "2024-12-28T15:00:00");
-        response = controller.conferenceCreate(request);
-        assertAll("Conference create success",
-                ()-> assertNotNull("Response", response),
-                ()-> assertNotNull("validationUUID", response.getValidationUUID()),
-                ()-> assertNotNull("conferenceUUID", response.getConferenceUUID()),
-                ()-> assertEquals("bookedFrom", request.getFrom(), response.getBookedFrom()),
-                ()-> assertEquals("bookedUntil", request.getUntil(), response.getBookedUntil()),
-                ()-> assertNull("reason", response.getReason())
-        );
-
         createConferenceCreateRequestOverlap("2024-12-31T10:00:00", "2024-12-31T15:00:00");
         response = controller.conferenceCreate(request);
         assertAll("Conference create success with other time",

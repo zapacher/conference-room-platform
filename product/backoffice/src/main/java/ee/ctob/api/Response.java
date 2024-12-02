@@ -36,6 +36,8 @@ public class Response {
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Feedback {
         String shortName;
         String feedback;
