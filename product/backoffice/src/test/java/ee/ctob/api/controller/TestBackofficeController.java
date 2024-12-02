@@ -11,7 +11,6 @@ import ee.ctob.data.enums.RoomStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import java.util.UUID;
 
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
 import static ee.ctob.data.enums.RoomStatus.CLOSED;
-import static java.time.LocalDateTime.now;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
@@ -304,33 +302,11 @@ class TestBackofficeController extends TestContainer {
         response = controller.conferenceFeedbacks(request);
         System.out.println(response);
         assertAll("Conference feedback OK",
-                ()-> assertNotNull("Response", response)
+                ()-> assertNotNull("Response", response),
+                ()-> assertEquals("participants count", roomCapacity, (Integer) response.getFeedbackList().size()),
+                ()-> assertNotNull("participant shortname", response.getFeedbackList().get(0).getShortName()),
+                ()-> assertNotNull("participant feedback", response.getFeedbackList().get(0).getFeedback())
         );
-    }
-
-    private void mockFeedbacks(int participantsCount) {
-        List <UUID> partipicantUUIDList = createParticipants(participantsCount);
-        Conference conference = Conference.builder()
-                .validationUUID(conferenceValidationUUID)
-                .conferenceUUID(conferenceUUID)
-                .roomUUID(roomUUID)
-                .participants(partipicantUUIDList)
-                .build();
-
-        when(conferenceDAO.getConferenceByValidationUUID(conferenceValidationUUID)).thenReturn(conference);
-        when(participantDAO.findByParticipantUUIDs(partipicantUUIDList)).thenReturn(createParticipants(partipicantUUIDList));
-    }
-
-    private List<Participant> createParticipants(List<UUID> partcipantUUIDList){
-        List<Participant> participantList = new ArrayList<>();
-        for(int i = 0; partcipantUUIDList.size()>=i;i++) {
-            participantList.add(Participant.builder()
-                    .firstName("Chuck"+i)
-                    .lastName("Norris"+i)
-                    .feedback("Test mocked feedback " +i)
-                    .build());
-        }
-        return participantList;
     }
 
     @Test
@@ -393,24 +369,6 @@ class TestBackofficeController extends TestContainer {
 
     }
 
-    private void mockSpace(int participantsCount) {
-        Conference conference = Conference.builder()
-                .validationUUID(conferenceValidationUUID)
-                .conferenceUUID(conferenceUUID)
-                .roomUUID(roomUUID)
-                .participants(createParticipants(participantsCount))
-                .build();
-        OngoingStubbing<Conference> ww = when(conferenceDAO.getConferenceByValidationUUID(any())).thenReturn(conference);
-    }
-
-    private List<UUID> createParticipants(int participantsCount) {
-        List<UUID> participantList = new ArrayList<>();
-        for(int i = 0; i<participantsCount;i++ ) {
-            participantList.add(UUID.randomUUID());
-        }
-        return participantList;
-    }
-
     @Test
     void conferenceSpaceFail() {
         roomCreate();
@@ -457,6 +415,49 @@ class TestBackofficeController extends TestContainer {
                 ()-> assertEquals("bookedFrom", request.getFrom(), response.getBookedFrom()),
                 ()-> assertEquals("bookedUntil", request.getUntil(), response.getBookedUntil())
         );
+    }
+
+    private void mockFeedbacks(int participantsCount) {
+        List <UUID> partipicantUUIDList = createParticipantUUIDList(participantsCount);
+        Conference conference = Conference.builder()
+                .validationUUID(conferenceValidationUUID)
+                .conferenceUUID(conferenceUUID)
+                .roomUUID(roomUUID)
+                .participants(partipicantUUIDList)
+                .build();
+
+        when(conferenceDAO.getConferenceByValidationUUID(conferenceValidationUUID)).thenReturn(conference);
+        when(participantDAO.findByParticipantUUIDs(partipicantUUIDList)).thenReturn(createParticipants(partipicantUUIDList));
+    }
+
+    private void mockSpace(int participantsCount) {
+        Conference conference = Conference.builder()
+                .validationUUID(conferenceValidationUUID)
+                .conferenceUUID(conferenceUUID)
+                .roomUUID(roomUUID)
+                .participants(createParticipantUUIDList(participantsCount))
+                .build();
+        OngoingStubbing<Conference> ww = when(conferenceDAO.getConferenceByValidationUUID(any())).thenReturn(conference);
+    }
+
+    private List<Participant> createParticipants(List<UUID> partcipantUUIDList){
+        List<Participant> participantList = new ArrayList<>();
+        for(int i = 0; partcipantUUIDList.size()>=i;i++) {
+            participantList.add(Participant.builder()
+                    .firstName("Chuck"+i)
+                    .lastName("Norris"+i)
+                    .feedback("Test mocked feedback " +i)
+                    .build());
+        }
+        return participantList;
+    }
+
+    private List<UUID> createParticipantUUIDList(int participantsCount) {
+        List<UUID> participantList = new ArrayList<>();
+        for(int i = 0; i<participantsCount;i++ ) {
+            participantList.add(UUID.randomUUID());
+        }
+        return participantList;
     }
 
     private void createConferenceUUIDRequest(UUID validationUUID) {
