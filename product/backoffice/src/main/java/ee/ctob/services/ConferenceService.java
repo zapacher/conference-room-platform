@@ -28,7 +28,7 @@ public class ConferenceService {
     ParticipantDAO participantDAO;
 
     public ConferenceDTO create(ConferenceDTO conferenceDTO) {
-        if(now().isAfter(conferenceDTO.getBookedFrom())) {
+        if(conferenceDTO.getBookedFrom() != null && now().isAfter(conferenceDTO.getBookedFrom())) {
             return ConferenceDTO.builder()
                     .info("Conference start time must be in future")
                     .build();

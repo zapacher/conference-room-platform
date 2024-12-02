@@ -39,6 +39,5 @@ public class Response {
         LocalDateTime until;
         @Schema(example = "Info about conference")
         String info;
-
     }
 }
