@@ -78,7 +78,7 @@ class UnitTestsBackofficeController extends TestContainer {
         assertAll("Room update fail, double update",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("roomUUID", response.getRoomUUID()),
-                ()-> assertNotNull("validationUUID", response.getValidationUUID()),
+                ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
                 ()-> assertNull("status", response.getRoomStatus()),
                 ()-> assertNull("capacity", response.getRoomCapacity()),
                 ()-> assertEquals("reason", "Please provide new room status OR new capacity", response.getReason())
@@ -89,7 +89,7 @@ class UnitTestsBackofficeController extends TestContainer {
         assertAll("Room update fail, validation uuid not valid",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("roomUUID", response.getRoomUUID()),
-                ()-> assertNotNull("validationUUID", response.getValidationUUID()),
+                ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
                 ()-> assertNull("status", response.getRoomStatus()),
                 ()-> assertNull("capacity", response.getRoomCapacity()),
                 ()-> assertEquals("reason", "Room not found, check validationUUID", response.getReason())
@@ -100,7 +100,7 @@ class UnitTestsBackofficeController extends TestContainer {
         assertAll("Room update fail, status is the same",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("roomUUID", response.getRoomUUID()),
-                ()-> assertNotNull("validationUUID", response.getValidationUUID()),
+                ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
                 ()-> assertNull("status", response.getRoomStatus()),
                 ()-> assertNull("capacity", response.getRoomCapacity()),
                 ()-> assertEquals("reason", "Room status is already : AVAILABLE", response.getReason())
@@ -117,7 +117,7 @@ class UnitTestsBackofficeController extends TestContainer {
                 ()-> assertNotNull("Response", response),
                 ()-> assertEquals("roomUUID", roomUUID, response.getRoomUUID()),
                 ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
-                ()-> assertNotNull("capacity", response.getRoomCapacity()),
+                ()-> assertEquals("capacity", roomCapacity, (int) response.getRoomCapacity()),
                 ()-> assertEquals("status", request.getStatus(), response.getRoomStatus()),
                 ()-> assertNull("reason", response.getReason())
         );
@@ -128,7 +128,7 @@ class UnitTestsBackofficeController extends TestContainer {
                 ()-> assertNotNull("Response", response),
                 ()-> assertEquals("roomUUID", roomUUID, response.getRoomUUID()),
                 ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
-                ()-> assertNotNull("capacity", response.getRoomCapacity()),
+                ()-> assertEquals("capacity", roomCapacity, (int) response.getRoomCapacity()),
                 ()-> assertEquals("status", AVAILABLE, response.getRoomStatus()),
                 ()-> assertNull("reason", response.getReason())
         );
@@ -168,8 +168,8 @@ class UnitTestsBackofficeController extends TestContainer {
                 ()-> assertNotNull("Response", response),
                 ()-> assertNotNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNotNull("conferenceUUID", response.getConferenceUUID()),
-                ()-> assertNotNull("bookedFrom", response.getBookedFrom()),
-                ()-> assertNotNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("bookedFrom", request.getFrom(), response.getBookedFrom()),
+                ()-> assertEquals("bookedUntil", request.getUntil(), response.getBookedUntil()),
                 ()-> assertNull("reason", response.getReason())
         );
         conferenceUUID = response.getConferenceUUID();
@@ -300,8 +300,7 @@ class UnitTestsBackofficeController extends TestContainer {
         roomCreate();
         conferenceCreate();
 
-//        mocks.mockFeedbacks(20, conferenceValidationUUID, conferenceUUID, roomUUID);
-        mockFeedbacks(20);
+        mockFeedbacks(roomCapacity);
 
         request = createConferenceUUIDRequest(conferenceValidationUUID);
         response = controller.conferenceFeedbacks(request);
