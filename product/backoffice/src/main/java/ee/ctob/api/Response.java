@@ -1,5 +1,6 @@
 package ee.ctob.api;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import ee.ctob.data.enums.ConferenceStatus;
 import ee.ctob.data.enums.RoomStatus;

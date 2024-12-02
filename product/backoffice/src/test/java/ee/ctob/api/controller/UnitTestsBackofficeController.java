@@ -38,11 +38,9 @@ class UnitTestsBackofficeController extends TestContainer {
     @SpyBean
     ConferenceDAO conferenceDAO;
 
-
     @InjectMocks
     @Autowired
     private BackofficeController controller;
-
 
     private UUID roomUUID;
     private UUID roomValidationUUID;
@@ -179,6 +177,7 @@ class UnitTestsBackofficeController extends TestContainer {
     @Test
     void conferenceCreateFail() {
         roomCreate();
+        withoutRoom = true;
         conferenceCreate();
 
         createConferenceCreateRequestOverlap("2024-12-31T10:00:00", "2024-12-31T15:00:00");
@@ -251,6 +250,7 @@ class UnitTestsBackofficeController extends TestContainer {
     @Test
     void conferenceCancel() {
         roomCreate();
+        withoutRoom = true;
         conferenceCreate();
 
         request = createConferenceUUIDRequest(conferenceValidationUUID);
@@ -268,6 +268,7 @@ class UnitTestsBackofficeController extends TestContainer {
     @Test
     void conferenceCancelFail() {
         roomCreate();
+        withoutRoom = true;
         conferenceCreate();
 
         request = createConferenceUUIDRequest(UUID.randomUUID());
@@ -298,6 +299,7 @@ class UnitTestsBackofficeController extends TestContainer {
     void setConferenceFeedbacks() {
         roomCapacity = 20;
         roomCreate();
+        withoutRoom = true;
         conferenceCreate();
 
         mockFeedbacks(roomCapacity);
@@ -315,6 +317,7 @@ class UnitTestsBackofficeController extends TestContainer {
     @Test
     void conferenceFeedbackFail() {
         roomCreate();
+        withoutRoom = true;
         conferenceCreate();
 
         request = createConferenceUUIDRequest(conferenceValidationUUID);
@@ -343,6 +346,7 @@ class UnitTestsBackofficeController extends TestContainer {
     @Test
     void conferenceSpace() {
         roomCreate();
+        withoutRoom = true;
         conferenceCreate();
 
         request = createConferenceUUIDRequest(conferenceValidationUUID);
@@ -356,7 +360,7 @@ class UnitTestsBackofficeController extends TestContainer {
                 ()-> assertNull("reason", response.getReason())
         );
 
-        roomCreate();
+        withoutRoom = false;
         conferenceCreate();
 
         request = createConferenceUUIDRequest(conferenceValidationUUID);
@@ -377,6 +381,7 @@ class UnitTestsBackofficeController extends TestContainer {
     @Test
     void conferenceSpaceFail() {
         roomCreate();
+        withoutRoom = true;
         conferenceCreate();
 
         request = createConferenceUUIDRequest(UUID.randomUUID());
@@ -394,6 +399,7 @@ class UnitTestsBackofficeController extends TestContainer {
     @Test
     void conferenceUpdate() {
         roomCreate();
+        withoutRoom = true;
         conferenceCreate();
 
         request = createConferenceCreateRequest(response.getBookedFrom().toString(), response.getBookedUntil().toString(), roomUUID, conferenceValidationUUID);
