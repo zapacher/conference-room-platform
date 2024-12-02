@@ -6,18 +6,17 @@ import ee.ctob.access.ParticipantDAO;
 import ee.ctob.api.Request;
 import ee.ctob.api.Response;
 import ee.ctob.data.Conference;
+import ee.ctob.data.Participant;
 import ee.ctob.data.enums.RoomStatus;
-import ee.ctob.services.ConferenceService;
-import ee.ctob.services.RoomService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import testutils.TestContainer;
 
@@ -28,18 +27,21 @@ import java.util.UUID;
 
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
 import static ee.ctob.data.enums.RoomStatus.CLOSED;
+import static java.time.LocalDateTime.now;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @Testcontainers
 @ExtendWith(MockitoExtension.class)
 class TestBackofficeController extends TestContainer {
-    @Spy
+    @SpyBean
     ConferenceDAO conferenceDAO;
+    @MockBean
+    ParticipantDAO participantDAO;
 
+    @InjectMocks
     @Autowired
     private BackofficeController controller;
 
@@ -51,6 +53,7 @@ class TestBackofficeController extends TestContainer {
     private Request request;
     private Response response;
     private boolean withoutRoom = false;
+    private Integer roomCapacity = 100;
     @Test
     void roomCreate() {
         createRoomCreateRequest(true);
@@ -181,7 +184,7 @@ class TestBackofficeController extends TestContainer {
 
         createConferenceCreateRequest("2024-12-31T10:00:00", "2024-12-31T15:00:00");
         response = controller.conferenceCreate(request);
-        assertAll("create conference fail overlapping time",
+        assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
@@ -192,7 +195,7 @@ class TestBackofficeController extends TestContainer {
 
         createConferenceCreateRequest("2024-12-31T09:00:00", "2024-12-31T16:00:00");
         response = controller.conferenceCreate(request);
-        assertAll("create conference fail overlapping time",
+        assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
@@ -203,7 +206,7 @@ class TestBackofficeController extends TestContainer {
 
         createConferenceCreateRequest("2024-12-31T09:00:00", "2024-12-31T10:00:01");
         response = controller.conferenceCreate(request);
-        assertAll("create conference fail overlapping time",
+        assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
@@ -214,7 +217,7 @@ class TestBackofficeController extends TestContainer {
 
         createConferenceCreateRequest("2024-12-31T14:59:59", "2024-12-31T16:00:00");
         response = controller.conferenceCreate(request);
-        assertAll("create conference fail overlapping time",
+        assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
@@ -225,7 +228,7 @@ class TestBackofficeController extends TestContainer {
 
         createConferenceCreateRequest("2024-12-31T14:59:59", "2024-12-31T16:00:00");
         response = controller.conferenceCreate(request);
-        assertAll("create conference fail overlapping time",
+        assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
@@ -236,7 +239,7 @@ class TestBackofficeController extends TestContainer {
 
         createConferenceCreateRequest("2024-12-20T10:00:00", "2024-12-20T08:00:00", UUID.randomUUID());
         response = controller.conferenceCreate(request);
-        assertAll("create conference fail roomUUID not valid",
+        assertAll("Create conference fail roomUUID not valid",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
@@ -281,7 +284,7 @@ class TestBackofficeController extends TestContainer {
         conferenceCancel();
         createConferenceUUIDRequest(null);
         response = controller.conferenceCancel(request);
-        assertAll("conference cancel fail, already canceled",
+        assertAll("Conference cancel fail, already canceled",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
@@ -289,6 +292,45 @@ class TestBackofficeController extends TestContainer {
                 ()-> assertNull("bookedUntil", response.getBookedUntil()),
                 ()-> assertEquals("reason","Conference is already canceled or not exists", response.getReason())
         );
+    }
+
+    @Test
+    void setConferenceFeedbacks() {
+        roomCapacity = 20;
+        roomCreate();
+        conferenceCreate();
+        mockFeedbacks(20);
+        createConferenceUUIDRequest(null);
+        response = controller.conferenceFeedbacks(request);
+        System.out.println(response);
+        assertAll("Conference feedback OK",
+                ()-> assertNotNull("Response", response)
+        );
+    }
+
+    private void mockFeedbacks(int participantsCount) {
+        List <UUID> partipicantUUIDList = createParticipants(participantsCount);
+        Conference conference = Conference.builder()
+                .validationUUID(conferenceValidationUUID)
+                .conferenceUUID(conferenceUUID)
+                .roomUUID(roomUUID)
+                .participants(partipicantUUIDList)
+                .build();
+
+        when(conferenceDAO.getConferenceByValidationUUID(conferenceValidationUUID)).thenReturn(conference);
+        when(participantDAO.findByParticipantUUIDs(partipicantUUIDList)).thenReturn(createParticipants(partipicantUUIDList));
+    }
+
+    private List<Participant> createParticipants(List<UUID> partcipantUUIDList){
+        List<Participant> participantList = new ArrayList<>();
+        for(int i = 0; partcipantUUIDList.size()>=i;i++) {
+            participantList.add(Participant.builder()
+                    .firstName("Chuck"+i)
+                    .lastName("Norris"+i)
+                    .feedback("Test mocked feedback " +i)
+                    .build());
+        }
+        return participantList;
     }
 
     @Test
@@ -344,7 +386,7 @@ class TestBackofficeController extends TestContainer {
                 ()-> assertNotNull("Response", response),
                 ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
                 ()-> assertEquals("availableSpace", (Integer) 80, response.getAvailableSpace()),
-                ()-> assertEquals("rooCapacity", (Integer) 80, response.getRoomCapacity()),
+                ()-> assertEquals("rooCapacity", (Integer) 100, response.getRoomCapacity()),
                 ()-> assertEquals("participantCount", (Integer) 20, response.getParticipantsCount()),
                 ()-> assertNull("reason", response.getReason())
         );
@@ -363,7 +405,7 @@ class TestBackofficeController extends TestContainer {
 
     private List<UUID> createParticipants(int participantsCount) {
         List<UUID> participantList = new ArrayList<>();
-        for(int i = 0; i<=participantsCount;i++ ) {
+        for(int i = 0; i<participantsCount;i++ ) {
             participantList.add(UUID.randomUUID());
         }
         return participantList;
@@ -416,14 +458,6 @@ class TestBackofficeController extends TestContainer {
                 ()-> assertEquals("bookedUntil", request.getUntil(), response.getBookedUntil())
         );
     }
-
-//    private void mockFeedbacks() {
-//        when(conferenceDAO.getConferenceByValidationUUID(conferenceValidationUUID)).thenReturn()
-//        Participant participant = Participant.builder().build()
-//        when(participantDAO.findByParticipantUUIDs(any())).thenReturn()
-//    }
-//
-//    private void createParticipant()
 
     private void createConferenceUUIDRequest(UUID validationUUID) {
         UUID vUUID = validationUUID;
@@ -493,7 +527,6 @@ class TestBackofficeController extends TestContainer {
     private void createRoomCreateRequest(boolean legit) {
         String roomName = "TestRoom";
         String roomLocation = "Tallinn";
-        int roomCapacity = 100;
         String roomDescription = "For tet purpose";
         request = new  Request(
                 roomName,
