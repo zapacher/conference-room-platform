@@ -40,7 +40,7 @@ class UnitTestsBackofficeController extends TestContainer {
 
     @InjectMocks
     @Autowired
-    private BackofficeController controller;
+    BackofficeController controller;
 
     private UUID roomUUID;
     private UUID roomValidationUUID;

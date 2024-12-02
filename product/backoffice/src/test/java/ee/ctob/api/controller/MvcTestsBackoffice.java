@@ -26,7 +26,6 @@ import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
 import static ee.ctob.data.enums.RoomStatus.CLOSED;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -46,7 +45,6 @@ public class MvcTestsBackoffice extends TestContainer {
 
     @SpyBean
     ConferenceDAO conferenceDAO;
-
 
     private UUID roomUUID;
     private UUID roomValidationUUID;
