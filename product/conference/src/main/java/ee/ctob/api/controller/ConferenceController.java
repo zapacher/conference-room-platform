@@ -32,7 +32,6 @@ public class ConferenceController {
     @Autowired
     ParticipantService participantService;
 
-
     @Operation(summary = "Register new participant to conference")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "firstName, lastName, gender, email, dateOfBirth, conferenceUUID")
     @ApiResponses(value = {
@@ -102,7 +101,7 @@ public class ConferenceController {
             @ApiResponse(responseCode = "200", description = "List of schema ConferenceAvailable response if success"),
     })
     @PostMapping("/conference/available")
-    public Response conferenceAvailable(@Validated(ConferenceAvailable.class) @RequestBody Request request) {
+    public Response availableConferences(@Validated(ConferenceAvailable.class) @RequestBody Request request) {
         ParticipantDTO result = participantService.availableConferences(
                 ParticipantDTO.builder()
                         .from(request.getFrom())

@@ -1,7 +1,6 @@
 package ee.ctob.api.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import ee.ctob.access.ConferenceDAO;
 import ee.ctob.access.ParticipantDAO;
 import ee.ctob.api.Request;
@@ -9,12 +8,12 @@ import ee.ctob.api.Response;
 import ee.ctob.data.Conference;
 import ee.ctob.data.Participant;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import testutils.TestContainer;
 
@@ -26,24 +25,21 @@ import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
 import static ee.ctob.data.enums.RoomStatus.CLOSED;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static testutils.ObjectCreators.*;
 
 @Testcontainers
-@AutoConfigureMockMvc
-@SpringBootTest
-public class MvcTestsBackoffice extends TestContainer {
-
-    @Autowired
-    MockMvc mockMvc;
+@ExtendWith(MockitoExtension.class)
+class TestsUnitBackofficeController extends TestContainer {
 
     @MockBean
     ParticipantDAO participantDAO;
 
     @SpyBean
     ConferenceDAO conferenceDAO;
+
+    @InjectMocks
+    @Autowired
+    BackofficeController controller;
 
     private UUID roomUUID;
     private UUID roomValidationUUID;
@@ -53,17 +49,19 @@ public class MvcTestsBackoffice extends TestContainer {
     private Response response;
     private boolean withoutRoom = false;
     private int roomCapacity = 100;
+
     @Test
     void roomCreate() {
         request = createRoomCreateRequest();
+        response = controller.roomCreate(request);
 
-        performMvc("/backoffice/room/create");
         assertAll( "Room create success",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNotNull(response.getRoomUUID(), "roomUUID"),
                 ()-> assertNotNull(response.getValidationUUID(), "validationUUID"),
                 ()-> assertNull(response.getReason(), "reason")
         );
+
         roomUUID = response.getRoomUUID();
         roomValidationUUID = response.getValidationUUID();
     }
@@ -73,7 +71,7 @@ public class MvcTestsBackoffice extends TestContainer {
         roomCreate();
 
         request = createRoomUpdateRequest(roomValidationUUID, null, CLOSED, 50);
-        performMvc("/backoffice/room/update");
+        response = controller.roomUpdate(request);
         assertAll("Room update fail, double update",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNull(response.getRoomUUID(), "roomUUID"),
@@ -84,7 +82,7 @@ public class MvcTestsBackoffice extends TestContainer {
         );
 
         request = createRoomUpdateRequest(roomValidationUUID, UUID.randomUUID(), CLOSED, null);
-        performMvc("/backoffice/room/update");
+        response = controller.roomUpdate(request);
         assertAll("Room update fail, validation uuid not valid",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNull(response.getRoomUUID(), "roomUUID"),
@@ -95,7 +93,7 @@ public class MvcTestsBackoffice extends TestContainer {
         );
 
         request = createRoomUpdateRequest(roomValidationUUID, null, AVAILABLE, null);
-        performMvc("/backoffice/room/update");
+        response = controller.roomUpdate(request);
         assertAll("Room update fail, status is the same",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNull(response.getRoomUUID(), "roomUUID"),
@@ -111,7 +109,7 @@ public class MvcTestsBackoffice extends TestContainer {
         roomCreate();
 
         request = createRoomUpdateRequest(roomValidationUUID, null, CLOSED, null);
-        performMvc("/backoffice/room/update");
+        response = controller.roomUpdate(request);
         assertAll("Room update success status",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertEquals(roomUUID, response.getRoomUUID(), "roomUUID"),
@@ -122,7 +120,7 @@ public class MvcTestsBackoffice extends TestContainer {
         );
 
         request = createRoomUpdateRequest(roomValidationUUID, null, AVAILABLE, null);
-        performMvc("/backoffice/room/update");
+        response = controller.roomUpdate(request);
         assertAll("Room update success status",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertEquals(roomUUID, response.getRoomUUID(), "roomUUID"),
@@ -134,7 +132,7 @@ public class MvcTestsBackoffice extends TestContainer {
 
         int roomNewCapacity = 40;
         request = createRoomUpdateRequest(roomValidationUUID, null, null, roomNewCapacity);
-        performMvc("/backoffice/room/update");
+        response= controller.roomUpdate(request);
         assertAll("Room update success capacity",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertEquals(roomUUID, response.getRoomUUID(), "roomUUID"),
@@ -151,8 +149,8 @@ public class MvcTestsBackoffice extends TestContainer {
             roomCreate();
         }
 
-        createConferenceCreateRequestOnlyTime("2024-12-31T10:00:00", "2024-12-31T15:00:00");
-        performMvc("/backoffice/conference/create");
+        createConferenceCreateRequestOverlap("2024-12-31T10:00:00", "2024-12-31T15:00:00");
+        response = controller.conferenceCreate(request);
         assertAll("Conference create success with other time",
                 ()-> assertNotNull(response,"Response"),
                 ()-> assertNotNull(response.getValidationUUID(), "validationUUID"),
@@ -171,8 +169,8 @@ public class MvcTestsBackoffice extends TestContainer {
         withoutRoom = true;
         conferenceCreate();
 
-        createConferenceCreateRequestOnlyTime("2024-12-31T10:00:00", "2024-12-31T15:00:00");
-        performMvc("/backoffice/conference/create");
+        createConferenceCreateRequestOverlap("2024-12-31T10:00:00", "2024-12-31T15:00:00");
+        response = controller.conferenceCreate(request);
         assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNull(response.getValidationUUID(), "validationUUID"),
@@ -182,8 +180,8 @@ public class MvcTestsBackoffice extends TestContainer {
                 ()-> assertEquals("Chosen time isn't available", response.getReason(), "reason")
         );
 
-        createConferenceCreateRequestOnlyTime("2024-12-31T09:00:00", "2024-12-31T16:00:00");
-        performMvc("/backoffice/conference/create");
+        createConferenceCreateRequestOverlap("2024-12-31T09:00:00", "2024-12-31T16:00:00");
+        response = controller.conferenceCreate(request);
         assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNull(response.getValidationUUID(), "validationUUID"),
@@ -193,8 +191,8 @@ public class MvcTestsBackoffice extends TestContainer {
                 ()-> assertEquals("Chosen time isn't available", response.getReason(), "reason")
         );
 
-        createConferenceCreateRequestOnlyTime("2024-12-31T09:00:00", "2024-12-31T10:00:01");
-        performMvc("/backoffice/conference/create");
+        createConferenceCreateRequestOverlap("2024-12-31T09:00:00", "2024-12-31T10:00:01");
+        response = controller.conferenceCreate(request);
         assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNull(response.getValidationUUID(), "validationUUID"),
@@ -204,8 +202,8 @@ public class MvcTestsBackoffice extends TestContainer {
                 ()-> assertEquals("Chosen time isn't available", response.getReason(), "reason")
         );
 
-        createConferenceCreateRequestOnlyTime("2024-12-31T14:59:59", "2024-12-31T16:00:00");
-        performMvc("/backoffice/conference/create");
+        createConferenceCreateRequestOverlap("2024-12-31T14:59:59", "2024-12-31T16:00:00");
+        response = controller.conferenceCreate(request);
         assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNull(response.getValidationUUID(), "validationUUID"),
@@ -215,8 +213,8 @@ public class MvcTestsBackoffice extends TestContainer {
                 ()-> assertEquals("Chosen time isn't available", response.getReason(), "reason")
         );
 
-        createConferenceCreateRequestOnlyTime("2024-12-31T14:59:59", "2024-12-31T16:00:00");
-        performMvc("/backoffice/conference/create");
+        createConferenceCreateRequestOverlap("2024-12-31T14:59:59", "2024-12-31T16:00:00");
+        response = controller.conferenceCreate(request);
         assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNull(response.getValidationUUID(), "validationUUID"),
@@ -228,10 +226,10 @@ public class MvcTestsBackoffice extends TestContainer {
 
         roomCreate();
         request = createRoomUpdateRequest(roomValidationUUID, null, CLOSED, null);
-        performMvc("/backoffice/room/update");
+        response = controller.roomUpdate(request);
 
-        request = createConferenceCreateRequest("2024-12-20T10:00:00", "2024-12-20T08:00:00", roomUUID, conferenceValidationUUID);
-        performMvc("/backoffice/conference/create");
+        createConferenceCreateRequest("2024-12-20T10:00:00", "2024-12-20T08:00:00", roomUUID, conferenceValidationUUID);
+        response = controller.conferenceCreate(request);
         assertAll("Create conference fail roomUUID not valid",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNull(response.getValidationUUID(), "validationUUID"),
@@ -249,7 +247,7 @@ public class MvcTestsBackoffice extends TestContainer {
         conferenceCreate();
 
         request = createConferenceUUIDRequest(conferenceValidationUUID);
-        performMvc("/backoffice/conference/cancel");
+        response = controller.conferenceCancel(request);
         assertAll("Conference cancel success",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertEquals(request.getValidationUUID(), response.getValidationUUID(), "validationUUID"),
@@ -267,7 +265,7 @@ public class MvcTestsBackoffice extends TestContainer {
         conferenceCreate();
 
         request = createConferenceUUIDRequest(UUID.randomUUID());
-        performMvc("/backoffice/conference/cancel");
+        response = controller.conferenceCancel(request);
         assertAll("Conference cancel fail, uuid not valid",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNull(response.getValidationUUID(),"validationUUID"),
@@ -279,7 +277,7 @@ public class MvcTestsBackoffice extends TestContainer {
 
         conferenceCancel();
         request = createConferenceUUIDRequest(conferenceValidationUUID);
-        performMvc("/backoffice/conference/cancel");
+        response = controller.conferenceCancel(request);
         assertAll("Conference cancel fail, already canceled",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNull(response.getValidationUUID(),"validationUUID"),
@@ -291,7 +289,7 @@ public class MvcTestsBackoffice extends TestContainer {
     }
 
     @Test
-    void conferenceFeedback() {
+    void setConferenceFeedbacks() {
         roomCapacity = 20;
         roomCreate();
         withoutRoom = true;
@@ -300,7 +298,8 @@ public class MvcTestsBackoffice extends TestContainer {
         mockFeedbacks(roomCapacity);
 
         request = createConferenceUUIDRequest(conferenceValidationUUID);
-        performMvc("/backoffice/conference/feedback");
+        response = controller.conferenceFeedbacks(request);
+        System.out.println(response);
         assertAll("Conference feedback OK",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertEquals(roomCapacity, response.getFeedbackList().size(), "participants count"),
@@ -317,7 +316,7 @@ public class MvcTestsBackoffice extends TestContainer {
         conferenceCreate();
 
         request = createConferenceUUIDRequest(conferenceValidationUUID);
-        performMvc("/backoffice/conference/feedback");
+        response = controller.conferenceFeedbacks(request);
         assertAll("conference feedbacks fail, no participants",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertEquals(request.getValidationUUID(), response.getValidationUUID(), "validationUUID"),
@@ -328,7 +327,7 @@ public class MvcTestsBackoffice extends TestContainer {
         );
 
         mockEmptyFeedbacks(20);
-        performMvc("/backoffice/conference/feedback");
+        response = controller.conferenceFeedbacks(request);
         assertAll("conference feedback fail, no feedbacks",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertEquals(request.getValidationUUID(), response.getValidationUUID(), "validationUUID"),
@@ -339,8 +338,8 @@ public class MvcTestsBackoffice extends TestContainer {
         );
 
         request = createConferenceUUIDRequest(UUID.randomUUID());
-        performMvc("/backoffice/conference/feedback");
-        assertAll("conference cancel fail, already canceled",
+        response = controller.conferenceFeedbacks(request);
+        assertAll("conference feedback fail, already canceled",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNull(response.getValidationUUID(), "validationUUID"),
                 ()-> assertNull(response.getConferenceUUID(), "conferenceUUID"),
@@ -357,7 +356,7 @@ public class MvcTestsBackoffice extends TestContainer {
         conferenceCreate();
 
         request = createConferenceUUIDRequest(conferenceValidationUUID);
-        performMvc("/backoffice/conference/space");
+        response = controller.conferenceSpace(request);
         assertAll("Conference space success",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertEquals(request.getValidationUUID(), response.getValidationUUID(), "validationUUID"),
@@ -367,13 +366,13 @@ public class MvcTestsBackoffice extends TestContainer {
                 ()-> assertNull(response.getReason(), "reason")
         );
 
-        roomCreate();
+        withoutRoom = false;
         conferenceCreate();
 
         int participantCount = 20;
         mockSpace(participantCount);
         request = createConferenceUUIDRequest(conferenceValidationUUID);
-        performMvc("/backoffice/conference/space");
+        response = controller.conferenceSpace(request);
         assertAll("Conference space success",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertEquals(request.getValidationUUID(), response.getValidationUUID(), "validationUUID"),
@@ -387,10 +386,11 @@ public class MvcTestsBackoffice extends TestContainer {
     @Test
     void conferenceSpaceFail() {
         roomCreate();
+        withoutRoom = true;
         conferenceCreate();
 
         request = createConferenceUUIDRequest(UUID.randomUUID());
-        performMvc("/backoffice/conference/space");
+        response = controller.conferenceSpace(request);
         assertAll("conference space fail, already canceled",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNull(response.getValidationUUID(), "validationUUID"),
@@ -404,10 +404,11 @@ public class MvcTestsBackoffice extends TestContainer {
     @Test
     void conferenceUpdate() {
         roomCreate();
+        withoutRoom = true;
         conferenceCreate();
 
         request = createConferenceCreateRequest(response.getBookedFrom().toString(), response.getBookedUntil().toString(), roomUUID, conferenceValidationUUID);
-        performMvc("/backoffice/conference/update");
+        response = controller.conferenceUpdate(request);
         assertAll("conference update with same roomUUID success",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNotEquals(conferenceValidationUUID, response.getValidationUUID(), "validationUUID"),
@@ -421,7 +422,7 @@ public class MvcTestsBackoffice extends TestContainer {
         roomCreate();
 
         request = createConferenceCreateRequest(responseCurrent.getBookedFrom().toString(), responseCurrent.getBookedUntil().toString(), roomUUID, responseCurrent.getValidationUUID());
-        performMvc("/backoffice/conference/update");
+        response = controller.conferenceUpdate(request);
         assertAll("conference update with roomUUID success",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNotEquals(conferenceValidationUUID, response.getValidationUUID(), "validationUUID"),
@@ -445,8 +446,8 @@ public class MvcTestsBackoffice extends TestContainer {
         when(participantDAO.findByParticipantUUIDs(partipicantUUIDList)).thenReturn(createParticipants(partipicantUUIDList));
     }
 
-    private void mockEmptyFeedbacks(int participantsCount) {
-        List<UUID> partipicantUUIDList = createParticipantUUIDList(participantsCount);
+    private void mockEmptyFeedbacks(int participantCount) {
+        List<UUID> partipicantUUIDList = createParticipantUUIDList(participantCount);
         Conference conference = Conference.builder()
                 .validationUUID(conferenceValidationUUID)
                 .conferenceUUID(conferenceUUID)
@@ -469,14 +470,15 @@ public class MvcTestsBackoffice extends TestContainer {
         when(conferenceDAO.getConferenceByValidationUUID(conferenceValidationUUID)).thenReturn(conference);
     }
 
-    private List<Participant> createParticipants(List<UUID> partcipantUUIDList){
+    private List<Participant> createParticipants(List<UUID> partcipantUUIDList) {
         List<Participant> participantList = new ArrayList<>();
         for(int i = 0; partcipantUUIDList.size()>i; i++) {
-            participantList.add(Participant.builder()
-                    .firstName("Chuck"+i)
-                    .lastName("Norris"+i)
-                    .feedback("Test mocked feedback " +i)
-                    .build());
+            participantList.add(
+                    Participant.builder()
+                            .firstName("Chuck" + i)
+                            .lastName("Norris" + i)
+                            .feedback("Test mocked feedback " + i)
+                            .build());
         }
         return participantList;
     }
@@ -489,23 +491,7 @@ public class MvcTestsBackoffice extends TestContainer {
         return participantList;
     }
 
-    private void createConferenceCreateRequestOnlyTime(String from, String until) {
+    private void createConferenceCreateRequestOverlap(String from, String until) {
         request = createConferenceCreateRequest(from, until, roomUUID, conferenceValidationUUID);
-    }
-
-    private void performMvc(String path) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        String responseMvc;
-        try {
-            responseMvc = mockMvc.perform(post(path)
-                            .contentType(APPLICATION_JSON)
-                            .content(mapper.writeValueAsString(request)))
-                    .andExpect(content().contentType(APPLICATION_JSON))
-                    .andReturn().getResponse().getContentAsString();
-            response = mapper.readValue(responseMvc, Response.class);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

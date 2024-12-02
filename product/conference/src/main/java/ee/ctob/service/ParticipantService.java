@@ -53,12 +53,14 @@ public class ParticipantService {
     }
 
     public ParticipantDTO registrationCancel(ParticipantDTO participantDTO) {
-        UUID participantUUID = participantDAO.getParticipantUUID(participantDTO.getValidationUUID());
-        if(participantUUID == null) {
+        Participant participant = participantDAO.getParticipantUUID(participantDTO.getValidationUUID());
+        if(participant == null) {
             return ParticipantDTO.builder()
                     .info("Participant with this validation doesn't exists")
                     .build();
         }
+
+        UUID participantUUID = participant.getValidationUUID();
 
         if(conferenceDAO.isAvailableForCancel(participantUUID) == null) {
             return ParticipantDTO.builder()
@@ -66,7 +68,7 @@ public class ParticipantService {
                     .build();
         }
 
-        if(participantDAO.cancelRegistration(participantUUID)==0) {
+        if(conferenceDAO.cancelRegistration(participantUUID)==0) {
             return ParticipantDTO.builder()
                     .info("Validation uuid isnt valid")
                     .build();
@@ -92,7 +94,7 @@ public class ParticipantService {
     }
 
     public ParticipantDTO availableConferences(ParticipantDTO participantDTO) {
-        if(now().isAfter(participantDTO.getUntil()) || now().isAfter(participantDTO.getFrom()) || participantDTO.getUntil().isAfter(participantDTO.getFrom())) {
+        if(now().isAfter(participantDTO.getFrom()) || participantDTO.getUntil().isBefore(participantDTO.getFrom())) {
             return ParticipantDTO.builder()
                     .info("Requested time isn't logical")
                     .build();
