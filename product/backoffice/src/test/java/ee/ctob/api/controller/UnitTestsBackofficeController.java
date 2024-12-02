@@ -320,9 +320,20 @@ class UnitTestsBackofficeController extends TestContainer {
                 ()-> assertEquals("reason","Conference has no participants", response.getReason())
         );
 
+        mockEmptyFeedbacks(20);
+        response = controller.conferenceFeedbacks(request);
+        assertAll("conference feedback fail, no feedbacks",
+                ()-> assertNotNull("Response", response),
+                ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
+                ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("reason","No feedback for this conference", response.getReason())
+        );
+
         request = createConferenceUUIDRequest(UUID.randomUUID());
         response = controller.conferenceFeedbacks(request);
-        assertAll("conference cancel fail, already canceled",
+        assertAll("conference feedback fail, already canceled",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
                 ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
@@ -353,7 +364,6 @@ class UnitTestsBackofficeController extends TestContainer {
         conferenceCreate();
 
         request = createConferenceUUIDRequest(conferenceValidationUUID);
-//        mocks.mockSpace(20, conferenceValidationUUID, conferenceUUID, roomUUID);
         mockSpace(20);
         response = controller.conferenceSpace(request);
         assertAll("Conference space success",
@@ -430,6 +440,20 @@ class UnitTestsBackofficeController extends TestContainer {
         when(participantDAO.findByParticipantUUIDs(partipicantUUIDList)).thenReturn(createParticipants(partipicantUUIDList));
     }
 
+    private void mockEmptyFeedbacks(int participantsCount) {
+        List<UUID> partipicantUUIDList = createParticipantUUIDList(participantsCount);
+        Conference conference = Conference.builder()
+                .validationUUID(conferenceValidationUUID)
+                .conferenceUUID(conferenceUUID)
+                .roomUUID(roomUUID)
+                .participants(partipicantUUIDList)
+                .build();
+
+        List<Participant> participantList = new ArrayList<>();
+        when(conferenceDAO.getConferenceByValidationUUID(conferenceValidationUUID)).thenReturn(conference);
+        when(participantDAO.findByParticipantUUIDs(partipicantUUIDList)).thenReturn(participantList);
+    }
+
     private void mockSpace(int participantsCount) {
         Conference conference = Conference.builder()
                 .validationUUID(conferenceValidationUUID)
@@ -440,14 +464,15 @@ class UnitTestsBackofficeController extends TestContainer {
         when(conferenceDAO.getConferenceByValidationUUID(conferenceValidationUUID)).thenReturn(conference);
     }
 
-    private List<Participant> createParticipants(List<UUID> partcipantUUIDList){
+    private List<Participant> createParticipants(List<UUID> partcipantUUIDList) {
         List<Participant> participantList = new ArrayList<>();
         for(int i = 0; partcipantUUIDList.size()>i; i++) {
-            participantList.add(Participant.builder()
-                    .firstName("Chuck"+i)
-                    .lastName("Norris"+i)
-                    .feedback("Test mocked feedback " +i)
-                    .build());
+            participantList.add(
+                    Participant.builder()
+                            .firstName("Chuck" + i)
+                            .lastName("Norris" + i)
+                            .feedback("Test mocked feedback " + i)
+                            .build());
         }
         return participantList;
     }

@@ -324,8 +324,19 @@ public class MvcTestsBackoffice extends TestContainer {
                 ()-> assertEquals("reason","Conference has no participants", response.getReason())
         );
 
+        mockEmptyFeedbacks(20);
+        performMvc("/backoffice/conference/feedback");
+        assertAll("conference feedback fail, no feedbacks",
+                ()-> assertNotNull("Response", response),
+                ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
+                ()-> assertNull("conferenceUUID", response.getConferenceUUID()),
+                ()-> assertNull("bookedFrom", response.getBookedFrom()),
+                ()-> assertNull("bookedUntil", response.getBookedUntil()),
+                ()-> assertEquals("reason","No feedback for this conference", response.getReason())
+        );
+
         request = createConferenceUUIDRequest(UUID.randomUUID());
-        performMvc("/backoffice/conference/feedbacks");
+        performMvc("/backoffice/conference/feedback");
         assertAll("conference cancel fail, already canceled",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
@@ -428,7 +439,21 @@ public class MvcTestsBackoffice extends TestContainer {
                 .build();
 
         when(conferenceDAO.getConferenceByValidationUUID(conferenceValidationUUID)).thenReturn(conference);
-        when(participantDAO.findByParticipantUUIDs(anyList())).thenReturn(createParticipants(partipicantUUIDList));
+        when(participantDAO.findByParticipantUUIDs(partipicantUUIDList)).thenReturn(createParticipants(partipicantUUIDList));
+    }
+
+    private void mockEmptyFeedbacks(int participantsCount) {
+        List<UUID> partipicantUUIDList = createParticipantUUIDList(participantsCount);
+        Conference conference = Conference.builder()
+                .validationUUID(conferenceValidationUUID)
+                .conferenceUUID(conferenceUUID)
+                .roomUUID(roomUUID)
+                .participants(partipicantUUIDList)
+                .build();
+
+        List<Participant> participantList = new ArrayList<>();
+        when(conferenceDAO.getConferenceByValidationUUID(conferenceValidationUUID)).thenReturn(conference);
+        when(participantDAO.findByParticipantUUIDs(partipicantUUIDList)).thenReturn(participantList);
     }
 
     private void mockSpace(int participantsCount) {
