@@ -226,7 +226,7 @@ public class MvcTestsBackoffice extends TestContainer {
                 ()-> assertEquals("reason","Chosen time isn't available", response.getReason())
         );
 
-        request = createConferenceCreateRequest("2024-12-20T10:00:00", "2024-12-20T08:00:00", UUID.randomUUID(), conferenceValidationUUID);
+        createConferenceCreateRequest("2024-12-20T10:00:00", "2024-12-20T08:00:00", UUID.randomUUID(), conferenceValidationUUID);
         performMvc("/backoffice/conference/create");
         assertAll("Create conference fail roomUUID not valid",
                 ()-> assertNotNull("Response", response),
