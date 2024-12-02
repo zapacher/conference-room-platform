@@ -2,8 +2,10 @@ package ee.ctob.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.UUID;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response {
     @Schema(example = "2d790a4d-7c9c-4e23-9c9c-5749c5fa7fdb")
@@ -26,6 +30,8 @@ public class Response {
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ConferenceAvailable {
         @Schema(example = "5a743569-35f8-4588-899a-7ebcd4a75def")
         UUID conferenceUUID;

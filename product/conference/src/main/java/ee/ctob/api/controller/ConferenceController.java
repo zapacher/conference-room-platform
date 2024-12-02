@@ -100,7 +100,7 @@ public class ConferenceController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of schema ConferenceAvailable response if success"),
     })
-    @PostMapping("/conference/available")
+    @PostMapping("/available")
     public Response availableConferences(@Validated(ConferenceAvailable.class) @RequestBody Request request) {
         ParticipantDTO result = participantService.availableConferences(
                 ParticipantDTO.builder()

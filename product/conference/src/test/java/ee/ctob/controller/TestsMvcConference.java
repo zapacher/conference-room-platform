@@ -1,19 +1,19 @@
 package ee.ctob.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import ee.ctob.access.ConferenceDAO;
 import ee.ctob.access.ParticipantDAO;
 import ee.ctob.access.RoomDAO;
 import ee.ctob.api.Request;
 import ee.ctob.api.Response;
-import ee.ctob.api.controller.ConferenceController;
-import ee.ctob.data.Participant;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import testutils.TestContainer;
 
@@ -21,23 +21,27 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static testutils.ObjectCreators.*;
 
 @Testcontainers
-@ExtendWith(MockitoExtension.class)
-public class TestsUnitConferenceController extends TestContainer {
+@AutoConfigureMockMvc
+@SpringBootTest
+public class TestsMvcConference  extends TestContainer {
     @MockBean
     RoomDAO roomDAO;
     @MockBean
     ConferenceDAO conferenceDAO;
     @SpyBean
     ParticipantDAO participantDAO;
-    @InjectMocks
     @Autowired
-    ConferenceController controller;
+    MockMvc mockMvc;
 
     Request request;
     Response response;
@@ -47,7 +51,7 @@ public class TestsUnitConferenceController extends TestContainer {
     void registration() {
         request = createRegitrationRequest(UUID.randomUUID());
         mockRegistration();
-        response = controller.registration(request);
+        performMvc("/conference/registration/create");
 
         assertAll("Registration Success",
                 ()-> assertNotNull(response, "Response"),
@@ -61,7 +65,7 @@ public class TestsUnitConferenceController extends TestContainer {
     @Test
     void registrationFail() {
         request = createRegitrationRequest(UUID.randomUUID());
-        response = controller.registration(request);
+        performMvc("/conference/registration/create");
 
         assertAll("Registration Fail",
                 ()-> assertNotNull(response, "Response"),
@@ -78,7 +82,7 @@ public class TestsUnitConferenceController extends TestContainer {
         mockParticipantForCancel(1);
 
         request = createRegitrationCancelRequest(participantValidationUUID);
-        response = controller.registrationCancel(request);
+        performMvc("/conference/registration/cancel");
 
         assertAll("Registration cancel success",
                 ()-> assertNotNull(response, "Response"),
@@ -93,7 +97,7 @@ public class TestsUnitConferenceController extends TestContainer {
         registration();
 
         request = createRegitrationCancelRequest(UUID.randomUUID());
-        response = controller.registrationCancel(request);
+        performMvc("/conference/registration/cancel");
 
         assertAll("Registration Fail",
                 ()-> assertNotNull(response, "Response"),
@@ -104,7 +108,7 @@ public class TestsUnitConferenceController extends TestContainer {
 
         request = createRegitrationCancelRequest(participantValidationUUID);
         mockConferenceForCancel(null);
-        response = controller.registrationCancel(request);
+        performMvc("/conference/registration/cancel");
 
         assertAll("Registration Fail",
                 ()-> assertNotNull(response, "Response"),
@@ -116,8 +120,7 @@ public class TestsUnitConferenceController extends TestContainer {
         request = createRegitrationCancelRequest(participantValidationUUID);
         mockConferenceForCancel(UUID.randomUUID());
         mockParticipantForCancel(0);
-        response = controller.registrationCancel(request);
-
+        performMvc("/conference/registration/cancel");
 
         assertAll("Registration Fail",
                 ()-> assertNotNull(response, "Response"),
@@ -133,7 +136,7 @@ public class TestsUnitConferenceController extends TestContainer {
 
         request = createFeedbackRequest(participantValidationUUID, "Any text for feedback");
         mockFeedback(1);
-        response = controller.feedback(request);
+        performMvc("/conference/feedback/create");
 
         assertAll("Feedback Success",
                 ()-> assertNotNull(response, "Response"),
@@ -149,7 +152,7 @@ public class TestsUnitConferenceController extends TestContainer {
 
         request = createFeedbackRequest(participantValidationUUID, "Any text for feedback");
         mockFeedback(0);
-        response = controller.feedback(request);
+        performMvc("/conference/feedback/create");
 
         assertAll("Feedback Fail",
                 ()-> assertNotNull(response, "Response"),
@@ -167,7 +170,7 @@ public class TestsUnitConferenceController extends TestContainer {
         mockLocation();
 
         request = createRequestForConfernces("2024-12-10T15:00:00", "2024-12-31T15:00:00");
-        response = controller.availableConferences(request);
+        performMvc("/conference/available");
 
         assertAll("Available conferences Fail",
                 ()-> assertNotNull(response, "Response"),
@@ -191,7 +194,7 @@ public class TestsUnitConferenceController extends TestContainer {
     void availableConferencesFail() {
         registration();
         request = createRequestForConfernces("2024-12-31T10:00:00", "2024-12-31T15:00:00");
-        response = controller.availableConferences(request);
+        performMvc("/conference/available");
 
         assertAll("Available conferences Fail",
                 ()-> assertNotNull(response, "Response"),
@@ -199,7 +202,7 @@ public class TestsUnitConferenceController extends TestContainer {
         );
 
         request = createRequestForConfernces("2024-12-31T10:00:00", "2024-12-31T09:59:59");
-        response = controller.availableConferences(request);
+        performMvc("/conference/available");
 
         assertAll("Available conferences Fail",
                 ()-> assertNotNull(response, "Response"),
@@ -207,7 +210,7 @@ public class TestsUnitConferenceController extends TestContainer {
         );
 
         request = createRequestForConfernces("2022-12-31T10:00:00", "2024-12-31T09:59:59");
-        response = controller.availableConferences(request);
+        performMvc("/conference/available");
 
         assertAll("Available conferences Fail",
                 ()-> assertNotNull(response, "Response"),
@@ -242,5 +245,21 @@ public class TestsUnitConferenceController extends TestContainer {
 
     private void mockRegistration() {
         when(conferenceDAO.registerParticipant(any(), any())).thenReturn(1);
+    }
+
+    private void performMvc(String path) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        String responseMvc;
+        try {
+            responseMvc = mockMvc.perform(post(path)
+                            .contentType(APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(request)))
+                    .andExpect(content().contentType(APPLICATION_JSON))
+                    .andReturn().getResponse().getContentAsString();
+            response = mapper.readValue(responseMvc, Response.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
