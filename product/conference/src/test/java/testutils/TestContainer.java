@@ -37,7 +37,6 @@ public class TestContainer {
 
     }
 
-
     @BeforeAll
     public static void containerStart() {
         PSQLcontainer.start();
