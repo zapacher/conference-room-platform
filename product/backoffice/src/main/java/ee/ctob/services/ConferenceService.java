@@ -62,7 +62,6 @@ public class ConferenceService {
                 .bookedFrom(conference.getBookedFrom())
                 .bookedUntil(conference.getBookedUntil())
                 .build();
-
     }
 
     public ConferenceDTO update(ConferenceDTO conferenceDTO) {
@@ -131,10 +130,7 @@ public class ConferenceService {
         }
 
         Integer roomCapacity = roomDAO.getRoomCapacityByRoomId(conference.getRoomUUID());
-        Integer participantsCount = 0;
-        if(!conference.getParticipants().isEmpty()) {
-            participantsCount = conference.getParticipants().size();
-        }
+        Integer participantsCount = conference.getParticipants().size();
 
         return ConferenceDTO.builder()
                 .validationUUID(conferenceDTO.getValidationUUID())

@@ -1,31 +1,48 @@
 package ee.ctob.api.controller;
 
 
+import ee.ctob.access.ConferenceDAO;
+import ee.ctob.access.ParticipantDAO;
 import ee.ctob.api.Request;
 import ee.ctob.api.Response;
 import ee.ctob.data.Conference;
 import ee.ctob.data.enums.RoomStatus;
+import ee.ctob.services.ConferenceService;
+import ee.ctob.services.RoomService;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.creation.SuspendMethod;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import testutils.TestContainer;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
 import static ee.ctob.data.enums.RoomStatus.CLOSED;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 @Testcontainers
+@ExtendWith(MockitoExtension.class)
 class TestBackofficeController extends TestContainer {
-
+    @Spy
+    ConferenceDAO conferenceDAO;
 
     @Autowired
     private BackofficeController controller;
+
 
     private UUID roomUUID;
     private UUID roomValidationUUID;
@@ -309,7 +326,6 @@ class TestBackofficeController extends TestContainer {
 
         createConferenceUUIDRequest(null);
         response = controller.conferenceSpace(request);
-        System.out.println(response);
         assertAll("Conference space success",
                 ()-> assertNotNull("Response", response),
                 ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
@@ -319,9 +335,46 @@ class TestBackofficeController extends TestContainer {
                 ()-> assertNull("reason", response.getReason())
         );
 
+        roomCreate();
+        conferenceCreate();
+        createConferenceUUIDRequest(null);
+        mockSpace(20);
+        response = controller.conferenceSpace(request);
+        assertAll("Conference space success",
+                ()-> assertNotNull("Response", response),
+                ()-> assertEquals("validationUUID", request.getValidationUUID(), response.getValidationUUID()),
+                ()-> assertEquals("availableSpace", (Integer) 80, response.getAvailableSpace()),
+                ()-> assertEquals("rooCapacity", (Integer) 80, response.getRoomCapacity()),
+                ()-> assertEquals("participantCount", (Integer) 20, response.getParticipantsCount()),
+                ()-> assertNull("reason", response.getReason())
+        );
+
+    }
+
+    private void mockSpace(int participantsCount) {
+        Conference conference = Conference.builder()
+                .validationUUID(conferenceValidationUUID)
+                .conferenceUUID(conferenceUUID)
+                .roomUUID(roomUUID)
+                .participants(createParticipants(participantsCount))
+                .build();
+        OngoingStubbing<Conference> ww = when(conferenceDAO.getConferenceByValidationUUID(any())).thenReturn(conference);
+    }
+
+    private List<UUID> createParticipants(int participantsCount) {
+        List<UUID> participantList = new ArrayList<>();
+        for(int i = 0; i<=participantsCount;i++ ) {
+            participantList.add(UUID.randomUUID());
+        }
+        return participantList;
+    }
+
+    @Test
+    void conferenceSpaceFail() {
+        roomCreate();
+        conferenceCreate();
         createConferenceUUIDRequest(UUID.randomUUID());
         response = controller.conferenceSpace(request);
-        System.out.println(response);
         assertAll("conference space fail, already canceled",
                 ()-> assertNotNull("Response", response),
                 ()-> assertNull("validationUUID", response.getValidationUUID()),
@@ -363,6 +416,14 @@ class TestBackofficeController extends TestContainer {
                 ()-> assertEquals("bookedUntil", request.getUntil(), response.getBookedUntil())
         );
     }
+
+//    private void mockFeedbacks() {
+//        when(conferenceDAO.getConferenceByValidationUUID(conferenceValidationUUID)).thenReturn()
+//        Participant participant = Participant.builder().build()
+//        when(participantDAO.findByParticipantUUIDs(any())).thenReturn()
+//    }
+//
+//    private void createParticipant()
 
     private void createConferenceUUIDRequest(UUID validationUUID) {
         UUID vUUID = validationUUID;

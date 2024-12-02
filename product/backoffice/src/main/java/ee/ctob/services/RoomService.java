@@ -43,7 +43,6 @@ public class RoomService {
                     .validationUUID(roomDTO.getValidationUUID())
                     .build();
         }
-
         Room room = null;
 
         if(roomDTO.getStatus() != null) {
@@ -64,7 +63,6 @@ public class RoomService {
             conferenceDAO.closeConferencesByRoomUUID(roomIf.getRoomUUID());
 
             room = roomDAO.updateStatus(roomDTO.getValidationUUID(), roomDTO.getStatus().name());
-
         }
 
         if(roomDTO.getCapacity() != null) {
