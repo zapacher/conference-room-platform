@@ -62,4 +62,12 @@ public interface ConferenceDAO extends BaseConferenceDAO<Conference, Integer> {
     )
     List<Conference> findAllAvailableBetween(LocalDateTime from, LocalDateTime until);
 
+    @Modifying
+    @Transactional
+    @Query(
+            value = "DELETE FROM backoffice.conference_participants  " +
+                    "WHERE participant_uuid = ?1 ",
+            nativeQuery = true
+    )
+    int cancelRegistration(UUID participantUUID);
 }

@@ -36,7 +36,7 @@ public class Request {
     @NotNull(groups = Registration.class)
     @Email
     String email;
-    @Schema(example = "1980-12-20T0:00:00")
+    @Schema(example = "1940-04-10T0:00:00")
     @Past(groups = Registration.class)
     @NotNull(groups = Registration.class)
     LocalDateTime dateOfBirth;

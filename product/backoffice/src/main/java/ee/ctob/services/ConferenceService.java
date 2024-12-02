@@ -28,7 +28,7 @@ public class ConferenceService {
     ParticipantDAO participantDAO;
 
     public ConferenceDTO create(ConferenceDTO conferenceDTO) {
-        if(now().isAfter(conferenceDTO.getBookedFrom())) {
+        if(conferenceDTO.getBookedFrom() != null && now().isAfter(conferenceDTO.getBookedFrom())) {
             return ConferenceDTO.builder()
                     .info("Conference start time must be in future")
                     .build();
@@ -62,7 +62,6 @@ public class ConferenceService {
                 .bookedFrom(conference.getBookedFrom())
                 .bookedUntil(conference.getBookedUntil())
                 .build();
-
     }
 
     public ConferenceDTO update(ConferenceDTO conferenceDTO) {
@@ -131,10 +130,7 @@ public class ConferenceService {
         }
 
         Integer roomCapacity = roomDAO.getRoomCapacityByRoomId(conference.getRoomUUID());
-        Integer participantsCount = 0;
-        if(!conference.getParticipants().isEmpty()) {
-            participantsCount = conference.getParticipants().size();
-        }
+        Integer participantsCount = conference.getParticipants().size();
 
         return ConferenceDTO.builder()
                 .validationUUID(conferenceDTO.getValidationUUID())

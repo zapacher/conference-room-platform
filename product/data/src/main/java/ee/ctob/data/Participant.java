@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -24,7 +23,7 @@ public class Participant {
     LocalDateTime created;
     @Column(name = "validation_uuid", unique = true)
     UUID validationUUID;
-    @Column(name = "participant_uuid",unique = true)
+    @Column(name = "participant_uuid", unique = true)
     UUID participantUUID;
     String firstName;
     String lastName;

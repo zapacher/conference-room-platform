@@ -14,20 +14,11 @@ public interface ParticipantDAO extends BaseParticipantDAO<Participant, Integer>
 
     @Transactional
     @Query(
-            value = "SELECT participant_uuid FROM conference.participants " +
-                    "WHERE validation_uuid = ?1 ",
+            value = "SELECT * FROM conference.participants " +
+                    "WHERE validation_uuid = ?1",
             nativeQuery = true
     )
-    UUID getParticipantUUID(UUID validationUUID);
-
-    @Modifying
-    @Transactional
-    @Query(
-            value = "DELETE FROM backoffice.conference_participants  " +
-                    "WHERE participant_uuid = ?1 ",
-            nativeQuery = true
-    )
-    int cancelRegistration(UUID participantUUID);
+    Participant getParticipantUUID(UUID validationUUID);
 
     @Modifying
     @Transactional
@@ -41,7 +32,7 @@ public interface ParticipantDAO extends BaseParticipantDAO<Participant, Integer>
                     "   WHERE id = ( " +
                     "       SELECT conference_id FROM backoffice.conference_participants " +
                     "       WHERE participant_uuid = ( " +
-                    "           SELECT participant_uuid FROM conference.participant " +
+                    "           SELECT participant_uuid FROM conference.participants " +
                     "           WHERE validation_uuid = ?1 " +
                     "       ) " +
                     "   ) " +
