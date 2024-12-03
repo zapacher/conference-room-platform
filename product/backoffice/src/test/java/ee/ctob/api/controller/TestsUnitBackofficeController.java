@@ -421,13 +421,13 @@ class TestsUnitBackofficeController extends TestContainer {
 
         roomCreate();
 
-        request = createConferenceCreateRequest(responseCurrent.getBookedFrom().toString(), responseCurrent.getBookedUntil().toString(), roomUUID, responseCurrent.getValidationUUID());
+        request = createConferenceUpdateWithRoomRequest(responseCurrent.getBookedFrom().toString(), responseCurrent.getBookedUntil().toString(), roomUUID, responseCurrent.getValidationUUID());
         response = controller.conferenceUpdate(request);
         assertAll("conference update with roomUUID success",
                 ()-> assertNotNull(response, "Response"),
-                ()-> assertNotEquals(conferenceValidationUUID, response.getValidationUUID(), "validationUUID"),
-                ()-> assertEquals(request.getValidationUUID(), response.getOldValidationUUID(), "validationUUID"),
-                ()-> assertNotEquals(conferenceUUID, response.getConferenceUUID(), "conferenceUUID"),
+                ()-> assertNotEquals(request.getValidationUUID(), response.getValidationUUID(), "validationUUID"),
+                ()-> assertEquals(request.getValidationUUID(), response.getOldValidationUUID(), "oldValidationUUID"),
+                ()-> assertEquals(conferenceUUID, response.getConferenceUUID(), "conferenceUUID"),
                 ()-> assertEquals(request.getFrom(), response.getBookedFrom(), "bookedFrom"),
                 ()-> assertEquals(request.getUntil(), response.getBookedUntil(), "bookedUntil")
         );

@@ -42,6 +42,13 @@ public class ObjectCreators {
     }
 
     public static Request createConferenceCreateRequest(String from, String until, UUID rUUID, UUID validationUUID) {
+        return createConferenceRequest(null, from, until, validationUUID, rUUID);
+    }
+    public static Request createConferenceUpdateWithRoomRequest(String from, String until, UUID newRoomUUID, UUID validationUUID) {
+        return createConferenceRequest(newRoomUUID, from, until, validationUUID, null);
+    }
+
+    public static Request createConferenceRequest(UUID newRoomUUID, String from, String until, UUID validationUUID, UUID rUUID) {
         return new  Request(
                 null,
                 null,
@@ -52,7 +59,7 @@ public class ObjectCreators {
                 LocalDateTime.parse(from),
                 LocalDateTime.parse(until),
                 validationUUID,
-                null
+                newRoomUUID
         );
     }
 
