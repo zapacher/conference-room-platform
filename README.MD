@@ -5,7 +5,7 @@ This platform allows the creation of rooms and conferences within them, and prov
 ## Technologies Used
 
 - **Java 17** | 17.0.8-tem
-- **Maven** for building the project
+- **Maven 3.8** for building the project
 - **Spring** for runtime framework
 - **Postgres** for Database
 - **Flyway** for database migrations
@@ -21,9 +21,9 @@ This platform allows the creation of rooms and conferences within them, and prov
 
 ### Other:
 
-- **sdkman** - as system configs
-- **kubuntu** - as OS
-- **postgres** - for local database
+- **Sdkman 5.18** - as system configs
+- **Kubuntu 24** - as OS
+- **Postgres 16** - for local database
 ---
 
 ## Project Structure
@@ -42,8 +42,11 @@ This platform allows the creation of rooms and conferences within them, and prov
 ### 1. Configure Database Connection
 
 Before running the application :
-- Ensure you are using ```JAVA 17.0.8-tem``` for build.
-- Ensure you update the database connection details in ```/config/local.yml```, or create a database using those values.
+- Ensure `maven` is installed.
+- Ensure installed `docker and it's components`. 
+- Ensure using `JAVA 17.0.8-tem` for build.
+- Ensure to update the database connection details in `/config/local.yml`, or create a database using those values.
+  - Local database from containers are reachable at `172.17.0.1:(default port 5432)`
 
 ### 2. Start the Application
 
