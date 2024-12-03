@@ -20,5 +20,4 @@ public class RoomDTO {
     String description;
     UUID validationUUID;
     UUID conferenceUUID;
-    UUID newRoomUUID;
 }

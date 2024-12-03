@@ -230,7 +230,7 @@ public class TestsMvcBackoffice extends TestContainer {
         request = createRoomUpdateRequest(roomValidationUUID, null, CLOSED, null);
         performMvc("/backoffice/room/update");
 
-        request = createConferenceCreateRequest("2024-12-20T10:00:00", "2024-12-20T08:00:00", roomUUID, conferenceValidationUUID);
+        request = createConferenceRequest("2024-12-20T10:00:00", "2024-12-20T08:00:00", conferenceValidationUUID, roomUUID);
         performMvc("/backoffice/conference/create");
         assertAll("Create conference fail roomUUID not valid",
                 ()-> assertNotNull(response, "Response"),
@@ -406,7 +406,7 @@ public class TestsMvcBackoffice extends TestContainer {
         roomCreate();
         conferenceCreate();
 
-        request = createConferenceCreateRequest(response.getBookedFrom().toString(), response.getBookedUntil().toString(), roomUUID, conferenceValidationUUID);
+        request = createConferenceRequest(response.getBookedFrom().toString(), response.getBookedUntil().toString(), conferenceValidationUUID, roomUUID);
         performMvc("/backoffice/conference/update");
         assertAll("conference update with same roomUUID success",
                 ()-> assertNotNull(response, "Response"),
@@ -420,13 +420,13 @@ public class TestsMvcBackoffice extends TestContainer {
 
         roomCreate();
 
-        request = createConferenceUpdateWithRoomRequest(responseCurrent.getBookedFrom().toString(), responseCurrent.getBookedUntil().toString(), roomUUID, responseCurrent.getValidationUUID());
+        request = createConferenceRequest(responseCurrent.getBookedFrom().toString(), responseCurrent.getBookedUntil().toString(), responseCurrent.getValidationUUID(), roomUUID);
         performMvc("/backoffice/conference/update");
         assertAll("conference update with roomUUID success",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNotEquals(request.getValidationUUID(), response.getValidationUUID(), "validationUUID"),
                 ()-> assertEquals(request.getValidationUUID(), response.getOldValidationUUID(), "oldValidationUUID"),
-                ()-> assertEquals(conferenceUUID, response.getConferenceUUID(), "conferenceUUID"),
+                ()-> assertNotEquals(conferenceUUID, response.getConferenceUUID(), "conferenceUUID"),
                 ()-> assertEquals(request.getFrom(), response.getBookedFrom(), "bookedFrom"),
                 ()-> assertEquals(request.getUntil(), response.getBookedUntil(), "bookedUntil")
         );
@@ -490,7 +490,7 @@ public class TestsMvcBackoffice extends TestContainer {
     }
 
     private void createConferenceCreateRequestOnlyTime(String from, String until) {
-        request = createConferenceCreateRequest(from, until, roomUUID, conferenceValidationUUID);
+        request = createConferenceRequest(from, until, conferenceValidationUUID, roomUUID);
     }
 
     private void performMvc(String path) {

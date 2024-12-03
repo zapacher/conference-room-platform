@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import ee.ctob.data.enums.ConferenceStatus;
 import ee.ctob.data.enums.RoomStatus;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,19 +20,33 @@ import java.util.UUID;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Response {
+    @Schema(example = "2d790a4d-7c9c-4e23-9c9c-5749c5fa7fdb")
     UUID validationUUID;
+    @Schema(example = "2d790a4d-7c9c-4e23-9c9c-5749c5fa7fdb")
     UUID oldValidationUUID;
+    @Schema(example = "2d790a4d-7c9c-4e23-9c9c-5749c5fa7fdb")
     UUID roomUUID;
+    @Schema(example = "2d790a4d-7c9c-4e23-9c9c-5749c5fa7fdb")
     UUID conferenceUUID;
+    @Schema(example = "53")
     Integer availableSpace;
+    @Schema(example = "60")
     Integer roomCapacity;
+    @Schema(example = "7")
     Integer participantsCount;
+    @Schema(example = "AVAILABLE|CLOSED")
     RoomStatus roomStatus;
+    @Schema(example = "2d790a4d-7c9c-4e23-9c9c-5749c5fa7fdb")
     UUID newValidationUUID;
+    @Schema(example = "List of feedback schema")
     List<Feedback> feedbackList;
+    @Schema(example = "2024-12-30T12:00:00")
     LocalDateTime bookedFrom;
+    @Schema(example = "2024-12-30T17:00:00")
     LocalDateTime bookedUntil;
+    @Schema(example = "AVAILABLE|CANCELED")
     ConferenceStatus conferenceStatus;
+    @Schema(example = "If is error, it will be described here")
     String reason;
 
     @Data
@@ -39,7 +54,9 @@ public class Response {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Feedback {
+        @Schema(example = "C.N.")
         String shortName;
+        @Schema(example = "Feedback text from participant of conference")
         String feedback;
     }
 }

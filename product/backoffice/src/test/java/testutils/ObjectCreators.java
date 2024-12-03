@@ -17,7 +17,6 @@ public class ObjectCreators {
                 "For tet purpose",
                 null,
                 null,
-                null,
                 null
         );
     }
@@ -36,19 +35,11 @@ public class ObjectCreators {
                 null,
                 null,
                 null,
-                validationUUUID,
-                null
+                validationUUUID
         );
     }
 
-    public static Request createConferenceCreateRequest(String from, String until, UUID rUUID, UUID validationUUID) {
-        return createConferenceRequest(null, from, until, validationUUID, rUUID);
-    }
-    public static Request createConferenceUpdateWithRoomRequest(String from, String until, UUID newRoomUUID, UUID validationUUID) {
-        return createConferenceRequest(newRoomUUID, from, until, validationUUID, null);
-    }
-
-    public static Request createConferenceRequest(UUID newRoomUUID, String from, String until, UUID validationUUID, UUID rUUID) {
+    public static Request createConferenceRequest(String from, String until, UUID validationUUID, UUID rUUID) {
         return new  Request(
                 null,
                 null,
@@ -58,8 +49,7 @@ public class ObjectCreators {
                 "Some info as example",
                 LocalDateTime.parse(from),
                 LocalDateTime.parse(until),
-                validationUUID,
-                newRoomUUID
+                validationUUID
         );
     }
 
@@ -73,8 +63,7 @@ public class ObjectCreators {
                 null,
                 null,
                 null,
-                validationUUID,
-                null
+                validationUUID
         );
     }
 }
