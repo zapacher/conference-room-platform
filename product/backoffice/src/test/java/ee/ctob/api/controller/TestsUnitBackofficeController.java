@@ -228,7 +228,7 @@ class TestsUnitBackofficeController extends TestContainer {
         request = createRoomUpdateRequest(roomValidationUUID, null, CLOSED, null);
         response = controller.roomUpdate(request);
 
-        createConferenceCreateRequest("2024-12-20T10:00:00", "2024-12-20T08:00:00", roomUUID, conferenceValidationUUID);
+        createConferenceRequest("2024-12-20T10:00:00", "2024-12-20T08:00:00", conferenceValidationUUID, roomUUID);
         response = controller.conferenceCreate(request);
         assertAll("Create conference fail roomUUID not valid",
                 ()-> assertNotNull(response, "Response"),
@@ -407,7 +407,7 @@ class TestsUnitBackofficeController extends TestContainer {
         withoutRoom = true;
         conferenceCreate();
 
-        request = createConferenceCreateRequest(response.getBookedFrom().toString(), response.getBookedUntil().toString(), roomUUID, conferenceValidationUUID);
+        request = createConferenceRequest(response.getBookedFrom().toString(), response.getBookedUntil().toString(), conferenceValidationUUID, roomUUID);
         response = controller.conferenceUpdate(request);
         assertAll("conference update with same roomUUID success",
                 ()-> assertNotNull(response, "Response"),
@@ -421,12 +421,12 @@ class TestsUnitBackofficeController extends TestContainer {
 
         roomCreate();
 
-        request = createConferenceCreateRequest(responseCurrent.getBookedFrom().toString(), responseCurrent.getBookedUntil().toString(), roomUUID, responseCurrent.getValidationUUID());
+        request = createConferenceRequest(responseCurrent.getBookedFrom().toString(), responseCurrent.getBookedUntil().toString(), responseCurrent.getValidationUUID(), roomUUID);
         response = controller.conferenceUpdate(request);
         assertAll("conference update with roomUUID success",
                 ()-> assertNotNull(response, "Response"),
-                ()-> assertNotEquals(conferenceValidationUUID, response.getValidationUUID(), "validationUUID"),
-                ()-> assertEquals(request.getValidationUUID(), response.getOldValidationUUID(), "validationUUID"),
+                ()-> assertNotEquals(request.getValidationUUID(), response.getValidationUUID(), "validationUUID"),
+                ()-> assertEquals(request.getValidationUUID(), response.getOldValidationUUID(), "oldValidationUUID"),
                 ()-> assertNotEquals(conferenceUUID, response.getConferenceUUID(), "conferenceUUID"),
                 ()-> assertEquals(request.getFrom(), response.getBookedFrom(), "bookedFrom"),
                 ()-> assertEquals(request.getUntil(), response.getBookedUntil(), "bookedUntil")
@@ -492,6 +492,6 @@ class TestsUnitBackofficeController extends TestContainer {
     }
 
     private void createConferenceCreateRequestOverlap(String from, String until) {
-        request = createConferenceCreateRequest(from, until, roomUUID, conferenceValidationUUID);
+        request = createConferenceRequest(from, until, conferenceValidationUUID, roomUUID);
     }
 }

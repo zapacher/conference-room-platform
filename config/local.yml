@@ -13,12 +13,27 @@ spring:
     baseline-on-migrate: true
     validate-on-migrate: true
   jpa:
-    show-sql: false
+    show-sql: true
     database: POSTGRESQL
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
 
 logging:
   level:
     org.flywaydb: DEBUG
+
+springdoc:
+  api-docs:
+    enabled: true
+    cache-time: 0
+  swagger-ui:
+    enabled: true
+  info:
+    contact:
+      name: "Toomas Park"
+      email: "toomas.park.work@gmail.com"
+      url: "https://github.com/zapacher"

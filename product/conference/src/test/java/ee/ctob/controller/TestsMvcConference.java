@@ -48,6 +48,28 @@ public class TestsMvcConference  extends TestContainer {
     UUID participantValidationUUID;
 
     @Test
+    void emptyRequest400() {
+        request = new Request(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        assertAll("BadRequest",
+                ()-> assertTrue(performMvcThrow("/conference/registration/create") == 400),
+                ()-> assertTrue(performMvcThrow("/conference/registration/cancel") == 400),
+                ()-> assertTrue(performMvcThrow("/conference/feedback/create") == 400),
+                ()-> assertTrue(performMvcThrow("/conference/available") == 400)
+        );
+    }
+
+    @Test
     void registration() {
         request = createRegitrationRequest(UUID.randomUUID());
         mockRegistration();
@@ -261,5 +283,13 @@ public class TestsMvcConference  extends TestContainer {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private int performMvcThrow(String path) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return mockMvc.perform(post(path)
+                .contentType(APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request))).andReturn().getResponse().getStatus();
     }
 }

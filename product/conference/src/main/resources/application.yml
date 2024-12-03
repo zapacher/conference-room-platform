@@ -5,3 +5,9 @@ spring:
     properties:
       hibernate:
         default_schema: conference
+
+springdoc:
+  info:
+    title: "API Documentation"
+    description: "For Conference module"
+    version: "1.0.0"

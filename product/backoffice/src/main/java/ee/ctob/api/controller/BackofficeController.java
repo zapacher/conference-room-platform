@@ -7,7 +7,9 @@ import ee.ctob.api.dto.RoomDTO;
 import ee.ctob.api.groups.*;
 import ee.ctob.services.ConferenceService;
 import ee.ctob.services.RoomService;
-import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -16,9 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static ee.ctob.data.enums.ConferenceStatus.CANCELED;
-
-@Slf4j
 @RestController("backoffice")
 @RequestMapping(
         path = "/backoffice",
@@ -32,6 +31,12 @@ public class BackofficeController {
     @Autowired
     ConferenceService conferenceService;
 
+    @Operation(summary = "Register new room. Autoconfigured to AVAILABLE")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "name, capacity, location")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "validationUUID, roomUUID will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
+    })
     @PostMapping("/room/create")
     public Response roomCreate(@Validated (RoomCreate.class) @RequestBody Request request) {
         RoomDTO result = roomService.create(RoomDTO.builder()
@@ -46,6 +51,12 @@ public class BackofficeController {
                 .build();
     }
 
+    @Operation(summary = "Update room capacity OR status")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID, capacity OR status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "roomUUID, roomCapacity, roomStatus, validationUUID will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
+    })
     @PostMapping("/room/update")
     public Response roomUpdate(@Validated (RoomUpdate.class) @RequestBody Request request) {
         RoomDTO result = roomService.update(RoomDTO.builder()
@@ -63,6 +74,12 @@ public class BackofficeController {
                 .build();
     }
 
+    @Operation(summary = "Create new conference. Autoconfigured to AVAILABLE")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "roomUUID, from, until, description(optional)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "conferenceUUID, validationUUID, bookedFrom, bookedUntil will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
+    })
     @PostMapping("/conference/create")
     public Response conferenceCreate(@Validated (ConferenceCreate.class) @RequestBody Request request) {
         ConferenceDTO result = conferenceService.create(
@@ -83,6 +100,12 @@ public class BackofficeController {
                 .build();
     }
 
+    @Operation(summary = "Conference update room or/and time")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID, from, until, roomUUID(if changing room), description(optional)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "roomUUID, conferenceUUID, validationUUID, bookedFrom, bookedUntil, oldValidationUUID will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
+    })
     @PostMapping("/conference/update")
     public Response conferenceUpdate(@Validated (ConferenceUpdate.class) @RequestBody Request request) {
         ConferenceDTO result = conferenceService.update(
@@ -106,6 +129,12 @@ public class BackofficeController {
                 .build();
     }
 
+    @Operation(summary = "Conference info of space")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "validationUUID, availableSpace, roomCapacity, participantsCount will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
+    })
     @PostMapping("/conference/space")
     public Response conferenceSpace(@Validated (ConferenceSpace.class) @RequestBody Request request) {
         ConferenceDTO result = conferenceService.checkFreeSpace(
@@ -122,6 +151,12 @@ public class BackofficeController {
                 .build();
     }
 
+    @Operation(summary = "Feedbacks for conference")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "validationUUID, feedbackList[shortName,feedback] will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
+    })
     @PostMapping("/conference/feedback")
     public Response conferenceFeedbacks(@Validated (ConferenceFeedbacks.class) @RequestBody Request request) {
         ConferenceDTO result = conferenceService.feedbackList(
@@ -136,6 +171,12 @@ public class BackofficeController {
                 .build();
     }
 
+    @Operation(summary = "Close/cancel conference")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "validationUUID will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
+    })
     @PostMapping("/conference/cancel")
     public Response conferenceCancel(@Validated (ConferenceCancel.class) @RequestBody Request request) {
         ConferenceDTO result = conferenceService.cancel(

@@ -40,7 +40,7 @@ public interface ConferenceDAO extends BaseConferenceDAO<Conference, Integer> {
                     "    WHERE r.room_uuid = (SELECT room_uuid FROM conference) " +
                     ") " +
                     "INSERT INTO backoffice.conference_participants (conference_id, participant_uuid) " +
-                    "VALUES ((SELECT conference_id FROM conference), participant_uuid = ?1 ) " +
+                    "SELECT (SELECT conference_id FROM conference) , ?1 " +
                     "WHERE ( " +
                     "    SELECT COUNT(*) " +
                     "    FROM backoffice.conference_participants cp " +
