@@ -87,7 +87,7 @@ Stops containers and cleans maven
     [http://172.17.0.1:8082/swagger-ui/index.html](http://172.17.0.1:8082/swagger-ui/index.html)
 - #### conference:
   - Swagger UI for the conference is reachable after successfully starting application by:   
-    [http://172.17.0.1:8083/swagger-ui/index.html](http://172.17.0.1:8082/swagger-ui/index.html)
+    [http://172.17.0.1:8083/swagger-ui/index.html](http://172.17.0.1:8083/swagger-ui/index.html)
 ---
 
 ## Info
