@@ -4,9 +4,10 @@ This platform allows the creation of rooms and conferences within them, and prov
 
 ## Technologies Used
 
-- **Java 17**
+- **Java 17** | 17.0.8-tem
 - **Maven** for building the project
 - **Spring** for runtime framework
+- **Postgres** for Database
 - **Flyway** for database migrations
 - **Hibernate** for ORM (Object Relational Mapping)
 - **Lombok** for reducing boilerplate code
@@ -18,6 +19,11 @@ This platform allows the creation of rooms and conferences within them, and prov
 - **Mockito** for mocking dependencies
 - **TestContainers** for database testing (without a real database)
 
+### Other:
+
+- **sdkman** - as system configs
+- **kubuntu** - as OS
+- **postgres** - for local database
 ---
 
 ## Project Structure
@@ -34,10 +40,10 @@ This platform allows the creation of rooms and conferences within them, and prov
 ## Setup Instructions
 
 ### 1. Configure Database Connection
+
 Before running the application :
-
-Ensure you update the database connection details in ```/config/local.yml```, or create a database using those values.
-
+- Ensure you are using ```JAVA 17.0.8-tem``` for build.
+- Ensure you update the database connection details in ```/config/local.yml```, or create a database using those values.
 
 ### 2. Start the Application
 
