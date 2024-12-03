@@ -34,7 +34,8 @@ public class BackofficeController {
     @Operation(summary = "Register new room. Autoconfigured to AVAILABLE")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "name, capacity, location")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "validationUUID, roomUUID will be in response if success")
+            @ApiResponse(responseCode = "200", description = "validationUUID, roomUUID will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
     })
     @PostMapping("/room/create")
     public Response roomCreate(@Validated (RoomCreate.class) @RequestBody Request request) {
@@ -53,8 +54,8 @@ public class BackofficeController {
     @Operation(summary = "Update room capacity OR status")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID, capacity OR status")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "roomUUID, roomCapacity, roomStatus, validationUUID will be in response if success"),
-            @ApiResponse(responseCode = "200", description = "reason will be in response if error"),
+            @ApiResponse(responseCode = "200", description = "roomUUID, roomCapacity, roomStatus, validationUUID will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
     })
     @PostMapping("/room/update")
     public Response roomUpdate(@Validated (RoomUpdate.class) @RequestBody Request request) {
@@ -76,8 +77,8 @@ public class BackofficeController {
     @Operation(summary = "Create new conference. Autoconfigured to AVAILABLE")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "roomUUID, from, until, description(optional)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "conferenceUUID, validationUUID, bookedFrom, bookedUntil will be in response if success"),
-            @ApiResponse(responseCode = "200", description = "reason will be in response if error"),
+            @ApiResponse(responseCode = "200", description = "conferenceUUID, validationUUID, bookedFrom, bookedUntil will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
     })
     @PostMapping("/conference/create")
     public Response conferenceCreate(@Validated (ConferenceCreate.class) @RequestBody Request request) {
@@ -102,8 +103,8 @@ public class BackofficeController {
     @Operation(summary = "Conference update room or/and time")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID, from, until, roomUUID(if changing room), description(optional)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "roomUUID, conferenceUUID, validationUUID, bookedFrom, bookedUntil, oldValidationUUID will be in response if success"),
-            @ApiResponse(responseCode = "200", description = "reason will be in response if error"),
+            @ApiResponse(responseCode = "200", description = "roomUUID, conferenceUUID, validationUUID, bookedFrom, bookedUntil, oldValidationUUID will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
     })
     @PostMapping("/conference/update")
     public Response conferenceUpdate(@Validated (ConferenceUpdate.class) @RequestBody Request request) {
@@ -131,8 +132,8 @@ public class BackofficeController {
     @Operation(summary = "Conference info of space")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "validationUUID, availableSpace, roomCapacity, participantsCount will be in response if success"),
-            @ApiResponse(responseCode = "200", description = "reason will be in response if error"),
+            @ApiResponse(responseCode = "200", description = "validationUUID, availableSpace, roomCapacity, participantsCount will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
     })
     @PostMapping("/conference/space")
     public Response conferenceSpace(@Validated (ConferenceSpace.class) @RequestBody Request request) {
@@ -153,8 +154,8 @@ public class BackofficeController {
     @Operation(summary = "Feedbacks for conference")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "validationUUID, feedbackList[shortName,feedback] will be in response if success"),
-            @ApiResponse(responseCode = "200", description = "reason will be in response if error"),
+            @ApiResponse(responseCode = "200", description = "validationUUID, feedbackList[shortName,feedback] will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
     })
     @PostMapping("/conference/feedback")
     public Response conferenceFeedbacks(@Validated (ConferenceFeedbacks.class) @RequestBody Request request) {
@@ -173,8 +174,8 @@ public class BackofficeController {
     @Operation(summary = "Close/cancel conference")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "validationUUID will be in response if success"),
-            @ApiResponse(responseCode = "200", description = "reason will be in response if error"),
+            @ApiResponse(responseCode = "200", description = "validationUUID will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
     })
     @PostMapping("/conference/cancel")
     public Response conferenceCancel(@Validated (ConferenceCancel.class) @RequestBody Request request) {

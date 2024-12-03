@@ -25,6 +25,8 @@ import java.util.UUID;
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
 import static ee.ctob.data.enums.RoomStatus.CLOSED;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -53,6 +55,31 @@ public class TestsMvcBackoffice extends TestContainer {
     private Response response;
     private boolean withoutRoom = false;
     private int roomCapacity = 100;
+
+    @Test
+    void emptyRequest400() {
+        request = new Request(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        assertAll("BadRequest",
+                ()-> assertTrue(performMvcThrow("/backoffice/room/create") == 400),
+                ()-> assertTrue(performMvcThrow("/backoffice/room/update") == 400),
+                ()-> assertTrue(performMvcThrow("/backoffice/conference/create") == 400),
+                ()-> assertTrue(performMvcThrow("/backoffice/conference/update") == 400),
+                ()-> assertTrue(performMvcThrow("/backoffice/conference/space") == 400),
+                ()-> assertTrue(performMvcThrow("/backoffice/conference/feedback") == 400),
+                ()-> assertTrue(performMvcThrow("/backoffice/conference/cancel") == 400)
+        );
+    }
+
     @Test
     void roomCreate() {
         request = createRoomCreateRequest();
@@ -507,5 +534,13 @@ public class TestsMvcBackoffice extends TestContainer {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private int performMvcThrow(String path) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return mockMvc.perform(post(path)
+                        .contentType(APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request))).andReturn().getResponse().getStatus();
     }
 }
