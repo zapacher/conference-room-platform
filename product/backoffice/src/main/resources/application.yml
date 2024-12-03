@@ -5,3 +5,13 @@ spring:
     properties:
       hibernate:
         default_schema: backoffice
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+  info:
+    title: "API Documentation"
+    description: "For Backoffice module"
+    version: "1.0.0"

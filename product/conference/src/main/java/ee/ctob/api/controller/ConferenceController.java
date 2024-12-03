@@ -11,7 +11,6 @@ import ee.ctob.service.ParticipantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
-@Slf4j
 @RestController("conference")
 @RequestMapping(
         path = "/conference",
@@ -36,6 +34,7 @@ public class ConferenceController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "firstName, lastName, gender, email, dateOfBirth, conferenceUUID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "validationUUID will be in response if success"),
+            @ApiResponse(responseCode = "200", description = "reason will be in response if error")
     })
     @PostMapping("/registration/create")
     public Response registration(@Validated(Registration.class) @RequestBody Request request) {
@@ -60,6 +59,7 @@ public class ConferenceController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "registrationCancel = true will be in response if success"),
+            @ApiResponse(responseCode = "200", description = "reason will be in response if error")
     })
     @PostMapping("/registration/cancel")
     public Response registrationCancel(@Validated(RegistrationCancel.class) @RequestBody Request request) {
@@ -78,6 +78,7 @@ public class ConferenceController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID, feedback")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "feedbackResult = true will be in response if success"),
+            @ApiResponse(responseCode = "200", description = "reason will be in response if error")
     })
     @PostMapping("/feedback/create")
     public Response feedback(@Validated(Feedback.class) @RequestBody Request request) {
@@ -99,6 +100,7 @@ public class ConferenceController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "from, until")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of schema ConferenceAvailable response if success"),
+            @ApiResponse(responseCode = "200", description = "reason will be in response if error")
     })
     @PostMapping("/available")
     public Response availableConferences(@Validated(ConferenceAvailable.class) @RequestBody Request request) {

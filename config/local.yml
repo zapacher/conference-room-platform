@@ -22,3 +22,14 @@ spring:
 logging:
   level:
     org.flywaydb: DEBUG
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+  info:
+    contact:
+      name: "Toomas Park"
+      email: "toomas.park.work@gmail.com"
+      url: "https://github.com/zapacher"

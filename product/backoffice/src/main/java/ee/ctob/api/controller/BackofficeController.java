@@ -7,7 +7,9 @@ import ee.ctob.api.dto.RoomDTO;
 import ee.ctob.api.groups.*;
 import ee.ctob.services.ConferenceService;
 import ee.ctob.services.RoomService;
-import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -16,9 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static ee.ctob.data.enums.ConferenceStatus.CANCELED;
-
-@Slf4j
 @RestController("backoffice")
 @RequestMapping(
         path = "/backoffice",
@@ -32,6 +31,11 @@ public class BackofficeController {
     @Autowired
     ConferenceService conferenceService;
 
+    @Operation(summary = "Register new room. Autoconfigured to AVAILABLE")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "name, capacity, location")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "validationUUID, roomUUID will be in response if success")
+    })
     @PostMapping("/room/create")
     public Response roomCreate(@Validated (RoomCreate.class) @RequestBody Request request) {
         RoomDTO result = roomService.create(RoomDTO.builder()
@@ -46,6 +50,12 @@ public class BackofficeController {
                 .build();
     }
 
+    @Operation(summary = "Update room capacity OR status")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "name, capacity, location")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "validationUUID, roomUUID will be in response if success"),
+            @ApiResponse(responseCode = "200", description = "reason will be in response if error"),
+    })
     @PostMapping("/room/update")
     public Response roomUpdate(@Validated (RoomUpdate.class) @RequestBody Request request) {
         RoomDTO result = roomService.update(RoomDTO.builder()
