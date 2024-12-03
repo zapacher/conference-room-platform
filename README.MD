@@ -73,7 +73,7 @@ Stops containers and cleans maven
 ---
 
 
-👤 Author  
+👤 Creator:
 Toomas Park
 
 📧 toomas.park.work@gmail.com
