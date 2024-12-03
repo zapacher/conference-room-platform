@@ -1,6 +1,6 @@
 # Platform for Creating Rooms and Conferences
 
-This platform allows the creation of rooms and conferences within them, and provides functionality for registering participants.
+### This platform allows the creation of rooms and conferences within them, and provides functionality for registering participants.
 
 ## Technologies Used
 
@@ -80,8 +80,16 @@ Stops containers and cleans maven
 
 - -s — Perform silent cleanup (without logs)
 
----
+### 4. Swagger
+- #### backoffice
+  - swagger for backoffice is reachable after successfully starting application by:   
+    [http://172.17.0.1:8082/swagger-ui/index.html](http://172.17.0.1:8082/swagger-ui/index.html)
+- #### conference:
+  - swagger for backoffice is reachable after successfully starting application by:   
+    [http://172.17.0.1:8083/swagger-ui/index.html](http://172.17.0.1:8082/swagger-ui/index.html)
 
+
+---
 ## Info
 
 
