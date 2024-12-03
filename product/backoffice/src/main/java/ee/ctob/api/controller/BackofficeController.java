@@ -51,9 +51,9 @@ public class BackofficeController {
     }
 
     @Operation(summary = "Update room capacity OR status")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "name, capacity, location")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID, capacity OR status")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "validationUUID, roomUUID will be in response if success"),
+            @ApiResponse(responseCode = "200", description = "roomUUID, roomCapacity, roomStatus, validationUUID will be in response if success"),
             @ApiResponse(responseCode = "200", description = "reason will be in response if error"),
     })
     @PostMapping("/room/update")
@@ -73,6 +73,12 @@ public class BackofficeController {
                 .build();
     }
 
+    @Operation(summary = "Create new conference. Autoconfigured to AVAILABLE")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "roomUUID, from, until, description(optional)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "conferenceUUID, validationUUID, bookedFrom, bookedUntil will be in response if success"),
+            @ApiResponse(responseCode = "200", description = "reason will be in response if error"),
+    })
     @PostMapping("/conference/create")
     public Response conferenceCreate(@Validated (ConferenceCreate.class) @RequestBody Request request) {
         ConferenceDTO result = conferenceService.create(
@@ -93,6 +99,12 @@ public class BackofficeController {
                 .build();
     }
 
+    @Operation(summary = "Conference update room or/and time")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID, from, until, roomUUID(if changing room), description(optional)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "roomUUID, conferenceUUID, validationUUID, bookedFrom, bookedUntil, oldValidationUUID will be in response if success"),
+            @ApiResponse(responseCode = "200", description = "reason will be in response if error"),
+    })
     @PostMapping("/conference/update")
     public Response conferenceUpdate(@Validated (ConferenceUpdate.class) @RequestBody Request request) {
         ConferenceDTO result = conferenceService.update(
@@ -116,6 +128,12 @@ public class BackofficeController {
                 .build();
     }
 
+    @Operation(summary = "Conference info of space")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "validationUUID, availableSpace, roomCapacity, participantsCount will be in response if success"),
+            @ApiResponse(responseCode = "200", description = "reason will be in response if error"),
+    })
     @PostMapping("/conference/space")
     public Response conferenceSpace(@Validated (ConferenceSpace.class) @RequestBody Request request) {
         ConferenceDTO result = conferenceService.checkFreeSpace(
@@ -132,6 +150,12 @@ public class BackofficeController {
                 .build();
     }
 
+    @Operation(summary = "Feedbacks for conference")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "validationUUID, feedbackList[shortName,feedback] will be in response if success"),
+            @ApiResponse(responseCode = "200", description = "reason will be in response if error"),
+    })
     @PostMapping("/conference/feedback")
     public Response conferenceFeedbacks(@Validated (ConferenceFeedbacks.class) @RequestBody Request request) {
         ConferenceDTO result = conferenceService.feedbackList(
@@ -146,6 +170,12 @@ public class BackofficeController {
                 .build();
     }
 
+    @Operation(summary = "Close/cancel conference")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "validationUUID will be in response if success"),
+            @ApiResponse(responseCode = "200", description = "reason will be in response if error"),
+    })
     @PostMapping("/conference/cancel")
     public Response conferenceCancel(@Validated (ConferenceCancel.class) @RequestBody Request request) {
         ConferenceDTO result = conferenceService.cancel(
