@@ -80,16 +80,15 @@ Stops containers and cleans maven
 
 - -s — Perform silent cleanup (without logs)
 
-### 4. Swagger
+### 4. Springdoc OpenAPI
 - #### backoffice
-  - swagger for backoffice is reachable after successfully starting application by:   
+  - Swagger UI for the backoffice is reachable after successfully starting application by:   
     [http://172.17.0.1:8082/swagger-ui/index.html](http://172.17.0.1:8082/swagger-ui/index.html)
 - #### conference:
-  - swagger for backoffice is reachable after successfully starting application by:   
+  - Swagger UI for the conference is reachable after successfully starting application by:   
     [http://172.17.0.1:8083/swagger-ui/index.html](http://172.17.0.1:8082/swagger-ui/index.html)
-
-
 ---
+
 ## Info
 
 
