@@ -79,6 +79,7 @@ Stops containers and cleans maven
 #### Available Flag for down.sh:
 
 - -s — Perform silent cleanup (without logs)
+- -f — Perform `docker system prune -af` after clean
 
 ### 4. Springdoc OpenAPI
 - #### backoffice

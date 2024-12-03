@@ -1,11 +1,15 @@
 
 
 SILENT_MODE=false
+PRUNE=false
 
 while getopts "fs" opt; do
   case ${opt} in
     s)
       SILENT_MODE=true
+      ;;
+    f)
+      PRUNE=true
       ;;
     \?)
       echo "Invalid option: -$OPTARG" 1>&2
@@ -22,6 +26,11 @@ if [ "$SILENT_MODE" = true ]; then
   mvn clean > /dev/null 2>&1
 else
   mvn clean
+fi
+
+if [ "$PRUNE" = true ]; then
+  echo "Docker system prune"
+  docker system prune -af
 fi
 
 echo "All done!"
