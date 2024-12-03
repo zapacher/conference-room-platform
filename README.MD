@@ -56,6 +56,7 @@ Script will:
 
 - -f — Skip the PostgreSQL check
 - -s — Run silently without logs
+- -t — Skip tests (-DskipTests)
 
 
 ### 3. Stop and Clean the Application

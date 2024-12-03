@@ -4,9 +4,13 @@ set -e
 
 SKIP_WAIT=false
 SILENT_MODE=false
+TESTS_MODE=true
 
-while getopts "fs" opt; do
+while getopts "fst" opt; do
   case ${opt} in
+    t)
+      TESTS_MODE=false
+      ;;
     f)
       SKIP_WAIT=true
       ;;
@@ -41,9 +45,19 @@ echo "PostgreSQL is up and running!"
 
 if [ "$SILENT_MODE" = true ]; then
     echo "Maven install in silent mode..."
-    mvn clean install >  /dev/null 2>&1
+    if [ "$TESTS_MODE" = true ]; then
+      mvn clean install >  /dev/null 2>&1
+    else
+      echo "Tests are ignored -DskipTests"
+      mvn clean install -DskipTests >  /dev/null 2>&1
+    fi
 else
-    mvn clean install
+     if [ "$TESTS_MODE" = true ]; then
+          mvn clean install
+        else
+          echo "Tests are ignored -DskipTests"
+          mvn clean install -DskipTests
+        fi
 fi
 
 if [ "$SILENT_MODE" = true ]; then
