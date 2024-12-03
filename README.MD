@@ -29,6 +29,8 @@ This platform allows the creation of rooms and conferences within them, and prov
     - ├── conference 
     - └── data
 
+---
+
 ## Setup Instructions
 
 ### 1. Configure Database Connection
@@ -36,7 +38,6 @@ Before running the application :
 
 Ensure you update the database connection details in ```/config/local.yml```, or create a database using those values.
 
----
 
 ### 2. Start the Application
 
@@ -56,7 +57,6 @@ Script will:
 - -f — Skip the PostgreSQL check
 - -s — Run silently without logs
 
----
 
 ### 3. Stop and Clean the Application
 
@@ -72,10 +72,15 @@ Stops containers and cleans maven
 
 ---
 
+## Info
+
 
 👤 Creator:
 Toomas Park
 
 📧 toomas.park.work@gmail.com
+
+---
+### Test task for Tallink
 
 ---
