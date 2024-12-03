@@ -1,32 +1,52 @@
 #!/bin/bash
 set -e
 
-MODE=$1
 
-echo "Checking if PostgreSQL is up..."
-TIMEOUT=10
-COUNTER=0
+SKIP_WAIT=false
+SILENT_MODE=false
 
-until pg_isready -h localhost -p 5432; do
-  COUNTER=$((COUNTER + 2))
-  if [ $COUNTER -ge $TIMEOUT ]; then
-    echo "PostgreSQL is not up after $TIMEOUT seconds. Exiting."
-    exit 1
-  fi
-  echo "Waiting for PostgreSQL to be ready... ($COUNTER/$TIMEOUT seconds)"
-  sleep 1
+while getopts "fs" opt; do
+  case ${opt} in
+    f)
+      SKIP_WAIT=true
+      ;;
+    s)
+      SILENT_MODE=true
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" 1>&2
+      ;;
+  esac
 done
 
+if [ "$SKIP_WAIT" = false ]; then
+
+  echo "Checking if PostgreSQL is up..."
+  TIMEOUT=10
+  COUNTER=0
+
+  COUNTER=0
+  TIMEOUT=30
+  while ! pg_isready -h localhost -p 5432; do
+    COUNTER=$((COUNTER + 2))
+    if [ $COUNTER -ge $TIMEOUT ]; then
+      echo "PostgreSQL is not up after $TIMEOUT seconds. Exiting."
+      exit 1
+    fi
+    echo "Waiting for PostgreSQL to be ready... ($COUNTER/$TIMEOUT seconds)"
+    sleep 1
+  done
+fi
 echo "PostgreSQL is up and running!"
 
-if [[ $MODE == "silent" ]]; then
+if [ "$SILENT_MODE" = true ]; then
     echo "Maven install in silent mode..."
     mvn clean install >  /dev/null 2>&1
 else
     mvn clean install
 fi
 
-if [[ $MODE == "silent" ]]; then
+if [ "$SILENT_MODE" = true ]; then
     echo "Docker starting  in silent mode..."
     docker-compose up -d >  /dev/null 2>&1
 else
