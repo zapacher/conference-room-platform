@@ -234,7 +234,7 @@ public class TestsUnitConferenceController extends TestContainer {
     }
 
     private void mockConferenceList() {
-        when(conferenceDAO.findAllAvailableBetween(any(), any())).thenReturn(getConferenceList())
+        when(conferenceDAO.findAllAvailableBetween(any(), any())).thenReturn(getConferenceList());
     }
 
     private void mockLocation() {
