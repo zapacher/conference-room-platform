@@ -6,6 +6,7 @@ import ee.ctob.data.Conference;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static ee.ctob.data.enums.Gender.MALE;
@@ -72,7 +73,7 @@ public class ObjectCreators {
         );
     }
 
-    public static List<Conference> getConferenceList() {
+    public static Optional<List<Conference>> getConferenceList() {
         Conference conference1 = Conference.builder()
                 .conferenceUUID(UUID.randomUUID())
                 .roomUUID(UUID.randomUUID())
@@ -114,6 +115,6 @@ public class ObjectCreators {
                 .bookedFrom(LocalDateTime.parse("2024-12-30T18:00:00"))
                 .bookedUntil(LocalDateTime.parse("2024-12-30T22:00:00"))
                 .build();
-        return List.of(conference1, conference2, conference3, conference4, conference5);
+        return Optional.of(List.of(conference1, conference2, conference3, conference4, conference5));
     }
 }

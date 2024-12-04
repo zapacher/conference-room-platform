@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -22,7 +23,7 @@ public interface ConferenceDAO extends BaseConferenceDAO {
                     ") ",
             nativeQuery = true
     )
-    Conference isAvailableForCancel(UUID participantUUID);
+    Optional<Conference> isAvailableForCancel(UUID participantUUID);
 
     @Modifying
     @Query(
@@ -56,7 +57,7 @@ public interface ConferenceDAO extends BaseConferenceDAO {
                     "AND status = 'AVAILABLE' ",
             nativeQuery = true
     )
-    List<Conference> findAllAvailableBetween(LocalDateTime from, LocalDateTime until);
+    Optional<List<Conference>> findAllAvailableBetween(LocalDateTime from, LocalDateTime until);
 
     @Modifying
     @Query(
