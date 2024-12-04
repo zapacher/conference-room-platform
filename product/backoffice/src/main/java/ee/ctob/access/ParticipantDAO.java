@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface ParticipantDAO extends BaseParticipantDAO<Participant, Integer> {
+public interface ParticipantDAO extends BaseParticipantDAO {
     @Transactional
     @Query(
             value = "SELECT * FROM conference.participants " +

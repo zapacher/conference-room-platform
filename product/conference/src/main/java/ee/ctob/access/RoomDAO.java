@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Repository
-public interface RoomDAO extends BaseRoomDAO<Room, Integer> {
+public interface RoomDAO extends BaseRoomDAO {
     @Transactional
     @Query(
             value = "SELECT location FROM rooms " +

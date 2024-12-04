@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Repository
-public interface ParticipantDAO extends BaseParticipantDAO<Participant, Integer> {
+public interface ParticipantDAO extends BaseParticipantDAO {
 
     @Transactional
     @Query(

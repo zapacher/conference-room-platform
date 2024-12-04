@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Repository
-public interface ConferenceDAO extends BaseConferenceDAO<Conference, Integer> {
+public interface ConferenceDAO extends BaseConferenceDAO {
 
     @Modifying
     @Transactional
