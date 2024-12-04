@@ -6,12 +6,14 @@ import ee.ctob.api.dto.RoomDTO;
 import ee.ctob.data.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RoomService {
 

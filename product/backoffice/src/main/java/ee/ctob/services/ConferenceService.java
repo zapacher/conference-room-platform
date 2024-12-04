@@ -9,6 +9,7 @@ import ee.ctob.data.Conference;
 import ee.ctob.data.Participant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import static java.time.LocalDateTime.now;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ConferenceService {
 
     final ConferenceDAO conferenceDAO;

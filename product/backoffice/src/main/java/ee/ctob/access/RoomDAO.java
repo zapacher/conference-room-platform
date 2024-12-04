@@ -2,17 +2,14 @@ package ee.ctob.access;
 
 import ee.ctob.data.Room;
 import ee.ctob.data.access.BaseRoomDAO;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Repository
 public interface RoomDAO extends BaseRoomDAO {
 
-    @Transactional
     @Query(
             value = "UPDATE backoffice.rooms " +
                     "SET status = ?2 " +
@@ -22,7 +19,6 @@ public interface RoomDAO extends BaseRoomDAO {
     )
     Room updateStatus(UUID validationUUID, String roomStatus);
 
-    @Transactional
     @Query(
             value = "UPDATE backoffice.rooms " +
                     "SET capacity = ?2 " +
@@ -32,7 +28,6 @@ public interface RoomDAO extends BaseRoomDAO {
     )
     Room updateCapacity(UUID validationUUID, Integer capacity);
 
-    @Transactional
     @Query(
             value = "SELECT capacity FROM backoffice.rooms " +
                     "WHERE validation_uuid = ?1 ",
@@ -40,7 +35,6 @@ public interface RoomDAO extends BaseRoomDAO {
     )
     Integer getRoomCapacity(UUID validationUUID);
 
-    @Transactional
     @Query(
             value = "SELECT * FROM backoffice.rooms " +
                     "WHERE validation_uuid = ?1 ",
@@ -48,7 +42,6 @@ public interface RoomDAO extends BaseRoomDAO {
     )
     Room getRoomByValidationUUID(UUID validationUUID);
 
-    @Transactional
     @Query(
             value = "SELECT capacity FROM backoffice.rooms " +
                     "WHERE room_uuid = ?1 ",
@@ -56,7 +49,6 @@ public interface RoomDAO extends BaseRoomDAO {
     )
     Integer getRoomCapacityByRoomId(UUID roomUUID);
 
-    @Transactional
     @Query(
             value = "SELECT COUNT(*) FROM backoffice.rooms " +
                     "WHERE room_uuid = ?1 " +

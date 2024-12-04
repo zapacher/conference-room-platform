@@ -5,7 +5,6 @@ import ee.ctob.data.access.BaseConferenceDAO;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.UUID;
 @Repository
 public interface ConferenceDAO extends BaseConferenceDAO {
 
-    @Transactional
     @Query(
             value = "SELECT conference_uuid FROM backoffice.conferences " +
                     "WHERE NOW() < booked_from " +
@@ -27,7 +25,6 @@ public interface ConferenceDAO extends BaseConferenceDAO {
     UUID isAvailableForCancel(UUID participantUUID);
 
     @Modifying
-    @Transactional
     @Query(
             value = "WITH conference AS ( " +
                     "    SELECT c.id AS conference_id, c.room_uuid, c.booked_from " +
@@ -52,7 +49,6 @@ public interface ConferenceDAO extends BaseConferenceDAO {
     )
     int registerParticipant(UUID participantUUID, UUID conferenceUUID);
 
-    @Transactional
     @Query(
             value = "SELECT * FROM backoffice.conferences " +
                     "WHERE booked_from > ?1 " +
@@ -63,7 +59,6 @@ public interface ConferenceDAO extends BaseConferenceDAO {
     List<Conference> findAllAvailableBetween(LocalDateTime from, LocalDateTime until);
 
     @Modifying
-    @Transactional
     @Query(
             value = "DELETE FROM backoffice.conference_participants  " +
                     "WHERE participant_uuid = ?1 ",

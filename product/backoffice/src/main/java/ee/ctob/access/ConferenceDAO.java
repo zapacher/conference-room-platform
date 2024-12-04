@@ -15,7 +15,6 @@ import java.util.UUID;
 public interface ConferenceDAO extends BaseConferenceDAO {
 
     @Modifying
-    @Transactional
     @Query(
             value = "UPDATE backoffice.conferences " +
                     "SET status = 'CLOSED' " +
@@ -34,7 +33,6 @@ public interface ConferenceDAO extends BaseConferenceDAO {
     )
     void closeConferenceOverlappingCountByRoomUUID(UUID roomUUID, int count);
 
-    @Transactional
     @Query(
             value = "SELECT * FROM backoffice.conferences " +
                     "WHERE validation_uuid = ?1 " +
@@ -43,7 +41,6 @@ public interface ConferenceDAO extends BaseConferenceDAO {
     )
     Conference getConferenceByValidationUUID(UUID validationUUID);
 
-    @Transactional
     @Query(
             value = "SELECT COUNT(*) FROM backoffice.conferences " +
                     "WHERE ?2 < booked_until " +
@@ -56,7 +53,6 @@ public interface ConferenceDAO extends BaseConferenceDAO {
     int countOverlappingBookingsByRoomUUID(UUID roomUUID, LocalDateTime from, LocalDateTime until);
 
     @Modifying
-    @Transactional
     @Query(
             value = "WITH closed_conferences AS (" +
                     "   UPDATE backoffice.conferences " +
@@ -73,7 +69,6 @@ public interface ConferenceDAO extends BaseConferenceDAO {
     )
     void closeConferencesByRoomUUID(UUID roomUUID);
 
-    @Transactional
     @Query(
             value = "WITH canceled_conference AS ( " +
                     "    UPDATE backoffice.conferences " +
@@ -94,7 +89,6 @@ public interface ConferenceDAO extends BaseConferenceDAO {
     )
     int cancelConference(UUID validationUUID);
 
-    @Transactional
     @Query(
             value = "WITH update_conference AS ( " +
                     "   UPDATE backoffice.conferences " +
@@ -111,7 +105,6 @@ public interface ConferenceDAO extends BaseConferenceDAO {
     )
     Conference updateConference(UUID validationUUID, LocalDateTime from, LocalDateTime until, UUID newValidationUUID);
 
-    @Transactional
     @Query(
             value = "SELECT COUNT(*) FROM backoffice.conferences " +
                     "WHERE ?2 < booked_until " +
