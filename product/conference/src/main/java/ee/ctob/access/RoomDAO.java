@@ -9,7 +9,7 @@ import java.util.UUID;
 @Repository
 public interface RoomDAO extends BaseRoomDAO {
     @Query(
-            value = "SELECT location FROM rooms " +
+            value = "SELECT location FROM backoffice.rooms " +
                     "WHERE room_uuid = ?1",
             nativeQuery = true
     )
