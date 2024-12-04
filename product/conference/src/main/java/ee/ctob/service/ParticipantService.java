@@ -7,7 +7,7 @@ import ee.ctob.api.Response;
 import ee.ctob.api.dto.ParticipantDTO;
 import ee.ctob.data.Conference;
 import ee.ctob.data.Participant;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,13 +18,12 @@ import static java.time.LocalDateTime.now;
 
 
 @Service
+@RequiredArgsConstructor
 public class ParticipantService {
-    @Autowired
-    ParticipantDAO participantDAO;
-    @Autowired
-    ConferenceDAO conferenceDAO;
-    @Autowired
-    RoomDAO roomDAO;
+
+    final ParticipantDAO participantDAO;
+    final ConferenceDAO conferenceDAO;
+    final RoomDAO roomDAO;
 
     public ParticipantDTO registration(ParticipantDTO participantDTO) {
         UUID participantUUID = UUID.randomUUID();

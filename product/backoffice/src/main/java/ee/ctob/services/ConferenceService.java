@@ -7,7 +7,7 @@ import ee.ctob.api.Response;
 import ee.ctob.api.dto.ConferenceDTO;
 import ee.ctob.data.Conference;
 import ee.ctob.data.Participant;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,13 +19,12 @@ import static ee.ctob.data.enums.ConferenceStatus.AVAILABLE;
 import static java.time.LocalDateTime.now;
 
 @Service
+@RequiredArgsConstructor
 public class ConferenceService {
-    @Autowired
-    ConferenceDAO conferenceDAO;
-    @Autowired
-    RoomDAO roomDAO;
-    @Autowired
-    ParticipantDAO participantDAO;
+
+    final ConferenceDAO conferenceDAO;
+    final RoomDAO roomDAO;
+    final ParticipantDAO participantDAO;
 
     public ConferenceDTO create(ConferenceDTO conferenceDTO) {
         if(conferenceDTO.getBookedFrom() != null && now().isAfter(conferenceDTO.getBookedFrom())) {

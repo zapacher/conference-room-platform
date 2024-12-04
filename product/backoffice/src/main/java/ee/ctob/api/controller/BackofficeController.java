@@ -12,7 +12,7 @@ import ee.ctob.services.RoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,13 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE
 )
+@RequiredArgsConstructor
 public class BackofficeController {
 
-    @Autowired
-    RoomService roomService;
-    @Autowired
-    ConferenceService conferenceService;
-
+    final RoomService roomService;
+    final ConferenceService conferenceService;
 
     ConferenceMapper conferenceMapper = ConferenceMapper.INSTANCE;
     RoomMapper roomMapper = RoomMapper.INSTANCE;
