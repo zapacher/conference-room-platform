@@ -35,7 +35,7 @@ public class ConferenceController {
     ParticipantMapper mapper = ParticipantMapper.INSTANCE;
 
     @Operation(summary = "Register new participant to conference")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "firstname, lastname, gender, email, dateOfBirth, conferenceUUID")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "firstName, lastName, gender, email, dateOfBirth, conferenceUUID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "100", description = "Any precondition errors will be explained"),
             @ApiResponse(responseCode = "200", description = "validationUUID will be in response if success"),
