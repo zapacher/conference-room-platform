@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -16,6 +17,5 @@ public interface ParticipantDAO extends BaseParticipantDAO {
                     "WHERE participant_uuid IN ?1 " +
                     "AND feedback IS NOT NULL",
             nativeQuery = true)
-    List<Participant> findByParticipantUUIDs(List<UUID> participantUUIDs);
-
+    Optional<List<Participant>> findByParticipantUUIDs(List<UUID> participantUUIDs);
 }

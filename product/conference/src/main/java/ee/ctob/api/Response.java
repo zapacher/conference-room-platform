@@ -25,8 +25,6 @@ public class Response {
     boolean registrationCancel;
     @Schema(example = "List of schema ConferenceAvailable")
     List<ConferenceAvailable> conferenceAvailableList;
-    @Schema(example = "If is error, it will be described here")
-    String reason;
 
     @Data
     @Builder

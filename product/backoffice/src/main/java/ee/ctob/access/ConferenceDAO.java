@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -37,7 +38,7 @@ public interface ConferenceDAO extends BaseConferenceDAO {
                     "AND status = 'AVAILABLE' ",
             nativeQuery = true
     )
-    Conference getConferenceByValidationUUID(UUID validationUUID);
+    Optional<Conference> getConferenceByValidationUUID(UUID validationUUID);
 
     @Query(
             value = "SELECT COUNT(*) FROM backoffice.conferences " +
@@ -101,7 +102,7 @@ public interface ConferenceDAO extends BaseConferenceDAO {
                     "SELECT * FROM update_conference",
             nativeQuery = true
     )
-    Conference updateConference(UUID validationUUID, LocalDateTime from, LocalDateTime until, UUID newValidationUUID);
+    Optional<Conference> updateConference(UUID validationUUID, LocalDateTime from, LocalDateTime until, UUID newValidationUUID);
 
     @Query(
             value = "SELECT COUNT(*) FROM backoffice.conferences " +

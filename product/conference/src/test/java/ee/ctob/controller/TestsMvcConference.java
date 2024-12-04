@@ -17,12 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.web.client.HttpClientErrorException;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import testutils.TestContainer;
 
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,10 +44,10 @@ public class TestsMvcConference  extends TestContainer {
     @Autowired
     MockMvc mockMvc;
 
-    Request request;
-    Response response;
-    ErrorResponse errorResponse;
-    UUID participantValidationUUID;
+    private Request request;
+    private Response response;
+    private ErrorResponse errorResponse;
+    private UUID participantValidationUUID;
 
     @Test
     void emptyRequest400() {
@@ -71,7 +68,6 @@ public class TestsMvcConference  extends TestContainer {
                 ()-> assertNull(errorResponse, "errorResponse"),
                 ()-> assertNull(response, "response")
         );
-
 
         performMvcThrow("/conference/registration/cancel");
         assertAll(
@@ -99,8 +95,7 @@ public class TestsMvcConference  extends TestContainer {
         performMvc("/conference/registration/create");
         assertAll("Registration Success",
                 ()-> assertNotNull(response, "Response"),
-                ()-> assertNotNull(response.getValidationUUID(), "validationUUID"),
-                ()-> assertNull(response.getReason(), "reason")
+                ()-> assertNotNull(response.getValidationUUID(), "validationUUID")
         );
 
         participantValidationUUID = response.getValidationUUID();
@@ -127,7 +122,6 @@ public class TestsMvcConference  extends TestContainer {
         performMvc("/conference/registration/cancel");
         assertAll("Registration cancel success",
                 ()-> assertNotNull(response, "Response"),
-                ()-> assertNull(response.getReason(), "response"),
                 ()-> assertNull(response.getValidationUUID(), "validationUUID"),
                 ()-> assertTrue(response.isRegistrationCancel(), "registrationCancel")
         );
@@ -176,7 +170,6 @@ public class TestsMvcConference  extends TestContainer {
         assertAll("Feedback Success",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertEquals(participantValidationUUID, response.getValidationUUID(), "validationUUID"),
-                ()-> assertNull(response.getReason(), "response"),
                 ()-> assertTrue(response.isFeedbackResult(), "feedbackResult")
         );
     }
@@ -199,7 +192,7 @@ public class TestsMvcConference  extends TestContainer {
     void availableConferences() {
         registration();
 
-        mockConferenceList(true);
+        mockConferenceList();
         mockLocation();
 
         request = createRequestForConfernces("2024-12-10T15:00:00", "2024-12-31T15:00:00");
@@ -207,8 +200,7 @@ public class TestsMvcConference  extends TestContainer {
 
         assertAll("Available conferences Fail",
                 ()-> assertNotNull(response, "Response"),
-                ()-> assertEquals(5, response.getConferenceAvailableList().size(), "conferenceAvailableList"),
-                ()-> assertNull(response.getReason(), "reason")
+                ()-> assertEquals(5, response.getConferenceAvailableList().size(), "conferenceAvailableList")
         );
 
         for(Response.ConferenceAvailable conference : response.getConferenceAvailableList()) {
@@ -252,12 +244,8 @@ public class TestsMvcConference  extends TestContainer {
         );
     }
 
-    private void mockConferenceList(boolean valid) {
-        if (valid) {
-            when(conferenceDAO.findAllAvailableBetween(any(), any())).thenReturn(getConferenceList());
-        } else {
-            when(conferenceDAO.findAllAvailableBetween(any(), any())).thenReturn(Optional.of(new ArrayList<>()));
-        }
+    private void mockConferenceList() {
+        when(conferenceDAO.findAllAvailableBetween(any(), any())).thenReturn(getConferenceList());
     }
 
     private void mockLocation() {

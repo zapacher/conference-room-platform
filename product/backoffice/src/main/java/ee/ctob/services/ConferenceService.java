@@ -5,6 +5,8 @@ import ee.ctob.access.ParticipantDAO;
 import ee.ctob.access.RoomDAO;
 import ee.ctob.api.Response;
 import ee.ctob.api.dto.ConferenceDTO;
+import ee.ctob.api.error.BadRequestException;
+import ee.ctob.api.error.PreconditionsFailedException;
 import ee.ctob.data.Conference;
 import ee.ctob.data.Participant;
 import lombok.RequiredArgsConstructor;
@@ -29,22 +31,15 @@ public class ConferenceService {
     final ParticipantDAO participantDAO;
 
     public ConferenceDTO create(ConferenceDTO conferenceDTO) {
-        if(conferenceDTO.getBookedFrom() != null && now().isAfter(conferenceDTO.getBookedFrom())) {
-            return ConferenceDTO.builder()
-                    .info("Conference start time must be in future")
-                    .build();
+        if(now().isAfter(conferenceDTO.getBookedFrom()) || conferenceDTO.getBookedFrom().isAfter(conferenceDTO.getBookedUntil())) {
+            throw new BadRequestException(400, "Unlogical booking time");
         }
 
-        if(roomDAO.isRoomAvailable(conferenceDTO.getRoomUUID())==0) {
-            return ConferenceDTO.builder()
-                    .info("Chosen room isn't available")
-                    .build();
-        }
+        roomDAO.isRoomAvailable(conferenceDTO.getRoomUUID())
+                .orElseThrow(()-> new PreconditionsFailedException("Chosen room isn't available"));
 
         if(conferenceDAO.countOverlappingBookingsByRoomUUID(conferenceDTO.getRoomUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil())>0) {
-            return ConferenceDTO.builder()
-                    .info("Chosen time isn't available")
-                    .build();
+            throw new PreconditionsFailedException("Chosen time isn't available");
         }
 
         Conference conference = conferenceDAO.saveAndFlush(Conference.builder()
@@ -67,17 +62,13 @@ public class ConferenceService {
 
     public ConferenceDTO update(ConferenceDTO conferenceDTO) {
         if(!timeGoodFormat(conferenceDTO)) {
-            return ConferenceDTO.builder()
-                    .info("Booking time is bad formatted")
-                    .build();
+            throw new BadRequestException(400, "Booking time is bad formatted");
         }
 
         if(conferenceDTO.getRoomUUID() != null) {
             if(conferenceDAO.countOverlappingBookingsByRoomUUID(conferenceDTO.getRoomUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil())==0) {
                 if(conferenceDAO.cancelConference(conferenceDTO.getValidationUUID())==0) {
-                    return ConferenceDTO.builder()
-                            .info("Conference doesn't exists")
-                            .build();
+                    throw new PreconditionsFailedException("Conference doesn't exists");
                 }
 
                 Conference conference = conferenceDAO.saveAndFlush(Conference.builder()
@@ -100,12 +91,8 @@ public class ConferenceService {
         }
 
         if(conferenceDAO.countOverlappingBookingsForUpdate(conferenceDTO.getValidationUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil())==0) {
-            Conference conference = conferenceDAO.updateConference(conferenceDTO.getValidationUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil(), UUID.randomUUID());
-            if(conference == null) {
-                return ConferenceDTO.builder()
-                        .info("Conference doesn't exists")
-                        .build();
-            }
+            Conference conference = conferenceDAO.updateConference(conferenceDTO.getValidationUUID(), conferenceDTO.getBookedFrom(), conferenceDTO.getBookedUntil(), UUID.randomUUID())
+                    .orElseThrow(()-> new PreconditionsFailedException("Conference doesn't exists"));
             return ConferenceDTO.builder()
                     .conferenceUUID(conference.getConferenceUUID())
                     .validationUUID(conference.getValidationUUID())
@@ -114,19 +101,12 @@ public class ConferenceService {
                     .build();
         }
 
-        return ConferenceDTO.builder()
-                .info("New values are conflicting with existing conferences")
-                .build();
+        throw new PreconditionsFailedException("New values are conflicting with existing conferences");
     }
 
     public ConferenceDTO checkFreeSpace(ConferenceDTO conferenceDTO) {
-        Conference conference = conferenceDAO.getConferenceByValidationUUID(conferenceDTO.getValidationUUID());
-
-        if(conference == null) {
-            return ConferenceDTO.builder()
-                    .info("Conference isn't available")
-                    .build();
-        }
+        Conference conference = conferenceDAO.getConferenceByValidationUUID(conferenceDTO.getValidationUUID())
+                .orElseThrow(()-> new PreconditionsFailedException("Conference isn't available"));
 
         Integer roomCapacity = roomDAO.getRoomCapacityByRoomId(conference.getRoomUUID());
         Integer participantsCount = conference.getParticipants().size();
@@ -140,27 +120,19 @@ public class ConferenceService {
     }
 
     public ConferenceDTO feedbackList(ConferenceDTO conferenceDTO) {
-        Conference conference = conferenceDAO.getConferenceByValidationUUID(conferenceDTO.getValidationUUID());
-        if(conference == null) {
-            return  ConferenceDTO.builder()
-                    .info("Conference doesn't exists")
-                    .build();
-        }
+        Conference conference = conferenceDAO.getConferenceByValidationUUID(conferenceDTO.getValidationUUID())
+                .orElseThrow(() -> new PreconditionsFailedException("Conference doesn't exists"));
 
         List<UUID> participantUUIDList = conference.getParticipants();
         if(participantUUIDList.isEmpty()) {
-            return  ConferenceDTO.builder()
-                    .validationUUID(conferenceDTO.getValidationUUID())
-                    .info("Conference has no participants")
-                    .build();
+            throw new PreconditionsFailedException("Conference has no participants");
         }
 
-        List<Participant> participantList = participantDAO.findByParticipantUUIDs(participantUUIDList);
+        List<Participant> participantList = participantDAO.findByParticipantUUIDs(participantUUIDList)
+                .orElseThrow(()-> new PreconditionsFailedException("No feedback for this conference"));
+
         if(participantList.isEmpty()) {
-            return  ConferenceDTO.builder()
-                    .validationUUID(conferenceDTO.getValidationUUID())
-                    .info("No feedback for this conference")
-                    .build();
+            throw new PreconditionsFailedException("No feedback for this conference");
         }
 
         List<Response.Feedback> feedbackList = new ArrayList<>();
@@ -189,9 +161,7 @@ public class ConferenceService {
                     .build();
         }
 
-        return ConferenceDTO.builder()
-                .info("Conference is already canceled or not exists")
-                .build();
+        throw new PreconditionsFailedException("Conference is already canceled or not exists");
     }
 
     private boolean timeGoodFormat(ConferenceDTO conferenceDTO) {

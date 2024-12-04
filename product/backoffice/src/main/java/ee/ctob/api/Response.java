@@ -43,8 +43,6 @@ public class Response {
     LocalDateTime bookedUntil;
     @Schema(example = "AVAILABLE|CANCELED")
     ConferenceStatus conferenceStatus;
-    @Schema(example = "If is error, it will be described here")
-    String reason;
 
     @Data
     @Builder

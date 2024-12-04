@@ -15,6 +15,5 @@ public interface ConferenceMapper {
     @Mapping(source = "until", target = "bookedUntil")
     ConferenceDTO toConferenceDTO(Request request);
 
-    @Mapping(source = "info", target = "reason")
     Response toResponse(ConferenceDTO conferenceDTO);
 }
