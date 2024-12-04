@@ -14,15 +14,15 @@ import java.util.UUID;
 public interface ConferenceDAO extends BaseConferenceDAO {
 
     @Query(
-            value = "SELECT conference_uuid FROM backoffice.conferences " +
+            value = "SELECT * FROM backoffice.conferences " +
                     "WHERE NOW() < booked_from " +
-                    "AND conference_id = ( " +
+                    "AND id = ( " +
                     "   SELECT conference_id FROM backoffice.conference_participants " +
                     "   WHERE participant_uuid = ?1 " +
                     ") ",
             nativeQuery = true
     )
-    UUID isAvailableForCancel(UUID participantUUID);
+    Conference isAvailableForCancel(UUID participantUUID);
 
     @Modifying
     @Query(

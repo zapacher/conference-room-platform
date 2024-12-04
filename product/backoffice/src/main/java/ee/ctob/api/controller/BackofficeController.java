@@ -37,7 +37,7 @@ public class BackofficeController {
 
 
     @Operation(summary = "Register new room. Autoconfigured to AVAILABLE")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "name, capacity, location")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "name, capacity, location, description(optional)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "validationUUID, roomUUID will be in response if success, reason will be in response if error"),
             @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")

@@ -16,7 +16,7 @@ public interface ParticipantDAO extends BaseParticipantDAO {
                     "WHERE validation_uuid = ?1",
             nativeQuery = true
     )
-    Participant getParticipantUUID(UUID validationUUID);
+    Participant getParticipant(UUID validationUUID);
 
     @Modifying
     @Query(

@@ -54,14 +54,14 @@ public class ParticipantService {
     }
 
     public ParticipantDTO registrationCancel(ParticipantDTO participantDTO) {
-        Participant participant = participantDAO.getParticipantUUID(participantDTO.getValidationUUID());
+        Participant participant = participantDAO.getParticipant(participantDTO.getValidationUUID());
         if(participant == null) {
             return ParticipantDTO.builder()
                     .info("Participant with this validation doesn't exists")
                     .build();
         }
 
-        UUID participantUUID = participant.getValidationUUID();
+        UUID participantUUID = participant.getParticipantUUID();
 
         if(conferenceDAO.isAvailableForCancel(participantUUID) == null) {
             return ParticipantDTO.builder()
@@ -73,8 +73,8 @@ public class ParticipantService {
             return ParticipantDTO.builder()
                     .info("Validation uuid isnt valid")
                     .build();
-
         }
+
         return ParticipantDTO.builder()
                 .registrationCancel(true)
                 .build();
