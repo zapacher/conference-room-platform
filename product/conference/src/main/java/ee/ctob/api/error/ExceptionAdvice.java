@@ -21,14 +21,6 @@ public class ExceptionAdvice {
    }
 
    @ExceptionHandler
-   @ResponseStatus(HttpStatus.FORBIDDEN)
-   @ResponseBody
-   protected ErrorResponse processException(ForbiddenException ex) {
-      log.warn(ex.getMessage(), ex);
-      return ex.getError();
-   }
-
-   @ExceptionHandler
    @ResponseStatus(HttpStatus.PRECONDITION_FAILED)
    @ResponseBody
    protected ErrorResponse processException(PreconditionsFailedException ex) {
@@ -36,10 +28,4 @@ public class ExceptionAdvice {
       return ex.getError();
    }
 
-   @ExceptionHandler
-   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-   protected ErrorResponse processException(InternalServerErrorException ex) {
-      log.error(ex.getMessage(), ex);
-      return ex.getError();
-   }
 }
