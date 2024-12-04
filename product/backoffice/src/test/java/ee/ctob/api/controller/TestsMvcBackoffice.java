@@ -438,7 +438,6 @@ public class TestsMvcBackoffice extends TestContainer {
         assertAll("conference update with same roomUUID success",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNotEquals(conferenceValidationUUID, response.getValidationUUID(), "validationUUID"),
-                ()-> assertEquals(conferenceValidationUUID, response.getOldValidationUUID(), "validationUUID"),
                 ()-> assertEquals(conferenceUUID, response.getConferenceUUID(), "conferennceUUID"),
                 ()-> assertEquals(request.getFrom(), response.getBookedFrom(), "bookedFrom"),
                 ()-> assertEquals(request.getUntil(), response.getBookedUntil(), "bookedUntil")
@@ -452,7 +451,6 @@ public class TestsMvcBackoffice extends TestContainer {
         assertAll("conference update with roomUUID success",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNotEquals(request.getValidationUUID(), response.getValidationUUID(), "validationUUID"),
-                ()-> assertEquals(request.getValidationUUID(), response.getOldValidationUUID(), "oldValidationUUID"),
                 ()-> assertNotEquals(conferenceUUID, response.getConferenceUUID(), "conferenceUUID"),
                 ()-> assertEquals(request.getFrom(), response.getBookedFrom(), "bookedFrom"),
                 ()-> assertEquals(request.getUntil(), response.getBookedUntil(), "bookedUntil")

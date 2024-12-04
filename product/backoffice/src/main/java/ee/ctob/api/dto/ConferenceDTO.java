@@ -15,7 +15,6 @@ public class ConferenceDTO {
     UUID roomUUID;
     UUID conferenceUUID;
     UUID validationUUID;
-    UUID oldValidationUUID;
     String info;
     LocalDateTime bookedFrom;
     LocalDateTime bookedUntil;

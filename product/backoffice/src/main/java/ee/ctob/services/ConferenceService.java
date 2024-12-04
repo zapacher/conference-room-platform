@@ -94,7 +94,6 @@ public class ConferenceService {
                         .validationUUID(conference.getValidationUUID())
                         .bookedFrom(conference.getBookedFrom())
                         .bookedUntil(conference.getBookedUntil())
-                        .oldValidationUUID(conferenceDTO.getValidationUUID())
                         .build();
             }
         }
@@ -111,7 +110,6 @@ public class ConferenceService {
                     .validationUUID(conference.getValidationUUID())
                     .bookedFrom(conference.getBookedFrom())
                     .bookedUntil(conference.getBookedUntil())
-                    .oldValidationUUID(conferenceDTO.getValidationUUID())
                     .build();
         }
 
@@ -186,7 +184,7 @@ public class ConferenceService {
     public ConferenceDTO cancel(ConferenceDTO conferenceDTO) {
         if (conferenceDAO.cancelConference(conferenceDTO.getValidationUUID())>0) {
             return ConferenceDTO.builder()
-                    .oldValidationUUID(conferenceDTO.getValidationUUID())
+                    .validationUUID(conferenceDTO.getValidationUUID())
                     .build();
         }
 

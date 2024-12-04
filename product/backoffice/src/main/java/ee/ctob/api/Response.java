@@ -1,6 +1,5 @@
 package ee.ctob.api;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import ee.ctob.data.enums.ConferenceStatus;
 import ee.ctob.data.enums.RoomStatus;
@@ -22,8 +21,6 @@ import java.util.UUID;
 public class Response {
     @Schema(example = "2d790a4d-7c9c-4e23-9c9c-5749c5fa7fdb")
     UUID validationUUID;
-    @Schema(example = "2d790a4d-7c9c-4e23-9c9c-5749c5fa7fdb")
-    UUID oldValidationUUID;
     @Schema(example = "2d790a4d-7c9c-4e23-9c9c-5749c5fa7fdb")
     UUID roomUUID;
     @Schema(example = "2d790a4d-7c9c-4e23-9c9c-5749c5fa7fdb")
