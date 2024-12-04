@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -16,7 +17,7 @@ public interface ParticipantDAO extends BaseParticipantDAO {
                     "WHERE validation_uuid = ?1",
             nativeQuery = true
     )
-    Participant getParticipant(UUID validationUUID);
+    Optional<Participant> getParticipant(UUID validationUUID);
 
     @Modifying
     @Query(

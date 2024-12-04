@@ -5,6 +5,8 @@ import ee.ctob.access.ParticipantDAO;
 import ee.ctob.access.RoomDAO;
 import ee.ctob.api.Response;
 import ee.ctob.api.dto.ParticipantDTO;
+import ee.ctob.api.error.BadRequestException;
+import ee.ctob.api.error.PreconditionsFailedException;
 import ee.ctob.data.Conference;
 import ee.ctob.data.Participant;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +32,10 @@ public class ParticipantService {
     public ParticipantDTO registration(ParticipantDTO participantDTO) {
         UUID participantUUID = UUID.randomUUID();
         if(conferenceDAO.registerParticipant(participantUUID, participantDTO.getConferenceUUID())==0) {
-            return ParticipantDTO.builder()
-                    .info("Registration isn't available for this conference")
-                    .build();
+            throw new PreconditionsFailedException("Registration isn't available for this conference");
+//            return ParticipantDTO.builder()
+//                    .info("Registration isn't available for this conference")
+//                    .build();
         }
 
         Participant participant = participantDAO.saveAndFlush(
@@ -54,25 +57,17 @@ public class ParticipantService {
     }
 
     public ParticipantDTO registrationCancel(ParticipantDTO participantDTO) {
-        Participant participant = participantDAO.getParticipant(participantDTO.getValidationUUID());
-        if(participant == null) {
-            return ParticipantDTO.builder()
-                    .info("Participant with this validation doesn't exists")
-                    .build();
-        }
+        Participant participant = participantDAO.getParticipant(participantDTO.getValidationUUID())
+                .orElseThrow(()-> new PreconditionsFailedException("Participant with this validation doesn't exists"));
 
         UUID participantUUID = participant.getParticipantUUID();
 
-        if(conferenceDAO.isAvailableForCancel(participantUUID) == null) {
-            return ParticipantDTO.builder()
-                    .info("Conference already started or finished")
-                    .build();
-        }
+        conferenceDAO.isAvailableForCancel(participantUUID)
+                .orElseThrow(()-> new PreconditionsFailedException("Conference already started or finished"));
+
 
         if(conferenceDAO.cancelRegistration(participantUUID)==0) {
-            return ParticipantDTO.builder()
-                    .info("Validation uuid isnt valid")
-                    .build();
+            throw new PreconditionsFailedException("Validation uuid isn't valid");
         }
 
         return ParticipantDTO.builder()
@@ -81,32 +76,23 @@ public class ParticipantService {
     }
 
     public ParticipantDTO feedback(ParticipantDTO participantDTO) {
-        boolean result = participantDAO.feedback(participantDTO.getValidationUUID(), participantDTO.getFeedback())>0;
-
-        ParticipantDTO.ParticipantDTOBuilder participantDTOBuilder = ParticipantDTO.builder()
-                .validationUUID(participantDTO.getValidationUUID())
-                .feedbackResult(result);
-
-        if(!result) {
-            return participantDTOBuilder.info("Feedback already exists or conference isn't finished").build();
+        if(participantDAO.feedback(participantDTO.getValidationUUID(), participantDTO.getFeedback())==0) {
+            throw new PreconditionsFailedException("Feedback already exists or conference isn't finished");
         }
 
-        return participantDTOBuilder.build();
+        return  ParticipantDTO.builder()
+                .validationUUID(participantDTO.getValidationUUID())
+                .feedbackResult(true)
+                .build();
     }
 
     public ParticipantDTO availableConferences(ParticipantDTO participantDTO) {
         if(now().isAfter(participantDTO.getFrom()) || participantDTO.getUntil().isBefore(participantDTO.getFrom())) {
-            return ParticipantDTO.builder()
-                    .info("Requested time isn't logical")
-                    .build();
+            throw new BadRequestException(400, "Requested time isn't logical");
         }
 
-        List<Conference> conferenceList = conferenceDAO.findAllAvailableBetween(participantDTO.getFrom(), participantDTO.getUntil());
-        if(conferenceList.isEmpty()) {
-            return  ParticipantDTO.builder()
-                    .info("No conferences is available at this time period")
-                    .build();
-        }
+        List<Conference> conferenceList = conferenceDAO.findAllAvailableBetween(participantDTO.getFrom(), participantDTO.getUntil())
+                .orElseThrow(()-> new PreconditionsFailedException("No conferences is available at this time period"));
 
         List<Response.ConferenceAvailable> conferenceAvailableList = new ArrayList<>();
         for(Conference conference : conferenceList) {

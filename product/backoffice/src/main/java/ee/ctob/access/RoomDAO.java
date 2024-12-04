@@ -5,6 +5,7 @@ import ee.ctob.data.access.BaseRoomDAO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -29,18 +30,11 @@ public interface RoomDAO extends BaseRoomDAO {
     Room updateCapacity(UUID validationUUID, Integer capacity);
 
     @Query(
-            value = "SELECT capacity FROM backoffice.rooms " +
-                    "WHERE validation_uuid = ?1 ",
-            nativeQuery = true
-    )
-    Integer getRoomCapacity(UUID validationUUID);
-
-    @Query(
             value = "SELECT * FROM backoffice.rooms " +
                     "WHERE validation_uuid = ?1 ",
             nativeQuery = true
     )
-    Room getRoomByValidationUUID(UUID validationUUID);
+    Optional<Room> getRoomByValidationUUID(UUID validationUUID);
 
     @Query(
             value = "SELECT capacity FROM backoffice.rooms " +
@@ -50,10 +44,10 @@ public interface RoomDAO extends BaseRoomDAO {
     Integer getRoomCapacityByRoomId(UUID roomUUID);
 
     @Query(
-            value = "SELECT COUNT(*) FROM backoffice.rooms " +
+            value = "SELECT * FROM backoffice.rooms " +
                     "WHERE room_uuid = ?1 " +
                     "AND status = 'AVAILABLE' ",
             nativeQuery = true
     )
-    int isRoomAvailable(UUID roomUUID);
+    Optional<Room> isRoomAvailable(UUID roomUUID);
 }

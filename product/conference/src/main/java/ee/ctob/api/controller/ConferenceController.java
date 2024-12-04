@@ -35,9 +35,10 @@ public class ConferenceController {
     ParticipantMapper mapper = ParticipantMapper.INSTANCE;
 
     @Operation(summary = "Register new participant to conference")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "firstname, lastname, gender, email, dateOfBirth, conferenceUUID")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "firstName, lastName, gender, email, dateOfBirth, conferenceUUID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "validationUUID will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "100", description = "Any precondition errors will be explained"),
+            @ApiResponse(responseCode = "200", description = "validationUUID will be in response if success"),
             @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
     })
     @PostMapping("/registration/create")
@@ -49,7 +50,8 @@ public class ConferenceController {
     @Operation(summary = "Cancel registration")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "registrationCancel = true will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "100", description = "Any precondition errors will be explained"),
+            @ApiResponse(responseCode = "200", description = "registrationCancel = true will be in response if success"),
             @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
     })
     @PostMapping("/registration/cancel")
@@ -61,7 +63,8 @@ public class ConferenceController {
     @Operation(summary = "Leave feedback after conference")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID, feedback")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "feedbackResult = true will be in response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "100", description = "Any precondition errors will be explained"),
+            @ApiResponse(responseCode = "200", description = "feedbackResult = true will be in response if success"),
             @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
     })
     @PostMapping("/feedback/create")
@@ -73,7 +76,8 @@ public class ConferenceController {
     @Operation(summary = "Leave feedback after conference")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "from, until")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of schema ConferenceAvailable response if success, reason will be in response if error"),
+            @ApiResponse(responseCode = "100", description = "Any precondition errors will be explained"),
+            @ApiResponse(responseCode = "200", description = "List of schema ConferenceAvailable response if success"),
             @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
     })
     @PostMapping("/available")

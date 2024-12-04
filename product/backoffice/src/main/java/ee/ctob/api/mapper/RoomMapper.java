@@ -15,6 +15,5 @@ public interface RoomMapper {
 
     @Mapping(source = "status", target = "roomStatus")
     @Mapping(source = "capacity", target = "roomCapacity")
-    @Mapping(source = "description", target = "reason")
     Response toResponse(RoomDTO roomDTO);
 }
