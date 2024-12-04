@@ -25,8 +25,6 @@ import java.util.UUID;
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
 import static ee.ctob.data.enums.RoomStatus.CLOSED;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -538,7 +536,7 @@ public class TestsMvcBackoffice extends TestContainer {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         return mockMvc.perform(post(path)
-                        .contentType(APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(request))).andReturn().getResponse().getStatus();
+                .contentType(APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request))).andReturn().getResponse().getStatus();
     }
 }

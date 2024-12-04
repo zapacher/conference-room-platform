@@ -6,7 +6,6 @@ import ee.ctob.access.RoomDAO;
 import ee.ctob.api.Request;
 import ee.ctob.api.Response;
 import ee.ctob.api.controller.ConferenceController;
-import ee.ctob.data.Participant;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
