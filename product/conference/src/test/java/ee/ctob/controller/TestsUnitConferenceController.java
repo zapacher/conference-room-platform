@@ -6,7 +6,7 @@ import ee.ctob.access.RoomDAO;
 import ee.ctob.api.Request;
 import ee.ctob.api.Response;
 import ee.ctob.api.controller.ConferenceController;
-import ee.ctob.data.Participant;
+import ee.ctob.data.Conference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -74,7 +74,7 @@ public class TestsUnitConferenceController extends TestContainer {
     void registrationCancel() {
         registration();
 
-        mockConferenceForCancel(UUID.randomUUID());
+        mockConferenceForCancel(false);
         mockParticipantForCancel(1);
 
         request = createRegitrationCancelRequest(participantValidationUUID);
@@ -103,7 +103,7 @@ public class TestsUnitConferenceController extends TestContainer {
         );
 
         request = createRegitrationCancelRequest(participantValidationUUID);
-        mockConferenceForCancel(null);
+        mockConferenceForCancel(true);
         response = controller.registrationCancel(request);
 
         assertAll("Registration Fail",
@@ -114,7 +114,7 @@ public class TestsUnitConferenceController extends TestContainer {
         );
 
         request = createRegitrationCancelRequest(participantValidationUUID);
-        mockConferenceForCancel(UUID.randomUUID());
+        mockConferenceForCancel(false);
         mockParticipantForCancel(0);
         response = controller.registrationCancel(request);
 
@@ -232,8 +232,13 @@ public class TestsUnitConferenceController extends TestContainer {
         when(participantDAO.feedback(any(), any())).thenReturn(result);
     }
 
-    private void mockConferenceForCancel(UUID response) {
-        when(conferenceDAO.isAvailableForCancel(any())).thenReturn(response);
+    private void mockConferenceForCancel(boolean isNull) {
+        Conference conference = null;
+        if(!isNull){
+            conference = Conference.builder().build();
+        }
+
+        when(conferenceDAO.isAvailableForCancel(any())).thenReturn(conference);
     }
 
     private void mockParticipantForCancel(int response) {

@@ -7,11 +7,12 @@ import ee.ctob.api.groups.ConferenceAvailable;
 import ee.ctob.api.groups.Feedback;
 import ee.ctob.api.groups.Registration;
 import ee.ctob.api.groups.RegistrationCancel;
+import ee.ctob.api.mapper.ParticipantMapper;
 import ee.ctob.service.ParticipantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,33 +27,23 @@ import org.springframework.web.bind.annotation.RestController;
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE
 )
+@RequiredArgsConstructor
 public class ConferenceController {
-    @Autowired
-    ParticipantService participantService;
+
+    final ParticipantService participantService;
+
+    ParticipantMapper mapper = ParticipantMapper.INSTANCE;
 
     @Operation(summary = "Register new participant to conference")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "firstName, lastName, gender, email, dateOfBirth, conferenceUUID")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "firstname, lastname, gender, email, dateOfBirth, conferenceUUID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "validationUUID will be in response if success, reason will be in response if error"),
             @ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
     })
     @PostMapping("/registration/create")
     public Response registration(@Validated(Registration.class) @RequestBody Request request) {
-        ParticipantDTO result = participantService.registration(
-                ParticipantDTO.builder()
-                        .firstName(request.getFirstname().trim())
-                        .lastName(request.getLastName().trim())
-                        .gender(request.getGender())
-                        .email(request.getEmail())
-                        .dateOfBirth(request.getDateOfBirth())
-                        .conferenceUUID(request.getConferenceUUID())
-                        .build()
-        );
-
-        return Response.builder()
-                .validationUUID(result.getValidationUUID())
-                .reason(result.getInfo())
-                .build();
+        ParticipantDTO result = participantService.registration(mapper.toParticipantDTO(request));
+        return mapper.toResponse(result);
     }
 
     @Operation(summary = "Cancel registration")
@@ -63,16 +54,8 @@ public class ConferenceController {
     })
     @PostMapping("/registration/cancel")
     public Response registrationCancel(@Validated(RegistrationCancel.class) @RequestBody Request request) {
-        ParticipantDTO result = participantService.registrationCancel(
-                ParticipantDTO.builder()
-                        .validationUUID(request.getValidationUUID())
-                        .build()
-        );
-
-        return Response.builder()
-                .registrationCancel(result.isRegistrationCancel())
-                .reason(result.getInfo())
-                .build();
+        ParticipantDTO result = participantService.registrationCancel(mapper.toParticipantDTO(request));
+        return mapper.toResponse(result);
     }
 
     @Operation(summary = "Leave feedback after conference")
@@ -83,18 +66,8 @@ public class ConferenceController {
     })
     @PostMapping("/feedback/create")
     public Response feedback(@Validated(Feedback.class) @RequestBody Request request) {
-        ParticipantDTO result = participantService.feedback(
-                ParticipantDTO.builder()
-                        .validationUUID(request.getValidationUUID())
-                        .feedback(request.getFeedback())
-                        .build()
-        );
-
-        return Response.builder()
-                .validationUUID(result.getValidationUUID())
-                .feedbackResult(result.isFeedbackResult())
-                .reason(result.getInfo())
-                .build();
+        ParticipantDTO result = participantService.feedback(mapper.toParticipantDTO(request));
+        return mapper.toResponse(result);
     }
 
     @Operation(summary = "Leave feedback after conference")
@@ -105,16 +78,7 @@ public class ConferenceController {
     })
     @PostMapping("/available")
     public Response availableConferences(@Validated(ConferenceAvailable.class) @RequestBody Request request) {
-        ParticipantDTO result = participantService.availableConferences(
-                ParticipantDTO.builder()
-                        .from(request.getFrom())
-                        .until(request.getUntil())
-                        .build()
-        );
-
-        return Response.builder()
-                .conferenceAvailableList(result.getConferenceAvailableList())
-                .reason(result.getInfo())
-                .build();
+        ParticipantDTO result = participantService.availableConferences(mapper.toParticipantDTO(request));
+        return mapper.toResponse(result);
     }
 }

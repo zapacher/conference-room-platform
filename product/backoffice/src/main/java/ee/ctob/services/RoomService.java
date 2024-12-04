@@ -1,23 +1,24 @@
 package ee.ctob.services;
 
-import ee.ctob.api.dto.RoomDTO;
-import ee.ctob.data.Room;
 import ee.ctob.access.ConferenceDAO;
 import ee.ctob.access.RoomDAO;
-import org.springframework.beans.factory.annotation.Autowired;
+import ee.ctob.api.dto.RoomDTO;
+import ee.ctob.data.Room;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class RoomService {
 
-    @Autowired
-    RoomDAO roomDAO;
-    @Autowired
-    ConferenceDAO conferenceDAO;
+    final RoomDAO roomDAO;
+    final ConferenceDAO conferenceDAO;
 
     public RoomDTO create(RoomDTO roomDTO) {
         Room room = roomDAO.saveAndFlush(

@@ -7,8 +7,9 @@ import ee.ctob.api.Response;
 import ee.ctob.api.dto.ConferenceDTO;
 import ee.ctob.data.Conference;
 import ee.ctob.data.Participant;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,13 +20,13 @@ import static ee.ctob.data.enums.ConferenceStatus.AVAILABLE;
 import static java.time.LocalDateTime.now;
 
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class ConferenceService {
-    @Autowired
-    ConferenceDAO conferenceDAO;
-    @Autowired
-    RoomDAO roomDAO;
-    @Autowired
-    ParticipantDAO participantDAO;
+
+    final ConferenceDAO conferenceDAO;
+    final RoomDAO roomDAO;
+    final ParticipantDAO participantDAO;
 
     public ConferenceDTO create(ConferenceDTO conferenceDTO) {
         if(conferenceDTO.getBookedFrom() != null && now().isAfter(conferenceDTO.getBookedFrom())) {
@@ -94,7 +95,6 @@ public class ConferenceService {
                         .validationUUID(conference.getValidationUUID())
                         .bookedFrom(conference.getBookedFrom())
                         .bookedUntil(conference.getBookedUntil())
-                        .oldValidationUUID(conferenceDTO.getValidationUUID())
                         .build();
             }
         }
@@ -111,7 +111,6 @@ public class ConferenceService {
                     .validationUUID(conference.getValidationUUID())
                     .bookedFrom(conference.getBookedFrom())
                     .bookedUntil(conference.getBookedUntil())
-                    .oldValidationUUID(conferenceDTO.getValidationUUID())
                     .build();
         }
 
@@ -186,7 +185,7 @@ public class ConferenceService {
     public ConferenceDTO cancel(ConferenceDTO conferenceDTO) {
         if (conferenceDAO.cancelConference(conferenceDTO.getValidationUUID())>0) {
             return ConferenceDTO.builder()
-                    .oldValidationUUID(conferenceDTO.getValidationUUID())
+                    .validationUUID(conferenceDTO.getValidationUUID())
                     .build();
         }
 

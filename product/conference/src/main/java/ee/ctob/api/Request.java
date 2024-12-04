@@ -25,7 +25,7 @@ public class Request {
     LocalDateTime until;
     @Schema(example = "Chuck")
     @NotEmpty(groups = Registration.class)
-    String firstname;
+    String firstName;
     @Schema(example = "Norris")
     @NotEmpty(groups = Registration.class)
     String lastName;

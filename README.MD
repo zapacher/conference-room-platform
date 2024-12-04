@@ -12,6 +12,7 @@
 - **Hibernate** for ORM (Object Relational Mapping)
 - **Lombok** for reducing boilerplate code
 - **Validation** for input validation
+- **Mapstruct** for code clean
 - **Springdoc** for API documentation
 
 ### Testing Tools:

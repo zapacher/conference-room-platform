@@ -23,14 +23,10 @@ while getopts "fst" opt; do
   esac
 done
 
+echo "Checking if PostgreSQL is up..."
 if [ "$SKIP_WAIT" = false ]; then
-
-  echo "Checking if PostgreSQL is up..."
   TIMEOUT=10
   COUNTER=0
-
-  COUNTER=0
-  TIMEOUT=30
   while ! pg_isready -h localhost -p 5432; do
     COUNTER=$((COUNTER + 2))
     if [ $COUNTER -ge $TIMEOUT ]; then
@@ -40,8 +36,10 @@ if [ "$SKIP_WAIT" = false ]; then
     echo "Waiting for PostgreSQL to be ready... ($COUNTER/$TIMEOUT seconds)"
     sleep 1
   done
+  echo "PostgreSQL is up and running!"
+else
+  echo "PostgreSQL check is ignored!"
 fi
-echo "PostgreSQL is up and running!"
 
 if [ "$SILENT_MODE" = true ]; then
     echo "Maven install in silent mode..."

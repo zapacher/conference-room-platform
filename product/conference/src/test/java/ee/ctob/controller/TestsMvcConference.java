@@ -7,6 +7,7 @@ import ee.ctob.access.ParticipantDAO;
 import ee.ctob.access.RoomDAO;
 import ee.ctob.api.Request;
 import ee.ctob.api.Response;
+import ee.ctob.data.Conference;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -100,7 +100,7 @@ public class TestsMvcConference  extends TestContainer {
     void registrationCancel() {
         registration();
 
-        mockConferenceForCancel(UUID.randomUUID());
+        mockConferenceForCancel(false);
         mockParticipantForCancel(1);
 
         request = createRegitrationCancelRequest(participantValidationUUID);
@@ -129,7 +129,7 @@ public class TestsMvcConference  extends TestContainer {
         );
 
         request = createRegitrationCancelRequest(participantValidationUUID);
-        mockConferenceForCancel(null);
+        mockConferenceForCancel(true);
         performMvc("/conference/registration/cancel");
 
         assertAll("Registration Fail",
@@ -140,7 +140,7 @@ public class TestsMvcConference  extends TestContainer {
         );
 
         request = createRegitrationCancelRequest(participantValidationUUID);
-        mockConferenceForCancel(UUID.randomUUID());
+        mockConferenceForCancel(false);
         mockParticipantForCancel(0);
         performMvc("/conference/registration/cancel");
 
@@ -257,8 +257,13 @@ public class TestsMvcConference  extends TestContainer {
         when(participantDAO.feedback(any(), any())).thenReturn(result);
     }
 
-    private void mockConferenceForCancel(UUID response) {
-        when(conferenceDAO.isAvailableForCancel(any())).thenReturn(response);
+    private void mockConferenceForCancel(boolean isNull) {
+        Conference conference = null;
+        if(!isNull){
+            conference = Conference.builder().build();
+        }
+
+        when(conferenceDAO.isAvailableForCancel(any())).thenReturn(conference);
     }
 
     private void mockParticipantForCancel(int response) {

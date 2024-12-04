@@ -25,8 +25,6 @@ import java.util.UUID;
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
 import static ee.ctob.data.enums.RoomStatus.CLOSED;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -438,7 +436,6 @@ public class TestsMvcBackoffice extends TestContainer {
         assertAll("conference update with same roomUUID success",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNotEquals(conferenceValidationUUID, response.getValidationUUID(), "validationUUID"),
-                ()-> assertEquals(conferenceValidationUUID, response.getOldValidationUUID(), "validationUUID"),
                 ()-> assertEquals(conferenceUUID, response.getConferenceUUID(), "conferennceUUID"),
                 ()-> assertEquals(request.getFrom(), response.getBookedFrom(), "bookedFrom"),
                 ()-> assertEquals(request.getUntil(), response.getBookedUntil(), "bookedUntil")
@@ -452,7 +449,6 @@ public class TestsMvcBackoffice extends TestContainer {
         assertAll("conference update with roomUUID success",
                 ()-> assertNotNull(response, "Response"),
                 ()-> assertNotEquals(request.getValidationUUID(), response.getValidationUUID(), "validationUUID"),
-                ()-> assertEquals(request.getValidationUUID(), response.getOldValidationUUID(), "oldValidationUUID"),
                 ()-> assertNotEquals(conferenceUUID, response.getConferenceUUID(), "conferenceUUID"),
                 ()-> assertEquals(request.getFrom(), response.getBookedFrom(), "bookedFrom"),
                 ()-> assertEquals(request.getUntil(), response.getBookedUntil(), "bookedUntil")
@@ -540,7 +536,7 @@ public class TestsMvcBackoffice extends TestContainer {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         return mockMvc.perform(post(path)
-                        .contentType(APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(request))).andReturn().getResponse().getStatus();
+                .contentType(APPLICATION_JSON)
+                .content(mapper.writeValueAsString(request))).andReturn().getResponse().getStatus();
     }
 }

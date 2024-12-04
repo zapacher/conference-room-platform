@@ -2,20 +2,17 @@ package ee.ctob.access;
 
 import ee.ctob.data.Conference;
 import ee.ctob.data.access.BaseConferenceDAO;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Repository
-public interface ConferenceDAO extends BaseConferenceDAO<Conference, Integer> {
+public interface ConferenceDAO extends BaseConferenceDAO {
 
     @Modifying
-    @Transactional
     @Query(
             value = "UPDATE backoffice.conferences " +
                     "SET status = 'CLOSED' " +
@@ -34,7 +31,6 @@ public interface ConferenceDAO extends BaseConferenceDAO<Conference, Integer> {
     )
     void closeConferenceOverlappingCountByRoomUUID(UUID roomUUID, int count);
 
-    @Transactional
     @Query(
             value = "SELECT * FROM backoffice.conferences " +
                     "WHERE validation_uuid = ?1 " +
@@ -43,7 +39,6 @@ public interface ConferenceDAO extends BaseConferenceDAO<Conference, Integer> {
     )
     Conference getConferenceByValidationUUID(UUID validationUUID);
 
-    @Transactional
     @Query(
             value = "SELECT COUNT(*) FROM backoffice.conferences " +
                     "WHERE ?2 < booked_until " +
@@ -56,7 +51,6 @@ public interface ConferenceDAO extends BaseConferenceDAO<Conference, Integer> {
     int countOverlappingBookingsByRoomUUID(UUID roomUUID, LocalDateTime from, LocalDateTime until);
 
     @Modifying
-    @Transactional
     @Query(
             value = "WITH closed_conferences AS (" +
                     "   UPDATE backoffice.conferences " +
@@ -73,7 +67,6 @@ public interface ConferenceDAO extends BaseConferenceDAO<Conference, Integer> {
     )
     void closeConferencesByRoomUUID(UUID roomUUID);
 
-    @Transactional
     @Query(
             value = "WITH canceled_conference AS ( " +
                     "    UPDATE backoffice.conferences " +
@@ -94,7 +87,6 @@ public interface ConferenceDAO extends BaseConferenceDAO<Conference, Integer> {
     )
     int cancelConference(UUID validationUUID);
 
-    @Transactional
     @Query(
             value = "WITH update_conference AS ( " +
                     "   UPDATE backoffice.conferences " +
@@ -111,7 +103,6 @@ public interface ConferenceDAO extends BaseConferenceDAO<Conference, Integer> {
     )
     Conference updateConference(UUID validationUUID, LocalDateTime from, LocalDateTime until, UUID newValidationUUID);
 
-    @Transactional
     @Query(
             value = "SELECT COUNT(*) FROM backoffice.conferences " +
                     "WHERE ?2 < booked_until " +

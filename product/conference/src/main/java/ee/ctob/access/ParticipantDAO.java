@@ -5,23 +5,20 @@ import ee.ctob.data.access.BaseParticipantDAO;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Repository
-public interface ParticipantDAO extends BaseParticipantDAO<Participant, Integer> {
+public interface ParticipantDAO extends BaseParticipantDAO {
 
-    @Transactional
     @Query(
             value = "SELECT * FROM conference.participants " +
                     "WHERE validation_uuid = ?1",
             nativeQuery = true
     )
-    Participant getParticipantUUID(UUID validationUUID);
+    Participant getParticipant(UUID validationUUID);
 
     @Modifying
-    @Transactional
     @Query(
             value = "UPDATE conference.participants " +
                     "SET feedback = ?2 " +

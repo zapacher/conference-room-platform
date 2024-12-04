@@ -7,8 +7,9 @@ import ee.ctob.api.Response;
 import ee.ctob.api.dto.ParticipantDTO;
 import ee.ctob.data.Conference;
 import ee.ctob.data.Participant;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +19,13 @@ import static java.time.LocalDateTime.now;
 
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class ParticipantService {
-    @Autowired
-    ParticipantDAO participantDAO;
-    @Autowired
-    ConferenceDAO conferenceDAO;
-    @Autowired
-    RoomDAO roomDAO;
+
+    final ParticipantDAO participantDAO;
+    final ConferenceDAO conferenceDAO;
+    final RoomDAO roomDAO;
 
     public ParticipantDTO registration(ParticipantDTO participantDTO) {
         UUID participantUUID = UUID.randomUUID();
@@ -53,14 +54,14 @@ public class ParticipantService {
     }
 
     public ParticipantDTO registrationCancel(ParticipantDTO participantDTO) {
-        Participant participant = participantDAO.getParticipantUUID(participantDTO.getValidationUUID());
+        Participant participant = participantDAO.getParticipant(participantDTO.getValidationUUID());
         if(participant == null) {
             return ParticipantDTO.builder()
                     .info("Participant with this validation doesn't exists")
                     .build();
         }
 
-        UUID participantUUID = participant.getValidationUUID();
+        UUID participantUUID = participant.getParticipantUUID();
 
         if(conferenceDAO.isAvailableForCancel(participantUUID) == null) {
             return ParticipantDTO.builder()
@@ -72,8 +73,8 @@ public class ParticipantService {
             return ParticipantDTO.builder()
                     .info("Validation uuid isnt valid")
                     .build();
-
         }
+
         return ParticipantDTO.builder()
                 .registrationCancel(true)
                 .build();
