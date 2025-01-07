@@ -1,6 +1,6 @@
 package ee.ctob.api.dto;
 
-import ee.ctob.data.enums.RoomStatus;
+import ee.ctob.api.enums.RoomStatus;
 import lombok.Builder;
 import lombok.Data;
 

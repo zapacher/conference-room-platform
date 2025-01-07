@@ -33,9 +33,6 @@ public class ParticipantService {
         UUID participantUUID = UUID.randomUUID();
         if(conferenceDAO.registerParticipant(participantUUID, participantDTO.getConferenceUUID())==0) {
             throw new PreconditionsFailedException("Registration isn't available for this conference");
-//            return ParticipantDTO.builder()
-//                    .info("Registration isn't available for this conference")
-//                    .build();
         }
 
         Participant participant = participantDAO.saveAndFlush(

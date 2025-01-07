@@ -1,8 +1,8 @@
 package ee.ctob.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import ee.ctob.data.enums.ConferenceStatus;
-import ee.ctob.data.enums.RoomStatus;
+import ee.ctob.api.enums.ConferenceStatus;
+import ee.ctob.api.enums.RoomStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

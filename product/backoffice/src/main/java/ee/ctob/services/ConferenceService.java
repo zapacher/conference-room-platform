@@ -3,12 +3,12 @@ package ee.ctob.services;
 import ee.ctob.access.ConferenceDAO;
 import ee.ctob.access.ParticipantDAO;
 import ee.ctob.access.RoomDAO;
+import ee.ctob.access.data.Conference;
+import ee.ctob.access.data.Participant;
 import ee.ctob.api.Response;
 import ee.ctob.api.dto.ConferenceDTO;
 import ee.ctob.api.error.BadRequestException;
 import ee.ctob.api.error.PreconditionsFailedException;
-import ee.ctob.data.Conference;
-import ee.ctob.data.Participant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static ee.ctob.data.enums.ConferenceStatus.AVAILABLE;
+import static ee.ctob.api.enums.ConferenceStatus.AVAILABLE;
 import static java.time.LocalDateTime.now;
 
 @Service

@@ -1,8 +1,8 @@
 package ee.ctob.api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ee.ctob.api.enums.RoomStatus;
 import ee.ctob.api.groups.*;
-import ee.ctob.data.enums.RoomStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Value;
 
