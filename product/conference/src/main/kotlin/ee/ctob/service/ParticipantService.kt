@@ -3,11 +3,11 @@ package ee.ctob.service
 import ee.ctob.access.ConferenceDAO
 import ee.ctob.access.ParticipantDAO
 import ee.ctob.access.RoomDAO
-import ee.ctob.access.data.Participant
 import ee.ctob.api.Request
 import ee.ctob.api.Response
 import ee.ctob.api.error.BadRequestException
 import ee.ctob.api.error.PreconditionsFailedException
+import ee.ctob.data.Participant
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime.now
@@ -28,16 +28,16 @@ open class ParticipantService (
         }
 
         val participant = participantDAO.saveAndFlush(
-            Participant(
-                created = now(),
-                participantUUID = participantUUID,
-                validationUUID = UUID.randomUUID(),
-                firstName = request.firstName,
-                lastName = request.lastName,
-                email = request.email,
-                gender = request.gender,
-                dateOfBirth = request.dateOfBirth
-            )
+            Participant.builder()
+                .created(now())
+                .participantUUID(participantUUID)
+                .validationUUID(UUID.randomUUID())
+                .firstName(request.firstName)
+                .lastName(request.lastName)
+                .email(request.email)
+                .gender(request.gender)
+                .dateOfBirth(request.dateOfBirth)
+                .build()
         )
 
         return Response(

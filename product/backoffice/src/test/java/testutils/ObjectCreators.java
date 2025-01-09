@@ -1,7 +1,7 @@
 package testutils;
 
 import ee.ctob.api.Request;
-import ee.ctob.api.enums.RoomStatus;
+import ee.ctob.data.enums.RoomStatus;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

@@ -17,7 +17,7 @@
     <modules>
         <module>conference</module>
         <module>backoffice</module>
-<!--        <module>data</module>-->
+        <module>data</module>
     </modules>
 
     <properties>

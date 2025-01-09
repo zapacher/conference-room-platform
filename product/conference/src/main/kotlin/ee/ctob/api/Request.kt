@@ -1,17 +1,17 @@
 package ee.ctob.api
 
-import ee.ctob.api.enums.Gender
 import ee.ctob.api.groups.ConferenceAvailable
 import ee.ctob.api.groups.Feedback
 import ee.ctob.api.groups.Registration
 import ee.ctob.api.groups.RegistrationCancel
+import ee.ctob.data.enums.Gender
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.LocalDateTime
+import java.util.*
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotEmpty
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Past
-import java.time.LocalDateTime
-import java.util.UUID
 
 data class Request(
     @field:NotNull(groups = [ConferenceAvailable::class])

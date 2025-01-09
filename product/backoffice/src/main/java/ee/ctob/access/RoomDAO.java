@@ -1,7 +1,7 @@
 package ee.ctob.access;
 
-import ee.ctob.access.data.Room;
-import org.springframework.data.jpa.repository.JpaRepository;
+import ee.ctob.data.Room;
+import ee.ctob.data.access.BaseRoomDAO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface RoomDAO extends JpaRepository<Room, Integer> {
+public interface RoomDAO extends BaseRoomDAO {
 
     @Query(
             value = "UPDATE backoffice.rooms " +

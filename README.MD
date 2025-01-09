@@ -5,6 +5,7 @@
 ## Technologies Used
 
 - **Java 17** | 17.0.8-tem
+- **Kotlin** | 2.1.0
 - **Maven 3.8** for building the project
 - **Spring** for runtime framework
 - **Postgres** for Database
@@ -32,9 +33,9 @@
 - platform/
   - ├── config 
   - ├── product 
-    - ├── backoffice 
-    - ├── conference 
-    - └── data
+    - ├── backoffice (Java)
+    - ├── conference (Kotlin) 
+    - └── data (Java)
 
 ---
 

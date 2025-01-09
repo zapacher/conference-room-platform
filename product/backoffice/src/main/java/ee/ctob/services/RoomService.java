@@ -2,16 +2,17 @@ package ee.ctob.services;
 
 import ee.ctob.access.ConferenceDAO;
 import ee.ctob.access.RoomDAO;
-import ee.ctob.access.data.Room;
 import ee.ctob.api.dto.RoomDTO;
 import ee.ctob.api.error.BadRequestException;
+import ee.ctob.data.Room;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import static ee.ctob.api.enums.RoomStatus.AVAILABLE;
+import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
+
 
 @Service
 @Transactional

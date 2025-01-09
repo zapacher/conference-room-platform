@@ -1,14 +1,14 @@
 package ee.ctob.access
 
-import ee.ctob.access.data.Participant
-import org.springframework.data.jpa.repository.JpaRepository
+import ee.ctob.data.Participant
+import ee.ctob.data.access.BaseParticipantDAO
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface ParticipantDAO : JpaRepository<Participant, Int>{
+interface ParticipantDAO : BaseParticipantDAO {
 
     @Query(
         value = "SELECT * FROM conference.participants " +

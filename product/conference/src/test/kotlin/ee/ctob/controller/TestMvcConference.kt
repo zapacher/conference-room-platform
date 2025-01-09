@@ -5,11 +5,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import ee.ctob.access.ConferenceDAO
 import ee.ctob.access.ParticipantDAO
 import ee.ctob.access.RoomDAO
-import ee.ctob.access.data.Conference
 import ee.ctob.api.Request
 import ee.ctob.api.Response
 import ee.ctob.api.error.ErrorResponse
 import ee.ctob.api.error.PreconditionsFailedException
+import ee.ctob.data.Conference
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -267,7 +267,7 @@ class TestsMvcConference : TestContainer() {
 
     private fun mockConferenceForCancel() {
         whenever(conferenceDAO.isAvailableForCancel(any()))
-            .thenReturn(Conference(conferenceUUID = UUID.randomUUID()))
+            .thenReturn(Conference.builder().conferenceUUID(UUID.randomUUID()).build())
     }
 
     private fun mockConferenceForCancelThrow() {

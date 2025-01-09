@@ -14,22 +14,25 @@
     <artifactId>conference</artifactId>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>ee.ctob</groupId>-->
-<!--            <artifactId>data</artifactId>-->
-<!--            <version>1.0-SNAPSHOT</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>ee.ctob</groupId>
+            <artifactId>data</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+            <version>1.9.0</version>
+        </dependency>
+
+        <!-- test dependencies -->
+
         <dependency>
             <groupId>org.mockito.kotlin</groupId>
             <artifactId>mockito-kotlin</artifactId>
             <version>4.1.0</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-            <version>1.9.0</version> <!-- Use the appropriate Kotlin version -->
         </dependency>
     </dependencies>
 

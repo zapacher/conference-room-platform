@@ -1,7 +1,7 @@
 package ee.ctob.access
 
-import ee.ctob.access.data.Conference
-import org.springframework.data.jpa.repository.JpaRepository
+import ee.ctob.data.Conference
+import ee.ctob.data.access.BaseConferenceDAO
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Repository
-interface ConferenceDAO : JpaRepository<Conference, Int> {
+interface ConferenceDAO : BaseConferenceDAO {
 
     @Query(
         value = "SELECT * FROM backoffice.conferences " +

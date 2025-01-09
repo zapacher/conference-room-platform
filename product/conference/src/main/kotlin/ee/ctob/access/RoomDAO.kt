@@ -1,13 +1,12 @@
 package ee.ctob.access
 
-import ee.ctob.access.data.Room
-import org.springframework.data.jpa.repository.JpaRepository
+import ee.ctob.data.access.BaseRoomDAO
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface RoomDAO : JpaRepository<Room,Int> {
+interface RoomDAO : BaseRoomDAO {
 
     @Query(
         value = "SELECT location FROM backoffice.rooms " +
