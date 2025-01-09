@@ -54,7 +54,7 @@ interface ConferenceDAO : JpaRepository<Conference, Int> {
                 "AND status = 'AVAILABLE' ",
         nativeQuery = true
     )
-    fun findAllAvailableBetween(from: LocalDateTime?, until: LocalDateTime?): List<Conference>
+    fun findAllAvailableBetween(from: LocalDateTime, until: LocalDateTime): List<Conference>
 
     @Modifying
     @Query(

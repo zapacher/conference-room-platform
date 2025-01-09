@@ -79,7 +79,7 @@ open class ParticipantService (
             throw BadRequestException(400, "Requested time isn't logical")
         }
 
-        val conferenceList = conferenceDAO.findAllAvailableBetween(request.from, request.until)
+        val conferenceList = conferenceDAO.findAllAvailableBetween(request.from!!, request.until!!)
 
         if(conferenceList.isEmpty()) {
             throw PreconditionsFailedException("No conferences are available at this time period")

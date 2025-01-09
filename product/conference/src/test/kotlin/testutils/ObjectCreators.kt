@@ -6,7 +6,7 @@ import ee.ctob.api.enums.Gender
 import java.time.LocalDateTime
 import java.util.*
 
-open class ObjectCreators {
+class ObjectCreators {
     companion object {
         fun createRegistrationRequest(conferenceUUID: UUID?): Request {
             return Request(

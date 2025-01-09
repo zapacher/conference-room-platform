@@ -312,8 +312,6 @@ class TestsMvcConference : TestContainer() {
                     .contentType(APPLICATION_JSON)
                     .content(mapper.writeValueAsString(request))
             ).andReturn().response.contentAsString
-            println("111111111")
-            println(responseMvc)
             errorResponse = mapper.readValue(responseMvc, ErrorResponse::class.java)
         } catch (_: Exception) {
         }

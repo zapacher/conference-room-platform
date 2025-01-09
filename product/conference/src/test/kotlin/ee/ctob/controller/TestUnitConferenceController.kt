@@ -44,7 +44,6 @@ class TestsUnitConferenceController : TestContainer() {
     @SpyBean
     lateinit var participantDAO: ParticipantDAO
 
-    @InjectMocks
     @Autowired
     lateinit var controller: ConferenceController
 
@@ -58,6 +57,7 @@ class TestsUnitConferenceController : TestContainer() {
         request = createRegistrationRequest(UUID.randomUUID())
         mockRegistration()
         response = controller.registration(request!!)
+
         assertAll("Registration Success",
             { assertNotNull(response, "Response") },
             { assertNotNull(response?.validationUUID, "validationUUID") }
@@ -195,7 +195,7 @@ class TestsUnitConferenceController : TestContainer() {
         assertAll("Available conferences Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
             { assertEquals(100, errorResponse?.code, "error code") },
-            { assertEquals("No conferences is available at this time period", errorResponse?.message, "error message") }
+            { assertEquals("No conferences are available at this time period", errorResponse?.message, "error message") }
         )
 
         request = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(59))
@@ -225,8 +225,8 @@ class TestsUnitConferenceController : TestContainer() {
     }
 
     private fun mockFeedback(result: Int) {
-        doReturn(result).whenever(participantDAO
-            .feedback(any(), any()))
+        doReturn(result)
+            .whenever(participantDAO).feedback(any(), any())
     }
 
     private fun mockConferenceForCancel() {
@@ -236,7 +236,7 @@ class TestsUnitConferenceController : TestContainer() {
 
     private fun mockConferenceForCancelThrow() {
         doThrow(PreconditionsFailedException("Conference already started or finished"))
-            .whenever(conferenceDAO.isAvailableForCancel(any()))
+            .whenever(conferenceDAO).isAvailableForCancel(any())
     }
 
     private fun mockParticipantForCancel(response: Int) {
