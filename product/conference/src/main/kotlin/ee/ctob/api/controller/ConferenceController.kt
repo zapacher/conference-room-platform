@@ -29,13 +29,10 @@ class ConferenceController(
 
     @Operation(summary = "Register new participant to conference")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "firstName, lastName, gender, email, dateOfBirth, conferenceUUID")
-    @ApiResponses(
-        value = [
+    @ApiResponses(value = [
             ApiResponse(responseCode = "100", description = "Any precondition errors will be explained"),
             ApiResponse(responseCode = "200", description = "validationUUID will be in response if success"),
-            ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
-        ]
-    )
+            ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")])
     @PostMapping("/registration/create")
     fun registration(@Validated(Registration::class) @RequestBody request: Request): Response {
         return participantService.registration(request)
@@ -43,13 +40,10 @@ class ConferenceController(
 
     @Operation(summary = "Cancel registration")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID")
-    @ApiResponses(
-        value = [
+    @ApiResponses(value = [
             ApiResponse(responseCode = "100", description = "Any precondition errors will be explained"),
             ApiResponse(responseCode = "200", description = "registrationCancel = true will be in response if success"),
-            ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
-        ]
-    )
+            ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")])
     @PostMapping("/registration/cancel")
     fun registrationCancel(@Validated(RegistrationCancel::class) @RequestBody request: Request): Response {
         return participantService.registrationCancel(request)
@@ -57,13 +51,10 @@ class ConferenceController(
 
     @Operation(summary = "Leave feedback after conference")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "validationUUID, feedback")
-    @ApiResponses(
-        value = [
+    @ApiResponses(value = [
             ApiResponse(responseCode = "100", description = "Any precondition errors will be explained"),
             ApiResponse(responseCode = "200", description = "feedbackResult = true will be in response if success"),
-            ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
-        ]
-    )
+            ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")])
     @PostMapping("/feedback/create")
     fun feedback(@Validated(Feedback::class) @RequestBody request: Request): Response {
         return participantService.feedback(request)
@@ -71,13 +62,10 @@ class ConferenceController(
 
     @Operation(summary = "Leave feedback after conference")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "from, until")
-    @ApiResponses(
-        value = [
+    @ApiResponses(value = [
             ApiResponse(responseCode = "100", description = "Any precondition errors will be explained"),
             ApiResponse(responseCode = "200", description = "List of schema ConferenceAvailable response if success"),
-            ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")
-        ]
-    )
+            ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")])
     @PostMapping("/available")
     fun availableConferences(@Validated(ConferenceAvailable::class) @RequestBody request: Request): Response {
         return participantService.availableConferences(request)
