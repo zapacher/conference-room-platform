@@ -11,16 +11,16 @@ data class Participant(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int? = null,
-    val created: LocalDateTime,
+    val created: LocalDateTime? = null,
     @Column(name = "validation_uuid", unique = true)
-    val validationUUID: UUID,
+    val validationUUID: UUID? = null,
     @Column(name = "participant_uuid", unique = true)
-    val participantUUID: UUID,
-    val firstName: String,
-    val lastName: String,
-    val email: String,
+    val participantUUID: UUID? = null,
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val email: String? = null,
     @Enumerated(EnumType.STRING)
-    val gender: Gender,
-    val dateOfBirth: LocalDateTime,
+    val gender: Gender? = null,
+    val dateOfBirth: LocalDateTime? = null,
     val feedback: String? = null
 )

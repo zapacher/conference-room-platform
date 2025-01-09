@@ -4,6 +4,7 @@ import ee.ctob.api.Request;
 import ee.ctob.api.enums.RoomStatus;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class ObjectCreators {
@@ -39,7 +40,7 @@ public class ObjectCreators {
         );
     }
 
-    public static Request createConferenceRequest(String from, String until, UUID validationUUID, UUID rUUID) {
+    public static Request createConferenceRequest(LocalDateTime from, LocalDateTime until, UUID validationUUID, UUID rUUID) {
         return new  Request(
                 null,
                 null,
@@ -47,8 +48,8 @@ public class ObjectCreators {
                 null,
                 rUUID,
                 "Some info as example",
-                LocalDateTime.parse(from),
-                LocalDateTime.parse(until),
+                from,
+                until,
                 validationUUID
         );
     }
@@ -65,5 +66,9 @@ public class ObjectCreators {
                 null,
                 validationUUID
         );
+    }
+
+    public static LocalDateTime format(LocalDateTime date) {
+        return LocalDateTime.parse(date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")));
     }
 }

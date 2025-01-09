@@ -16,43 +16,43 @@ import java.util.UUID
 data class Request(
     @field:NotNull(groups = [ConferenceAvailable::class])
     @field:Schema(example = "2024-12-28T11:00:00")
-    val from: LocalDateTime,
+    var from: LocalDateTime? = null,
 
     @field:Schema(example = "2024-12-28T12:00:00")
     @field:NotNull(groups = [ConferenceAvailable::class])
-    val until: LocalDateTime,
+    var until: LocalDateTime? = null,
 
     @field:Schema(example = "Chuck")
     @field:NotEmpty(groups = [Registration::class])
-    val firstName: String,
+    var firstName: String? = null,
 
     @field:Schema(example = "Norris")
     @field:NotEmpty(groups = [Registration::class])
-    val lastName: String,
+    var lastName: String? = null,
 
     @field:Schema(example = "MALE")
     @field:NotNull(groups = [Registration::class])
-    val gender: Gender,
+    var gender: Gender? = null,
 
     @field:Schema(example = "chuck.norris@gmail.com")
     @field:NotNull(groups = [Registration::class])
     @field:Email
-    val email: String,
+    var email: String? = null,
 
     @field:Schema(example = "1940-04-10T0:00:00")
     @field:Past(groups = [Registration::class])
     @field:NotNull(groups = [Registration::class])
-    val dateOfBirth: LocalDateTime,
+    var dateOfBirth: LocalDateTime? = null,
 
     @field:Schema(example = "af7c1fe6-d669-414e-b066-e9733f0de7a8")
     @field:NotNull(groups = [Registration::class])
-    val conferenceUUID: UUID,
+    var conferenceUUID: UUID? = null,
 
     @field:Schema(example = "08c71152-c552-42e7-b094-f510ff44e9cb")
     @field:NotNull(groups = [RegistrationCancel::class, Feedback::class])
-    val validationUUID: UUID,
+    var validationUUID: UUID? = null,
 
     @field:Schema(example = "Simple text")
     @field:NotEmpty(groups = [Feedback::class])
-    val feedback: String
+    var feedback: String? = null
 )

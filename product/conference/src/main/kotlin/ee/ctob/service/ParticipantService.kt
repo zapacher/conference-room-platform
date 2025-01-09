@@ -15,18 +15,17 @@ import java.util.*
 
 @Service
 @Transactional
-open class ParticipantService(
+open class ParticipantService (
     private val participantDAO: ParticipantDAO,
     private val conferenceDAO: ConferenceDAO,
     private val roomDAO: RoomDAO
 ) {
 
-    fun registration(request: Request): Response {
+    open fun registration(request: Request): Response {
         val participantUUID = UUID.randomUUID()
         if (conferenceDAO.registerParticipant(participantUUID, request.conferenceUUID) == 0) {
             throw PreconditionsFailedException("Registration isn't available for this conference")
         }
-
 
         val participant = participantDAO.saveAndFlush(
             Participant(
@@ -41,19 +40,18 @@ open class ParticipantService(
             )
         )
 
-
         return Response(
             validationUUID = participant.validationUUID
         )
     }
 
-    fun registrationCancel(request: Request): Response {
-        val participant = participantDAO.getParticipant(request.validationUUID)?:
+    open fun registrationCancel(request: Request): Response {
+        val participant = participantDAO.getParticipant(request.validationUUID!!)?:
         throw PreconditionsFailedException("Participant with this validation doesn't exists")
 
         val participantUUID = participant.participantUUID
 
-        conferenceDAO.isAvailableForCancel(participantUUID)?:
+        conferenceDAO.isAvailableForCancel(participantUUID!!)?:
         throw PreconditionsFailedException("Conference already started or finished")
 
         if (conferenceDAO.cancelRegistration(participantUUID) == 0) {
@@ -65,8 +63,8 @@ open class ParticipantService(
         )
     }
 
-    fun feedback(request: Request): Response {
-        if (participantDAO.feedback(request.validationUUID, request.feedback) == 0) {
+    open fun feedback(request: Request): Response {
+        if (participantDAO.feedback(request.validationUUID!!, request.feedback!!) == 0) {
             throw PreconditionsFailedException("Feedback already exists or conference isn't finished")
         }
 
@@ -77,18 +75,18 @@ open class ParticipantService(
     }
 
     fun availableConferences(request: Request): Response {
-        if (now().isAfter(request.from) || request.until.isBefore(request.from)) {
+        if (now().isAfter(request.from) || request.until!!.isBefore(request.from)) {
             throw BadRequestException(400, "Requested time isn't logical")
         }
 
-        val conferenceList = conferenceDAO.findAllAvailableBetween(request.from, request.until)?:
+        val conferenceList = conferenceDAO.findAllAvailableBetween(request.from!!, request.until!!)?:
         throw PreconditionsFailedException("No conferences are available at this time period")
 
         val conferenceAvailableList = conferenceList.map { conference ->
             Response.ConferenceAvailable(
                 conferenceUUID = conference.conferenceUUID,
-                location = roomDAO.getRoomLocationByRoomId(conference.roomUUID),
-                participantsAmount = conference.participants.size,
+                location = roomDAO.getRoomLocationByRoomId(conference.roomUUID!!),
+                participantsAmount = conference.participants?.size,
                 info = conference.info,
                 from = conference.bookedFrom,
                 until = conference.bookedUntil
