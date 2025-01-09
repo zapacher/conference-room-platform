@@ -23,21 +23,21 @@ data class Response(
     @JsonInclude(JsonInclude.Include.NON_NULL)
     data class ConferenceAvailable(
         @field:Schema(example = "5a743569-35f8-4588-899a-7ebcd4a75def")
-        var conferenceUUID: UUID?,
+        var conferenceUUID: UUID? = null,
 
         @field:Schema(example = "Tartu mnt. 62, floor 30, room 247")
-        var location: String?,
+        var location: String? = null,
 
         @field:Schema(example = "20")
-        var participantsAmount: Int?,
+        var participantsAmount: Int? = null,
 
         @field:Schema(example = "2024-12-30T12:00:00")
-        var from: LocalDateTime?,
+        var from: LocalDateTime? = null,
 
         @field:Schema(example = "2024-12-30T17:30:00")
-        var until: LocalDateTime?,
+        var until: LocalDateTime? = null,
 
         @field:Schema(example = "Info about conference")
-        var info: String?
+        var info: String? = null
     )
 }

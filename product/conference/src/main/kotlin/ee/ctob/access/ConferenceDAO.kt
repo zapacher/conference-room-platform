@@ -4,7 +4,6 @@ import ee.ctob.access.data.Conference
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 import java.util.*
@@ -55,7 +54,7 @@ interface ConferenceDAO : JpaRepository<Conference, Int> {
                 "AND status = 'AVAILABLE' ",
         nativeQuery = true
     )
-    fun findAllAvailableBetween(from: LocalDateTime, until: LocalDateTime): List<Conference>?
+    fun findAllAvailableBetween(from: LocalDateTime?, until: LocalDateTime?): List<Conference>
 
     @Modifying
     @Query(

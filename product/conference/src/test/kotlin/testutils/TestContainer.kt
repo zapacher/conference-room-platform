@@ -1,4 +1,4 @@
-package testUtils
+package testutils
 
 import ee.ctob.Application
 import org.junit.jupiter.api.BeforeAll

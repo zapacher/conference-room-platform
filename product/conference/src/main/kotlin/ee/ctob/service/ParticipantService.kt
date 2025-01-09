@@ -74,13 +74,16 @@ open class ParticipantService (
         )
     }
 
-    fun availableConferences(request: Request): Response {
+    open fun availableConferences(request: Request): Response {
         if (now().isAfter(request.from) || request.until!!.isBefore(request.from)) {
             throw BadRequestException(400, "Requested time isn't logical")
         }
 
-        val conferenceList = conferenceDAO.findAllAvailableBetween(request.from!!, request.until!!)?:
-        throw PreconditionsFailedException("No conferences are available at this time period")
+        val conferenceList = conferenceDAO.findAllAvailableBetween(request.from, request.until)
+
+        if(conferenceList.isEmpty()) {
+            throw PreconditionsFailedException("No conferences are available at this time period")
+        }
 
         val conferenceAvailableList = conferenceList.map { conference ->
             Response.ConferenceAvailable(

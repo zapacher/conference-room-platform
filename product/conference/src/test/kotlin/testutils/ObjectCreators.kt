@@ -1,4 +1,4 @@
-package testUtils
+package testutils
 
 import ee.ctob.access.data.Conference
 import ee.ctob.api.Request

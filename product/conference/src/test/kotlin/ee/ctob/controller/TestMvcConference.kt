@@ -26,12 +26,12 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.testcontainers.junit.jupiter.Testcontainers
-import testUtils.ObjectCreators.Companion.createFeedbackRequest
-import testUtils.ObjectCreators.Companion.createRegistrationCancelRequest
-import testUtils.ObjectCreators.Companion.createRegistrationRequest
-import testUtils.ObjectCreators.Companion.createRequestForConferences
-import testUtils.ObjectCreators.Companion.getConferenceList
-import testUtils.TestContainer
+import testutils.ObjectCreators.Companion.createFeedbackRequest
+import testutils.ObjectCreators.Companion.createRegistrationCancelRequest
+import testutils.ObjectCreators.Companion.createRegistrationRequest
+import testutils.ObjectCreators.Companion.createRequestForConferences
+import testutils.ObjectCreators.Companion.getConferenceList
+import testutils.TestContainer
 import java.time.LocalDateTime
 import java.util.*
 
@@ -226,12 +226,12 @@ class TestsMvcConference : TestContainer() {
     fun availableConferencesFail() {
         registration()
 
-        request = createRequestForConferences(LocalDateTime.now().plusHours(40), LocalDateTime.now().plusHours(45))
+        request = createRequestForConferences(LocalDateTime.now().plusHours(90), LocalDateTime.now().plusHours(100))
         performMvcThrow("/conference/available")
         assertAll("Available conferences Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(100, errorResponse?.code!!, "error code") },
-            { assertEquals("No conferences is available at this time period", errorResponse?.message!!, "error message") }
+            { assertEquals(100, errorResponse?.code, "error code") },
+            { assertEquals("No conferences are available at this time period", errorResponse?.message, "error message") }
         )
 
         request = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(59))
@@ -272,7 +272,7 @@ class TestsMvcConference : TestContainer() {
 
     private fun mockConferenceForCancelThrow() {
         doThrow(PreconditionsFailedException("Conference already started or finished"))
-            .whenever(conferenceDAO.isAvailableForCancel(any()))
+            .whenever(conferenceDAO).isAvailableForCancel(any())
     }
 
     private fun mockParticipantForCancel(response: Int) {
@@ -312,7 +312,8 @@ class TestsMvcConference : TestContainer() {
                     .contentType(APPLICATION_JSON)
                     .content(mapper.writeValueAsString(request))
             ).andReturn().response.contentAsString
-
+            println("111111111")
+            println(responseMvc)
             errorResponse = mapper.readValue(responseMvc, ErrorResponse::class.java)
         } catch (_: Exception) {
         }
