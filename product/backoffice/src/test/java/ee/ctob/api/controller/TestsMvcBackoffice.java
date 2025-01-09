@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import testutils.TestContainer;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,7 @@ import java.util.UUID;
 
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
 import static ee.ctob.data.enums.RoomStatus.CLOSED;
+import static java.time.LocalDateTime.now;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -182,14 +184,14 @@ public class TestsMvcBackoffice extends TestContainer {
             roomCreate();
         }
 
-        createConferenceCreateRequestOnlyTime("2024-12-31T10:00:00", "2024-12-31T15:00:00");
+        createConferenceCreateRequestOnlyTime(now().plusHours(60), now().plusHours(65));
         performMvc("/backoffice/conference/create");
         assertAll("Conference create success with other time",
                 ()-> assertNotNull(response,"Response"),
                 ()-> assertNotNull(response.getValidationUUID(), "validationUUID"),
                 ()-> assertNotNull(response.getConferenceUUID(), "conferenceUUID"),
-                ()-> assertEquals(request.getFrom(), response.getBookedFrom(), "bookedFrom"),
-                ()-> assertEquals(request.getUntil(), response.getBookedUntil(), "bookedUntil")
+                ()-> assertEquals(format(request.getFrom()), response.getBookedFrom(), "bookedFrom"),
+                ()-> assertEquals(format(request.getUntil()), response.getBookedUntil(), "bookedUntil")
         );
         conferenceUUID = response.getConferenceUUID();
         conferenceValidationUUID = response.getValidationUUID();
@@ -201,7 +203,7 @@ public class TestsMvcBackoffice extends TestContainer {
         withoutRoom = true;
         conferenceCreate();
 
-        createConferenceCreateRequestOnlyTime("2024-12-31T10:00:00", "2024-12-31T15:00:00");
+        createConferenceCreateRequestOnlyTime(now().plusHours(60), now().plusHours(65));
         performMvcThrow("/backoffice/conference/create");
         assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull(errorResponse, "ErrorResponse"),
@@ -209,7 +211,7 @@ public class TestsMvcBackoffice extends TestContainer {
                 ()-> assertEquals("Chosen time isn't available", errorResponse.getMessage(), "error message")
         );
 
-        createConferenceCreateRequestOnlyTime("2024-10-31T10:00:00", "2024-12-31T15:00:00");
+        createConferenceCreateRequestOnlyTime(now().minusHours(60), now().plusHours(65));
         performMvcThrow("/backoffice/conference/create");
         assertAll("Create conference bad time ",
                 ()-> assertNotNull(errorResponse, "ErrorResponse"),
@@ -217,7 +219,7 @@ public class TestsMvcBackoffice extends TestContainer {
                 ()-> assertEquals("Unlogical booking time", errorResponse.getMessage(), "error message")
         );
 
-        createConferenceCreateRequestOnlyTime("2025-12-31T10:00:00", "2024-12-31T15:00:00");
+        createConferenceCreateRequestOnlyTime(now().plusHours(60), now().minusHours(65));
         performMvcThrow("/backoffice/conference/create");
         assertAll("Create conference bad time ",
                 ()-> assertNotNull(errorResponse, "ErrorResponse"),
@@ -225,7 +227,7 @@ public class TestsMvcBackoffice extends TestContainer {
                 ()-> assertEquals("Unlogical booking time", errorResponse.getMessage(), "error message")
         );
 
-        createConferenceCreateRequestOnlyTime("2024-12-31T09:00:00", "2024-12-31T16:00:00");
+        createConferenceCreateRequestOnlyTime(now().plusHours(59), now().plusHours(61));
         performMvcThrow("/backoffice/conference/create");
         assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull(errorResponse, "ErrorResponse"),
@@ -233,7 +235,7 @@ public class TestsMvcBackoffice extends TestContainer {
                 ()-> assertEquals("Chosen time isn't available", errorResponse.getMessage(), "error message")
         );
 
-        createConferenceCreateRequestOnlyTime("2024-12-31T09:00:00", "2024-12-31T10:00:01");
+        createConferenceCreateRequestOnlyTime(now().plusHours(64), now().plusHours(66));
         performMvcThrow("/backoffice/conference/create");
         assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull(errorResponse, "ErrorResponse"),
@@ -241,15 +243,7 @@ public class TestsMvcBackoffice extends TestContainer {
                 ()-> assertEquals("Chosen time isn't available", errorResponse.getMessage(), "error message")
         );
 
-        createConferenceCreateRequestOnlyTime("2024-12-31T14:59:59", "2024-12-31T16:00:00");
-        performMvcThrow("/backoffice/conference/create");
-        assertAll("Create conference fail overlapping time",
-                ()-> assertNotNull(errorResponse, "ErrorResponse"),
-                ()-> assertEquals(100, errorResponse.getCode(), "error code"),
-                ()-> assertEquals("Chosen time isn't available", errorResponse.getMessage(), "error message")
-        );
-
-        createConferenceCreateRequestOnlyTime("2024-12-31T14:59:59", "2024-12-31T16:00:00");
+        createConferenceCreateRequestOnlyTime(now().plusHours(59), now().plusHours(66));
         performMvcThrow("/backoffice/conference/create");
         assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull(errorResponse, "ErrorResponse"),
@@ -261,7 +255,7 @@ public class TestsMvcBackoffice extends TestContainer {
         request = createRoomUpdateRequest(roomValidationUUID, null, CLOSED, null);
         performMvcThrow("/backoffice/room/update");
 
-        request = createConferenceRequest("2024-12-20T10:00:00", "2024-12-20T18:00:00", conferenceValidationUUID, roomUUID);
+        request = createConferenceRequest(now().plusHours(60), now().plusHours(65), conferenceValidationUUID, roomUUID);
         performMvcThrow("/backoffice/conference/create");
         assertAll("Create conference fail overlapping time",
                 ()-> assertNotNull(errorResponse, "ErrorResponse"),
@@ -412,7 +406,7 @@ public class TestsMvcBackoffice extends TestContainer {
         roomCreate();
         conferenceCreate();
 
-        request = createConferenceRequest(response.getBookedFrom().toString(), response.getBookedUntil().toString(), conferenceValidationUUID, roomUUID);
+        request = createConferenceRequest(response.getBookedFrom(), response.getBookedUntil(), conferenceValidationUUID, roomUUID);
         performMvc("/backoffice/conference/update");
         assertAll("conference update with same roomUUID success",
                 ()-> assertNotNull(response, "Response"),
@@ -425,7 +419,7 @@ public class TestsMvcBackoffice extends TestContainer {
 
         roomCreate();
 
-        request = createConferenceRequest(responseCurrent.getBookedFrom().toString(), responseCurrent.getBookedUntil().toString(), responseCurrent.getValidationUUID(), roomUUID);
+        request = createConferenceRequest(responseCurrent.getBookedFrom(), responseCurrent.getBookedUntil(), responseCurrent.getValidationUUID(), roomUUID);
         performMvc("/backoffice/conference/update");
         assertAll("conference update with roomUUID success",
                 ()-> assertNotNull(response, "Response"),
@@ -493,7 +487,7 @@ public class TestsMvcBackoffice extends TestContainer {
         return participantList;
     }
 
-    private void createConferenceCreateRequestOnlyTime(String from, String until) {
+    private void createConferenceCreateRequestOnlyTime(LocalDateTime from, LocalDateTime until) {
         request = createConferenceRequest(from, until, conferenceValidationUUID, roomUUID);
     }
 

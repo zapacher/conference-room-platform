@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import static ee.ctob.data.enums.RoomStatus.AVAILABLE;
 
+
 @Service
 @Transactional
 @RequiredArgsConstructor

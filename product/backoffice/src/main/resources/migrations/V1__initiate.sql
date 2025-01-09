@@ -25,3 +25,5 @@ CREATE TABLE rooms (
     capacity INT,
     location VARCHAR(255)
 );
+
+CREATE INDEX idx_conference_id ON conference_participants(conference_id);
