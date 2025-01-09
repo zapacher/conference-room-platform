@@ -2,7 +2,6 @@ package ee.ctob.access;
 
 import ee.ctob.data.Participant;
 import ee.ctob.data.access.BaseParticipantDAO;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
