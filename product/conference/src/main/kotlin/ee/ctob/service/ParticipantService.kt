@@ -23,7 +23,7 @@ open class ParticipantService (
 
     open fun registration(request: Request): Response {
         val participantUUID = UUID.randomUUID()
-        if (conferenceDAO.registerParticipant(participantUUID, request.conferenceUUID) == 0) {
+        if (conferenceDAO.registerParticipant(participantUUID, request.conferenceUUID!!) == 0) {
             throw PreconditionsFailedException("Registration isn't available for this conference")
         }
 

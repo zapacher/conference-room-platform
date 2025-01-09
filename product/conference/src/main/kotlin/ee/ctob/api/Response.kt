@@ -11,10 +11,10 @@ data class Response(
     var validationUUID: UUID? = null,
 
     @field:Schema(example = "true")
-    var feedbackResult: Boolean? = null,
+    var feedbackResult: Boolean? = false,
 
     @field:Schema(example = "true")
-    var registrationCancel: Boolean? = null,
+    var registrationCancel: Boolean? = false,
 
     @field:Schema(example = "List of schema ConferenceAvailable")
     var conferenceAvailableList: List<ConferenceAvailable>? = null

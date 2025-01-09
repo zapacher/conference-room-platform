@@ -46,7 +46,7 @@ interface ConferenceDAO : JpaRepository<Conference, Int> {
                 "AND 'AVAILABLE' = (SELECT status FROM room)",
         nativeQuery = true
     )
-    fun registerParticipant(participantUUID: UUID, conferenceUUID: UUID?): Int
+    fun registerParticipant(participantUUID: UUID, conferenceUUID: UUID): Int
 
     @Query(
         value = "SELECT * FROM backoffice.conferences " +
