@@ -3,8 +3,8 @@ package ee.ctob.service
 import ee.ctob.access.ConferenceDAO
 import ee.ctob.access.ParticipantDAO
 import ee.ctob.access.RoomDAO
-import ee.ctob.api.Request
-import ee.ctob.api.Response
+import ee.ctob.api.dto.RequestDTO
+import ee.ctob.api.dto.ResponseDTO
 import ee.ctob.api.error.BadRequestException
 import ee.ctob.api.error.PreconditionsFailedException
 import ee.ctob.data.Participant
@@ -21,9 +21,9 @@ open class ParticipantService (
     private val roomDAO: RoomDAO
 ) {
 
-    open fun registration(request: Request): Response {
+    open fun registration(requestDTO: RequestDTO): ResponseDTO {
         val participantUUID = UUID.randomUUID()
-        if (conferenceDAO.registerParticipant(participantUUID, request.conferenceUUID!!) == 0) {
+        if (conferenceDAO.registerParticipant(participantUUID, requestDTO.conferenceUUID!!) == 0) {
             throw PreconditionsFailedException("Registration isn't available for this conference")
         }
 
@@ -32,21 +32,21 @@ open class ParticipantService (
                 .created(now())
                 .participantUUID(participantUUID)
                 .validationUUID(UUID.randomUUID())
-                .firstName(request.firstName)
-                .lastName(request.lastName)
-                .email(request.email)
-                .gender(request.gender)
-                .dateOfBirth(request.dateOfBirth)
+                .firstName(requestDTO.firstName)
+                .lastName(requestDTO.lastName)
+                .email(requestDTO.email)
+                .gender(requestDTO.gender)
+                .dateOfBirth(requestDTO.dateOfBirth)
                 .build()
         )
 
-        return Response(
+        return ResponseDTO(
             validationUUID = participant.validationUUID
         )
     }
 
-    open fun registrationCancel(request: Request): Response {
-        val participant = participantDAO.getParticipant(request.validationUUID!!)?:
+    open fun registrationCancel(requestDTO: RequestDTO): ResponseDTO {
+        val participant = participantDAO.getParticipant(requestDTO.validationUUID!!) ?:
         throw PreconditionsFailedException("Participant with this validation doesn't exists")
 
         val participantUUID = participant.participantUUID
@@ -58,35 +58,35 @@ open class ParticipantService (
             throw PreconditionsFailedException("Validation uuid isn't valid")
         }
 
-        return Response(
+        return ResponseDTO(
             registrationCancel = true
         )
     }
 
-    open fun feedback(request: Request): Response {
-        if (participantDAO.feedback(request.validationUUID!!, request.feedback!!) == 0) {
+    open fun feedback(requestDTO: RequestDTO): ResponseDTO {
+        if (participantDAO.feedback(requestDTO.validationUUID!!, requestDTO.feedback!!) == 0) {
             throw PreconditionsFailedException("Feedback already exists or conference isn't finished")
         }
 
-        return Response(
-            validationUUID = request.validationUUID,
+        return ResponseDTO(
+            validationUUID = requestDTO.validationUUID,
             feedbackResult = true
         )
     }
 
-    open fun availableConferences(request: Request): Response {
-        if (now().isAfter(request.from) || request.until!!.isBefore(request.from)) {
+    open fun availableConferences(requestDTO: RequestDTO): ResponseDTO {
+        if (now().isAfter(requestDTO.from) || requestDTO.until!!.isBefore(requestDTO.from)) {
             throw BadRequestException(400, "Requested time isn't logical")
         }
 
-        val conferenceList = conferenceDAO.findAllAvailableBetween(request.from!!, request.until!!)
+        val conferenceList = conferenceDAO.findAllAvailableBetween(requestDTO.from!!, requestDTO.until!!)
 
         if(conferenceList.isEmpty()) {
             throw PreconditionsFailedException("No conferences are available at this time period")
         }
 
         val conferenceAvailableList = conferenceList.map { conference ->
-            Response.ConferenceAvailable(
+            ResponseDTO.ConferenceAvailable(
                 conferenceUUID = conference.conferenceUUID,
                 location = roomDAO.getRoomLocationByRoomId(conference.roomUUID!!),
                 participantsAmount = conference.participants?.size,
@@ -96,7 +96,7 @@ open class ParticipantService (
             )
         }
 
-        return Response(
+        return ResponseDTO(
             conferenceAvailableList = conferenceAvailableList
         )
     }

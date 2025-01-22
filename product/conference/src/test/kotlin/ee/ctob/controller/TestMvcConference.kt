@@ -5,8 +5,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import ee.ctob.access.ConferenceDAO
 import ee.ctob.access.ParticipantDAO
 import ee.ctob.access.RoomDAO
-import ee.ctob.api.Request
-import ee.ctob.api.Response
+import ee.ctob.api.data.requests.*
+import ee.ctob.api.data.responses.AvailableConferenceListResponse
+import ee.ctob.api.data.responses.FeedbackResponse
+import ee.ctob.api.data.responses.RegistrationCancelResponse
+import ee.ctob.api.data.responses.RegistrationResponse
 import ee.ctob.api.error.ErrorResponse
 import ee.ctob.api.error.PreconditionsFailedException
 import ee.ctob.data.Conference
@@ -51,69 +54,63 @@ class TestsMvcConference : TestContainer() {
     @Autowired
     lateinit var mockMvc: MockMvc
 
-    private var request: Request? = null
-    private var response: Response? = null
+    private var registrationRequest: RegistrationRequest? = null
+    private var registrationCancelRequest: RegistrationCancelRequest? = null
+    private var feedbackRequest: FeedbackRequest? = null
+    private var availableConferenceRequest: AvailableConferenceRequest? = null
+    private var registrationResponse: RegistrationResponse? = null
+    private var registrationCancelResponse: RegistrationCancelResponse? = null
+    private var feedbackResponse: FeedbackResponse? = null
+    private var availableConferenceListResponse: AvailableConferenceListResponse? = null
     private var errorResponse: ErrorResponse? = null
     private var participantValidationUUID: UUID? = null
 
     @Test
     fun emptyRequest400() {
-        request = Request(
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        )
 
-        performMvcThrow("/conference/registration/create")
+        performMvcThrow("/conference/registration/create", registrationRequest)
         assertAll(
             { assertNull(errorResponse, "errorResponse") },
-            { assertNull(response, "response") }
+            { assertNull(registrationResponse, "response") }
         )
 
-        performMvcThrow("/conference/registration/cancel")
+        performMvcThrow("/conference/registration/cancel", registrationCancelRequest)
         assertAll(
             { assertNull(errorResponse, "errorResponse") },
-            { assertNull(response, "response") }
+            { assertNull(registrationCancelResponse, "response") }
         )
 
-        performMvcThrow("/conference/feedback/create")
+        performMvcThrow("/conference/feedback/create", feedbackRequest)
         assertAll(
             { assertNull(errorResponse, "errorResponse") },
-            { assertNull(response, "response") }
+            { assertNull(feedbackResponse, "response") }
         )
 
-        performMvcThrow("/conference/available")
+        performMvcThrow("/conference/available", availableConferenceRequest)
         assertAll(
             { assertNull(errorResponse, "errorResponse") },
-            { assertNull(response, "response") }
+            { assertNull(availableConferenceListResponse, "response") }
         )
     }
 
     @Test
     fun registration() {
-        request = createRegistrationRequest(UUID.randomUUID())
+        registrationRequest = createRegistrationRequest(UUID.randomUUID())
         mockRegistration()
-        performMvc("/conference/registration/create")
+        registrationResponse = performMvc("/conference/registration/create", registrationRequest, RegistrationResponse::class.java)
         assertAll("Registration Success",
-            { assertNotNull(response, "Response") },
-            { assertNotNull(response?.validationUUID, "validationUUID")}
+            { assertNotNull(registrationResponse, "Response") },
+            { assertNotNull(registrationResponse?.validationUUID, "validationUUID")}
         )
 
-        participantValidationUUID = response?.validationUUID
+        participantValidationUUID = registrationResponse?.validationUUID
     }
 
     @Test
     fun registrationFail() {
-        request = createRegistrationRequest(UUID.randomUUID())
+        registrationRequest = createRegistrationRequest(UUID.randomUUID())
 
-        performMvcThrow("/conference/registration/create")
+        performMvcThrow("/conference/registration/create", registrationRequest)
         assertAll("Regostration Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
             { assertEquals(100, errorResponse?.code, "error code") },
@@ -126,12 +123,14 @@ class TestsMvcConference : TestContainer() {
 
         mockConferenceForCancel()
         mockParticipantForCancel(1)
-        request = createRegistrationCancelRequest(participantValidationUUID)
-        performMvc("/conference/registration/cancel")
+
+        registrationCancelRequest = createRegistrationCancelRequest(participantValidationUUID)
+        registrationCancelResponse = performMvc("/conference/registration/cancel", registrationCancelRequest, RegistrationCancelResponse::class.java)
+
         assertAll("Registration cancel success",
-            { assertNotNull(response, "Response") },
-            { assertNull(response?.validationUUID, "validationUUID") },
-            { assertTrue(response?.registrationCancel!!, "registrationCancel") }
+            { assertNotNull(registrationCancelResponse, "Response") },
+            { assertNull(registrationCancelResponse?.validationUUID, "validationUUID") },
+            { assertTrue(registrationCancelResponse?.registrationCancel!!, "registrationCancel") }
         )
     }
 
@@ -139,27 +138,27 @@ class TestsMvcConference : TestContainer() {
     fun registrationCancelFail() {
         registration()
 
-        request = createRegistrationCancelRequest(UUID.randomUUID())
-        performMvcThrow("/conference/registration/cancel")
+        registrationCancelRequest = createRegistrationCancelRequest(UUID.randomUUID())
+        performMvcThrow("/conference/registration/cancel", registrationCancelRequest)
         assertAll("Registration cancel Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
             { assertEquals(100, errorResponse?.code, "error code") },
             { assertEquals("Participant with this validation doesn't exists", errorResponse?.message, "error message") }
         )
 
-        request = createRegistrationCancelRequest(participantValidationUUID)
+        registrationCancelRequest = createRegistrationCancelRequest(participantValidationUUID)
         mockConferenceForCancelThrow()
-        performMvcThrow("/conference/registration/cancel")
+        performMvcThrow("/conference/registration/cancel", registrationCancelRequest)
         assertAll("Registration cancel Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
             { assertEquals(100, errorResponse?.code, "error code") },
             { assertEquals("Conference already started or finished", errorResponse?.message, "error message") }
         )
 
-        request = createRegistrationCancelRequest(participantValidationUUID)
+        registrationCancelRequest = createRegistrationCancelRequest(participantValidationUUID)
         mockConferenceForCancelThrow()
         mockParticipantForCancel(0)
-        performMvcThrow("/conference/registration/cancel")
+        performMvcThrow("/conference/registration/cancel", registrationCancelRequest)
         assertAll("Registration cancel Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
             { assertEquals(100, errorResponse?.code, "error code") },
@@ -171,13 +170,13 @@ class TestsMvcConference : TestContainer() {
     fun feedback() {
         registration()
 
-        request = createFeedbackRequest(participantValidationUUID, "Any text for feedback")
+        feedbackRequest = createFeedbackRequest(participantValidationUUID, "Any text for feedback")
         mockFeedback(1)
-        performMvc("/conference/feedback/create")
+        feedbackResponse = performMvc("/conference/feedback/create", feedbackRequest, FeedbackResponse::class.java)
         assertAll("Feedback Success",
-            { assertNotNull(response, "Response") },
-            { assertEquals(participantValidationUUID, response?.validationUUID, "validationUUID") },
-            { assertTrue(response?.feedbackResult!!, "feedbackResult") }
+            { assertNotNull(feedbackResponse, "Response") },
+            { assertEquals(participantValidationUUID, feedbackResponse?.validationUUID, "validationUUID") },
+            { assertTrue(feedbackResponse?.feedbackResult!!, "feedbackResult") }
         )
     }
 
@@ -185,9 +184,9 @@ class TestsMvcConference : TestContainer() {
     fun feedbackFail() {
         registration()
 
-        request = createFeedbackRequest(participantValidationUUID, "Any text for feedback")
+        feedbackRequest = createFeedbackRequest(participantValidationUUID, "Any text for feedback")
         mockFeedback(0)
-        performMvcThrow("/conference/feedback/create")
+        performMvcThrow("/conference/feedback/create", feedbackRequest)
         assertAll("Feedback Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
             { assertEquals(100, errorResponse?.code, "error code") },
@@ -202,15 +201,15 @@ class TestsMvcConference : TestContainer() {
         mockConferenceList()
         mockLocation()
 
-        request = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(65))
-        performMvc("/conference/available")
+        availableConferenceRequest = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(65))
+        availableConferenceListResponse = performMvc("/conference/available", availableConferenceRequest, AvailableConferenceListResponse::class.java)
 
         assertAll("Available conferences Fail",
-            { assertNotNull(response, "Response") },
-            { assertEquals(5, response?.conferenceAvailableList?.size, "conferenceAvailableList") }
+            { assertNotNull(availableConferenceListResponse, "Response") },
+            { assertEquals(5, availableConferenceListResponse?.conferenceAvailableList?.size, "conferenceAvailableList") }
         )
 
-        for (conference in response?.conferenceAvailableList!!) {
+        for (conference in availableConferenceListResponse?.conferenceAvailableList!!) {
             assertAll("Conference from availableList",
                 { assertNotNull(conference.conferenceUUID, "conferenceUUID") },
                 { assertNotNull(conference.participantsAmount, "participantsAmount") },
@@ -226,24 +225,24 @@ class TestsMvcConference : TestContainer() {
     fun availableConferencesFail() {
         registration()
 
-        request = createRequestForConferences(LocalDateTime.now().plusHours(90), LocalDateTime.now().plusHours(100))
-        performMvcThrow("/conference/available")
+        availableConferenceRequest = createRequestForConferences(LocalDateTime.now().plusHours(90), LocalDateTime.now().plusHours(100))
+        performMvcThrow("/conference/available", availableConferenceRequest)
         assertAll("Available conferences Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
             { assertEquals(100, errorResponse?.code, "error code") },
             { assertEquals("No conferences are available at this time period", errorResponse?.message, "error message") }
         )
 
-        request = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(59))
-        performMvcThrow("/conference/available")
+        availableConferenceRequest = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(59))
+        performMvcThrow("/conference/available", availableConferenceRequest)
         assertAll("Available conferences Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
             { assertEquals(400, errorResponse?.code, "error code") },
             { assertEquals("Requested time isn't logical", errorResponse?.message, "error message") }
         )
 
-        request = createRequestForConferences(LocalDateTime.now().minusHours(60), LocalDateTime.now().plusHours(65))
-        performMvcThrow("/conference/available")
+        availableConferenceRequest = createRequestForConferences(LocalDateTime.now().minusHours(60), LocalDateTime.now().plusHours(65))
+        performMvcThrow("/conference/available", availableConferenceRequest)
         assertAll("Available conferences Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
             { assertEquals(400, errorResponse?.code, "error code") },
@@ -284,7 +283,7 @@ class TestsMvcConference : TestContainer() {
             .thenReturn(1)
     }
 
-    private fun performMvc(path: String) {
+    private fun <T, R> performMvc(path: String, request: T, responseClass: Class<R>): R {
         val mapper = ObjectMapper()
         mapper.registerModule(JavaTimeModule())
         val responseMvc: String
@@ -296,13 +295,13 @@ class TestsMvcConference : TestContainer() {
             )
                 .andExpect(MockMvcResultMatchers.content().contentType(APPLICATION_JSON))
                 .andReturn().response.contentAsString
-            response = mapper.readValue(responseMvc, Response::class.java)
+            return mapper.readValue(responseMvc, responseClass)
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
     }
 
-    private fun performMvcThrow(path: String) {
+    private fun <T> performMvcThrow(path: String, request: T) {
         val mapper = ObjectMapper().apply {
             registerModule(JavaTimeModule())
         }

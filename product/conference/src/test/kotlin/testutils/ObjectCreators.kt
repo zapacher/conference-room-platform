@@ -1,6 +1,9 @@
 package testutils
 
-import ee.ctob.api.Request
+import ee.ctob.api.data.requests.AvailableConferenceRequest
+import ee.ctob.api.data.requests.FeedbackRequest
+import ee.ctob.api.data.requests.RegistrationCancelRequest
+import ee.ctob.api.data.requests.RegistrationRequest
 import ee.ctob.data.Conference
 import ee.ctob.data.enums.Gender
 import java.time.LocalDateTime
@@ -8,34 +11,34 @@ import java.util.*
 
 class ObjectCreators {
     companion object {
-        fun createRegistrationRequest(conferenceUUID: UUID?): Request {
-            return Request(
+        fun createRegistrationRequest(conferenceUUID: UUID?): RegistrationRequest {
+            return RegistrationRequest(
                 firstName = "Chuck",
                 lastName = "Norris",
                 gender = Gender.MALE,
                 email = "chuck.norris@hot.me",
                 dateOfBirth = LocalDateTime.parse("1940-04-10T00:00:00"),
-                conferenceUUID = conferenceUUID
+                conferenceUUID = conferenceUUID!!
             )
         }
 
-        fun createRegistrationCancelRequest(validationUUID: UUID?): Request {
-            return Request(
+        fun createRegistrationCancelRequest(validationUUID: UUID?): RegistrationCancelRequest {
+            return RegistrationCancelRequest(
                 validationUUID = validationUUID
             )
         }
 
-        fun createFeedbackRequest(validationUUID: UUID?, feedbackText: String?): Request {
-            return Request(
-                validationUUID = validationUUID,
-                feedback = feedbackText
+        fun createFeedbackRequest(validationUUID: UUID?, feedbackText: String?): FeedbackRequest {
+            return FeedbackRequest(
+                validationUUID = validationUUID!!,
+                feedback = feedbackText!!
             )
         }
 
-        fun createRequestForConferences(from: LocalDateTime?, until: LocalDateTime?): Request {
-            return Request(
-                from = from,
-                until = until
+        fun createRequestForConferences(from: LocalDateTime?, until: LocalDateTime?): AvailableConferenceRequest {
+            return AvailableConferenceRequest(
+                from = from!!,
+                until = until!!
             )
         }
 
