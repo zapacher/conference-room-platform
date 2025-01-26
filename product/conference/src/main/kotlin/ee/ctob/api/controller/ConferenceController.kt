@@ -8,6 +8,7 @@ import ee.ctob.api.data.responses.AvailableConferenceListResponse
 import ee.ctob.api.data.responses.FeedbackResponse
 import ee.ctob.api.data.responses.RegistrationCancelResponse
 import ee.ctob.api.data.responses.RegistrationResponse
+import ee.ctob.api.dto.ResponseDTO
 import ee.ctob.api.mapper.ParticipantMapper
 import ee.ctob.service.ParticipantService
 import io.swagger.v3.oas.annotations.Operation
@@ -66,7 +67,7 @@ class ConferenceController(
         return participantMapper.toFeedbackResponse(responseDTO)
     }
 
-    @Operation(summary = "Leave feedback after conference")
+    @Operation(summary = "Get available conferences")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "from, until")
     @ApiResponses(value = [
         ApiResponse(responseCode = "100", description = "Any precondition errors will be explained"),
@@ -75,6 +76,6 @@ class ConferenceController(
     @PostMapping("/available")
     fun availableConferences(@RequestBody request: AvailableConferenceRequest): AvailableConferenceListResponse {
         val responseDTO = participantService.availableConferences(participantMapper.toDTO(request))
-        return participantMapper.toConferenceResponse(responseDTO);
+        return participantMapper.toConferenceResponse(responseDTO)
     }
 }

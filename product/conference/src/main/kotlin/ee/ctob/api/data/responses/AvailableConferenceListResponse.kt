@@ -6,7 +6,7 @@ import java.util.*
 
 data class AvailableConferenceListResponse(
     @Schema(example = "List of schema ConferenceAvailable")
-    val conferenceAvailableList: List<ConferenceAvailable>? = null
+    var conferenceAvailableList: List<ConferenceAvailable>? = null
 ) {
     data class ConferenceAvailable(
         @Schema(example = "5a743569-35f8-4588-899a-7ebcd4a75def")

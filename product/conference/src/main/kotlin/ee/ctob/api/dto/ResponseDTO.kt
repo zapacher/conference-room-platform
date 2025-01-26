@@ -7,9 +7,9 @@ data class ResponseDTO(
     var validationUUID: UUID? = null,
     var feedbackResult: Boolean? = false,
     var registrationCancel: Boolean? = false,
-    var conferenceAvailableList: List<ConferenceAvailable>? = null
+    var conferenceAvailableList: List<ConferenceAvailableDTO>? = null
 ) {
-    data class ConferenceAvailable(
+    data class ConferenceAvailableDTO(
         var conferenceUUID: UUID? = null,
         var location: String? = null,
         var participantsAmount: Int? = null,

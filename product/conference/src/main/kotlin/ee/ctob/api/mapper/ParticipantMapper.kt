@@ -11,6 +11,7 @@ import ee.ctob.api.data.responses.RegistrationResponse
 import ee.ctob.api.dto.RequestDTO
 import ee.ctob.api.dto.ResponseDTO
 import org.mapstruct.Mapper
+import org.mapstruct.Mapping
 import org.mapstruct.factory.Mappers
 
 @Mapper(componentModel = "spring")
@@ -27,6 +28,7 @@ interface ParticipantMapper {
     fun toRegistrationResponse(responseDTO: ResponseDTO): RegistrationResponse
     fun toCancelResponse(responseDTO: ResponseDTO): RegistrationCancelResponse
     fun toFeedbackResponse(responseDTO: ResponseDTO): FeedbackResponse
-    fun toConferenceResponse(responseDTO: ResponseDTO): AvailableConferenceListResponse
 
+    @Mapping(source = "responseDTO.conferenceAvailableList", target = "conferenceAvailableList")
+    fun toConferenceResponse(responseDTO: ResponseDTO): AvailableConferenceListResponse
 }

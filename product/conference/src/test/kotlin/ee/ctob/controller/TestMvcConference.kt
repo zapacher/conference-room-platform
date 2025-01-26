@@ -5,7 +5,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import ee.ctob.access.ConferenceDAO
 import ee.ctob.access.ParticipantDAO
 import ee.ctob.access.RoomDAO
-import ee.ctob.api.data.requests.*
+import ee.ctob.api.data.requests.AvailableConferenceRequest
+import ee.ctob.api.data.requests.FeedbackRequest
+import ee.ctob.api.data.requests.RegistrationCancelRequest
+import ee.ctob.api.data.requests.RegistrationRequest
 import ee.ctob.api.data.responses.AvailableConferenceListResponse
 import ee.ctob.api.data.responses.FeedbackResponse
 import ee.ctob.api.data.responses.RegistrationCancelResponse
@@ -266,7 +269,7 @@ class TestsMvcConference : TestContainer() {
 
     private fun mockConferenceForCancel() {
         whenever(conferenceDAO.isAvailableForCancel(any()))
-            .thenReturn(Conference.builder().conferenceUUID(UUID.randomUUID()).build())
+            .thenReturn(Conference().apply {conferenceUUID = UUID.randomUUID()})
     }
 
     private fun mockConferenceForCancelThrow() {
