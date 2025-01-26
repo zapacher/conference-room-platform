@@ -28,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType.APPLICATION_JSON
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
@@ -201,7 +202,7 @@ class TestsMvcConference : TestContainer() {
     fun availableConferences() {
         registration()
 
-        mockConferenceList()
+        val conferenceListSize = mockConferenceList()
         mockLocation()
 
         availableConferenceRequest = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(65))
@@ -209,7 +210,7 @@ class TestsMvcConference : TestContainer() {
 
         assertAll("Available conferences Fail",
             { assertNotNull(availableConferenceListResponse, "Response") },
-            { assertEquals(5, availableConferenceListResponse?.conferenceAvailableList?.size, "conferenceAvailableList") }
+            { assertEquals(conferenceListSize, availableConferenceListResponse?.conferenceAvailableList?.size, "conferenceAvailableList") }
         )
 
         for (conference in availableConferenceListResponse?.conferenceAvailableList!!) {
@@ -253,9 +254,11 @@ class TestsMvcConference : TestContainer() {
         )
     }
 
-    private fun mockConferenceList() {
+    private fun mockConferenceList(): Int {
+        val conferenceList = getConferenceList()
         whenever(conferenceDAO.findAllAvailableBetween(any(), any()))
-            .thenReturn(getConferenceList())
+            .thenReturn(conferenceList)
+        return conferenceList.size
     }
 
     private fun mockLocation() {
@@ -269,7 +272,7 @@ class TestsMvcConference : TestContainer() {
 
     private fun mockConferenceForCancel() {
         whenever(conferenceDAO.isAvailableForCancel(any()))
-            .thenReturn(Conference().apply {conferenceUUID = UUID.randomUUID()})
+            .thenReturn(Conference().apply {conferenceUUID = UUID.randomUUID() })
     }
 
     private fun mockConferenceForCancelThrow() {
@@ -287,8 +290,10 @@ class TestsMvcConference : TestContainer() {
     }
 
     private fun <T, R> performMvc(path: String, request: T, responseClass: Class<R>): R {
-        val mapper = ObjectMapper()
-        mapper.registerModule(JavaTimeModule())
+        val mapper = ObjectMapper().apply {
+            registerModule(JavaTimeModule())
+            registerModule(KotlinModule())
+        }
         val responseMvc: String
         try {
             responseMvc = mockMvc.perform(

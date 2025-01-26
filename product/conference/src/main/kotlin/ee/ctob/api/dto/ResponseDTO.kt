@@ -5,8 +5,8 @@ import java.util.*
 
 data class ResponseDTO(
     var validationUUID: UUID? = null,
-    var feedbackResult: Boolean? = false,
-    var registrationCancel: Boolean? = false,
+    var feedbackResult: Boolean = false,
+    var registrationCancel: Boolean = false,
     var conferenceAvailableList: List<ConferenceAvailableDTO>? = null
 ) {
     data class ConferenceAvailableDTO(

@@ -8,5 +8,5 @@ data class FeedbackResponse(
     var validationUUID: UUID? = null,
 
     @Schema(example = "true")
-    var feedbackResult: Boolean,
+    var feedbackResult: Boolean = false,
 )

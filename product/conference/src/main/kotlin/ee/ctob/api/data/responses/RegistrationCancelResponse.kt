@@ -7,5 +7,5 @@ data class RegistrationCancelResponse(
     @Schema(example = "08c71152-c552-42e7-b094-f510ff44e9cb")
     var validationUUID: UUID? = null,
     @Schema(example = "true")
-    val registrationCancel: Boolean,
+    var registrationCancel: Boolean = false
 )

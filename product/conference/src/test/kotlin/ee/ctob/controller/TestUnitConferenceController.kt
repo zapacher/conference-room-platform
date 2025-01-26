@@ -174,7 +174,7 @@ class TestsUnitConferenceController : TestContainer() {
     fun availableConferences() {
         registration()
 
-        var conferenceListSize = mockConferenceList()
+        val conferenceListSize = mockConferenceList()
         mockLocation()
 
         conferenceAvailableRequest = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(65))
@@ -227,7 +227,7 @@ class TestsUnitConferenceController : TestContainer() {
     }
 
     private fun mockConferenceList(): Int {
-        var conferenceList = getConferenceList()
+        val conferenceList = getConferenceList()
         whenever(conferenceDAO.findAllAvailableBetween(any(), any()))
             .thenReturn(conferenceList)
         return conferenceList.size
