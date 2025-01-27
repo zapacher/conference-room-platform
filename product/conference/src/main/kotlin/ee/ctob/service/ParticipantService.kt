@@ -9,7 +9,6 @@ import ee.ctob.api.error.BadRequestException
 import ee.ctob.api.error.PreconditionsFailedException
 import ee.ctob.data.Participant
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime.now
 import java.util.*
 
@@ -47,18 +46,19 @@ class ParticipantService (
 
     fun registrationCancel(requestDTO: RequestDTO): ResponseDTO {
         val participant = participantDAO.getParticipant(requestDTO.validationUUID!!) ?:
-        throw PreconditionsFailedException("Participant with this validation doesn't exists")
+            throw PreconditionsFailedException("Participant with this validation doesn't exists")
 
         val participantUUID = participant.participantUUID
 
         conferenceDAO.isAvailableForCancel(participantUUID!!) ?:
-        throw PreconditionsFailedException("Conference already started or finished")
+            throw PreconditionsFailedException("Conference already started or finished")
 
         if (conferenceDAO.cancelRegistration(participantUUID) == 0) {
             throw PreconditionsFailedException("Validation uuid isn't valid")
         }
 
         return ResponseDTO(
+            validationUUID = requestDTO.validationUUID,
             registrationCancel = true
         )
     }

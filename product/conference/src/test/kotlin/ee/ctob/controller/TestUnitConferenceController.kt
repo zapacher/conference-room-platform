@@ -100,7 +100,7 @@ class TestsUnitConferenceController : TestContainer() {
 
         assertAll("Registration cancel success",
             { assertNotNull(registrationCancelResponse, "Response") },
-            { assertNull(registrationCancelResponse!!.validationUUID, "validationUUID") },
+            { assertEquals(registrationCancelRequest!!.validationUUID, registrationCancelResponse!!.validationUUID, "validationUUID") },
             { assertTrue(registrationCancelResponse!!.registrationCancel, "registrationCancel") }
         )
     }

@@ -100,14 +100,14 @@ class TestsMvcConference : TestContainer() {
     @Test
     fun registration() {
         registrationRequest = createRegistrationRequest(UUID.randomUUID())
-//        mockRegistration()
+        mockRegistration()
         registrationResponse = performMvc("/conference/registration/create", registrationRequest, RegistrationResponse::class.java)
         assertAll("Registration Success",
             { assertNotNull(registrationResponse, "Response") },
-            { assertNotNull(registrationResponse?.validationUUID, "validationUUID")}
+            { assertNotNull(registrationResponse!!.validationUUID, "validationUUID")}
         )
 
-        participantValidationUUID = registrationResponse?.validationUUID
+        participantValidationUUID = registrationResponse!!.validationUUID
     }
 
     @Test
@@ -117,8 +117,8 @@ class TestsMvcConference : TestContainer() {
         performMvcThrow("/conference/registration/create", registrationRequest)
         assertAll("Regostration Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(100, errorResponse?.code, "error code") },
-            { assertEquals("Registration isn't available for this conference", errorResponse?.message, "error message") })
+            { assertEquals(100, errorResponse!!.code, "error code") },
+            { assertEquals("Registration isn't available for this conference", errorResponse!!.message, "error message") })
     }
 
     @Test
@@ -133,8 +133,8 @@ class TestsMvcConference : TestContainer() {
 
         assertAll("Registration cancel success",
             { assertNotNull(registrationCancelResponse, "Response") },
-            { assertNull(registrationCancelResponse?.validationUUID, "validationUUID") },
-            { assertTrue(registrationCancelResponse?.registrationCancel!!, "registrationCancel") }
+            { assertEquals(registrationCancelRequest!!.validationUUID, registrationCancelResponse!!.validationUUID, "validationUUID") },
+            { assertTrue(registrationCancelResponse!!.registrationCancel, "registrationCancel") }
         )
     }
 
@@ -146,8 +146,8 @@ class TestsMvcConference : TestContainer() {
         performMvcThrow("/conference/registration/cancel", registrationCancelRequest)
         assertAll("Registration cancel Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(100, errorResponse?.code, "error code") },
-            { assertEquals("Participant with this validation doesn't exists", errorResponse?.message, "error message") }
+            { assertEquals(100, errorResponse!!.code, "error code") },
+            { assertEquals("Participant with this validation doesn't exists", errorResponse!!.message, "error message") }
         )
 
         registrationCancelRequest = createRegistrationCancelRequest(participantValidationUUID)
@@ -155,8 +155,8 @@ class TestsMvcConference : TestContainer() {
         performMvcThrow("/conference/registration/cancel", registrationCancelRequest)
         assertAll("Registration cancel Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(100, errorResponse?.code, "error code") },
-            { assertEquals("Conference already started or finished", errorResponse?.message, "error message") }
+            { assertEquals(100, errorResponse!!.code, "error code") },
+            { assertEquals("Conference already started or finished", errorResponse!!.message, "error message") }
         )
 
         registrationCancelRequest = createRegistrationCancelRequest(participantValidationUUID)
@@ -165,8 +165,8 @@ class TestsMvcConference : TestContainer() {
         performMvcThrow("/conference/registration/cancel", registrationCancelRequest)
         assertAll("Registration cancel Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(100, errorResponse?.code, "error code") },
-            { assertEquals("Conference already started or finished", errorResponse?.message, "error message") }
+            { assertEquals(100, errorResponse!!.code, "error code") },
+            { assertEquals("Conference already started or finished", errorResponse!!.message, "error message") }
         )
     }
 
@@ -179,8 +179,8 @@ class TestsMvcConference : TestContainer() {
         feedbackResponse = performMvc("/conference/feedback/create", feedbackRequest, FeedbackResponse::class.java)
         assertAll("Feedback Success",
             { assertNotNull(feedbackResponse, "Response") },
-            { assertEquals(participantValidationUUID, feedbackResponse?.validationUUID, "validationUUID") },
-            { assertTrue(feedbackResponse?.feedbackResult!!, "feedbackResult") }
+            { assertEquals(participantValidationUUID, feedbackResponse!!.validationUUID, "validationUUID") },
+            { assertTrue(feedbackResponse!!.feedbackResult, "feedbackResult") }
         )
     }
 
@@ -193,8 +193,8 @@ class TestsMvcConference : TestContainer() {
         performMvcThrow("/conference/feedback/create", feedbackRequest)
         assertAll("Feedback Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(100, errorResponse?.code, "error code") },
-            { assertEquals("Feedback already exists or conference isn't finished", errorResponse?.message, "error message") }
+            { assertEquals(100, errorResponse!!.code, "error code") },
+            { assertEquals("Feedback already exists or conference isn't finished", errorResponse!!.message, "error message") }
         )
     }
 
@@ -210,10 +210,10 @@ class TestsMvcConference : TestContainer() {
 
         assertAll("Available conferences Fail",
             { assertNotNull(availableConferenceListResponse, "Response") },
-            { assertEquals(conferenceListSize, availableConferenceListResponse?.conferenceAvailableList?.size, "conferenceAvailableList") }
+            { assertEquals(conferenceListSize, availableConferenceListResponse!!.conferenceAvailableList?.size, "conferenceAvailableList") }
         )
 
-        for (conference in availableConferenceListResponse?.conferenceAvailableList!!) {
+        for (conference in availableConferenceListResponse!!.conferenceAvailableList!!) {
             assertAll("Conference from availableList",
                 { assertNotNull(conference.conferenceUUID, "conferenceUUID") },
                 { assertNotNull(conference.participantsAmount, "participantsAmount") },
@@ -233,24 +233,24 @@ class TestsMvcConference : TestContainer() {
         performMvcThrow("/conference/available", availableConferenceRequest)
         assertAll("Available conferences Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(100, errorResponse?.code, "error code") },
-            { assertEquals("No conferences are available at this time period", errorResponse?.message, "error message") }
+            { assertEquals(100, errorResponse!!.code, "error code") },
+            { assertEquals("No conferences are available at this time period", errorResponse!!.message, "error message") }
         )
 
         availableConferenceRequest = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(59))
         performMvcThrow("/conference/available", availableConferenceRequest)
         assertAll("Available conferences Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(400, errorResponse?.code, "error code") },
-            { assertEquals("Requested time isn't logical", errorResponse?.message, "error message") }
+            { assertEquals(400, errorResponse!!.code, "error code") },
+            { assertEquals("Requested time isn't logical", errorResponse!!.message, "error message") }
         )
 
         availableConferenceRequest = createRequestForConferences(LocalDateTime.now().minusHours(60), LocalDateTime.now().plusHours(65))
         performMvcThrow("/conference/available", availableConferenceRequest)
         assertAll("Available conferences Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(400, errorResponse?.code, "error code") },
-            { assertEquals("Requested time isn't logical", errorResponse?.message, "error message") }
+            { assertEquals(400, errorResponse!!.code, "error code") },
+            { assertEquals("Requested time isn't logical", errorResponse!!.message, "error message") }
         )
     }
 
@@ -312,6 +312,7 @@ class TestsMvcConference : TestContainer() {
     private fun <T> performMvcThrow(path: String, request: T) {
         val mapper = ObjectMapper().apply {
             registerModule(JavaTimeModule())
+            registerModule(KotlinModule())
         }
         try {
             val responseMvc = mockMvc.perform(
