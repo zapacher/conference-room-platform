@@ -26,7 +26,6 @@
         <kotlin.version>2.1.0</kotlin.version>
     </properties>
 
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -142,12 +141,6 @@
             <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.ninja-squad</groupId>-->
-<!--            <artifactId>springmockk</artifactId>-->
-<!--            <version>4.0.2</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
     </dependencies>
 
     <build>
@@ -175,7 +168,6 @@
                     </dependency>
                 </dependencies>
                 <executions>
-
                     <execution>
                         <id>kapt</id>
                         <goals>
@@ -221,7 +213,6 @@
                             </sourceDirs>
                         </configuration>
                     </execution>
-
                 </executions>
             </plugin>
             <plugin>
@@ -244,13 +235,6 @@
                             <goal>compile</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>java-test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -260,6 +244,5 @@
         </plugins>
         <finalName>module</finalName>
     </build>
-
 
 </project>

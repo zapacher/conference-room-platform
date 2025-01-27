@@ -37,7 +37,7 @@ import static testutils.ObjectCreators.*;
 
 @Testcontainers
 @ExtendWith(MockitoExtension.class)
-class TestsUnitBackofficeController extends TestContainer {
+class TestUnitBackofficeController extends TestContainer {
 
     @MockBean
     ParticipantDAO participantDAO;
