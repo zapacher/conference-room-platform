@@ -8,7 +8,7 @@ import ee.ctob.api.dto.ResponseDTO
 import ee.ctob.api.error.BadRequestException
 import ee.ctob.api.error.PreconditionsFailedException
 import ee.ctob.data.Participant
-import ee.ctob.data.enums.Gender
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime.now
@@ -17,13 +17,13 @@ import java.util.*
 @Service
 @Transactional
 open class ParticipantService (
-    private val participantDAO: ParticipantDAO,
-    private val conferenceDAO: ConferenceDAO,
+    @Autowired private val participantDAO: ParticipantDAO,
+    val conferenceDAO: ConferenceDAO,
     private val roomDAO: RoomDAO
 ) {
 
-    open fun registration(requestDTO: RequestDTO): ResponseDTO {
-        var newParticipantUUID = UUID.randomUUID()
+    fun registration(requestDTO: RequestDTO): ResponseDTO {
+        val newParticipantUUID = UUID.randomUUID()
         if (conferenceDAO.registerParticipant(newParticipantUUID, requestDTO.conferenceUUID!!) == 0) {
             throw PreconditionsFailedException("Registration isn't available for this conference")
         }
@@ -46,13 +46,13 @@ open class ParticipantService (
         )
     }
 
-    open fun registrationCancel(requestDTO: RequestDTO): ResponseDTO {
+    fun registrationCancel(requestDTO: RequestDTO): ResponseDTO {
         val participant = participantDAO.getParticipant(requestDTO.validationUUID!!) ?:
         throw PreconditionsFailedException("Participant with this validation doesn't exists")
 
         val participantUUID = participant.participantUUID
 
-        conferenceDAO.isAvailableForCancel(participantUUID!!)?:
+        conferenceDAO.isAvailableForCancel(participantUUID!!) ?:
         throw PreconditionsFailedException("Conference already started or finished")
 
         if (conferenceDAO.cancelRegistration(participantUUID) == 0) {
@@ -64,7 +64,7 @@ open class ParticipantService (
         )
     }
 
-    open fun feedback(requestDTO: RequestDTO): ResponseDTO {
+    fun feedback(requestDTO: RequestDTO): ResponseDTO {
         if (participantDAO.feedback(requestDTO.validationUUID!!, requestDTO.feedback!!) == 0) {
             throw PreconditionsFailedException("Feedback already exists or conference isn't finished")
         }
@@ -75,7 +75,7 @@ open class ParticipantService (
         )
     }
 
-    open fun availableConferences(requestDTO: RequestDTO): ResponseDTO {
+    fun availableConferences(requestDTO: RequestDTO): ResponseDTO {
         if (now().isAfter(requestDTO.from) || requestDTO.until!!.isBefore(requestDTO.from)) {
             throw BadRequestException(400, "Requested time isn't logical")
         }

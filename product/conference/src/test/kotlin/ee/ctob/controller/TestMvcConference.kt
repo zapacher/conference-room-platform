@@ -2,6 +2,7 @@ package ee.ctob.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import ee.ctob.access.ConferenceDAO
 import ee.ctob.access.ParticipantDAO
 import ee.ctob.access.RoomDAO
@@ -28,7 +29,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.mock.mockito.SpyBean
 import org.springframework.http.MediaType.APPLICATION_JSON
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
@@ -100,7 +100,7 @@ class TestsMvcConference : TestContainer() {
     @Test
     fun registration() {
         registrationRequest = createRegistrationRequest(UUID.randomUUID())
-        mockRegistration()
+//        mockRegistration()
         registrationResponse = performMvc("/conference/registration/create", registrationRequest, RegistrationResponse::class.java)
         assertAll("Registration Success",
             { assertNotNull(registrationResponse, "Response") },

@@ -1,4 +1,4 @@
-package ee.ctob.api.mapper
+package ee.ctob.api.dto.mapper
 
 import ee.ctob.api.data.requests.AvailableConferenceRequest
 import ee.ctob.api.data.requests.FeedbackRequest
@@ -16,9 +16,9 @@ import org.mapstruct.factory.Mappers
 
 @Mapper(componentModel = "spring")
 interface ParticipantMapper {
-    companion object {
-        val INSTANCE: ParticipantMapper = Mappers.getMapper(ParticipantMapper::class.java)
-    }
+//    companion object {
+//        val INSTANCE: ParticipantMapper = Mappers.getMapper(ParticipantMapper::class.java)
+//    }
 
     fun toDTO(request: RegistrationRequest): RequestDTO
     fun toDTO(request: RegistrationCancelRequest): RequestDTO

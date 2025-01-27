@@ -8,12 +8,13 @@ import ee.ctob.api.data.responses.AvailableConferenceListResponse
 import ee.ctob.api.data.responses.FeedbackResponse
 import ee.ctob.api.data.responses.RegistrationCancelResponse
 import ee.ctob.api.data.responses.RegistrationResponse
-import ee.ctob.api.dto.ResponseDTO
-import ee.ctob.api.mapper.ParticipantMapper
+import ee.ctob.api.dto.mapper.ParticipantMapper
 import ee.ctob.service.ParticipantService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.mapstruct.factory.Mappers
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -28,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController
 )
 class ConferenceController(
     private val participantService: ParticipantService,
-    private val participantMapper: ParticipantMapper
+    private val participantMapper: ParticipantMapper = Mappers.getMapper(ParticipantMapper::class.java)
 ) {
 
     @Operation(summary = "Register new participant to conference")
@@ -39,6 +40,7 @@ class ConferenceController(
         ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")])
     @PostMapping("/registration/create")
     fun registration(@RequestBody request: RegistrationRequest): RegistrationResponse {
+        println("we are IN")
         val responseDTO = participantService.registration(participantMapper.toDTO(request))
         return participantMapper.toRegistrationResponse(responseDTO)
     }
