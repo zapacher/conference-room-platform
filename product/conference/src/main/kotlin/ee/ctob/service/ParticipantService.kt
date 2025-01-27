@@ -8,18 +8,17 @@ import ee.ctob.api.dto.ResponseDTO
 import ee.ctob.api.error.BadRequestException
 import ee.ctob.api.error.PreconditionsFailedException
 import ee.ctob.data.Participant
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime.now
 import java.util.*
 
+
 @Service
-@Transactional
-open class ParticipantService (
-    @Autowired private val participantDAO: ParticipantDAO,
-    val conferenceDAO: ConferenceDAO,
-    private val roomDAO: RoomDAO
+class ParticipantService (
+    private var participantDAO: ParticipantDAO,
+    private var conferenceDAO: ConferenceDAO,
+    private var roomDAO: RoomDAO
 ) {
 
     fun registration(requestDTO: RequestDTO): ResponseDTO {

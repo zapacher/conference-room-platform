@@ -28,8 +28,8 @@ import org.springframework.web.bind.annotation.RestController
     consumes = [MediaType.APPLICATION_JSON_VALUE]
 )
 class ConferenceController(
-    private val participantService: ParticipantService,
-    private val participantMapper: ParticipantMapper = Mappers.getMapper(ParticipantMapper::class.java)
+    private var participantService: ParticipantService,
+    private var participantMapper: ParticipantMapper = Mappers.getMapper(ParticipantMapper::class.java)
 ) {
 
     @Operation(summary = "Register new participant to conference")
