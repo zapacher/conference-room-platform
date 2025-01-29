@@ -5,5 +5,5 @@ import java.util.*
 
 data class RegistrationCancelRequest(
     @Schema(example = "08c71152-c552-42e7-b094-f510ff44e9cb")
-    val validationUUID: UUID? = null,
-) : Request()
+    val validationUUID: UUID,
+)

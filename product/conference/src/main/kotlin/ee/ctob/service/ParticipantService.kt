@@ -15,9 +15,9 @@ import java.util.*
 
 @Service
 class ParticipantService (
-    private var participantDAO: ParticipantDAO,
-    private var conferenceDAO: ConferenceDAO,
-    private var roomDAO: RoomDAO
+    private val participantDAO: ParticipantDAO,
+    private val conferenceDAO: ConferenceDAO,
+    private val roomDAO: RoomDAO
 ) {
 
     fun registration(requestDTO: RequestDTO): ResponseDTO {
@@ -48,12 +48,11 @@ class ParticipantService (
         val participant = participantDAO.getParticipant(requestDTO.validationUUID!!) ?:
             throw PreconditionsFailedException("Participant with this validation doesn't exists")
 
-        val participantUUID = participant.participantUUID
-
-        conferenceDAO.isAvailableForCancel(participantUUID!!) ?:
+        if (!conferenceDAO.isAvailableForCancel(participant.validationUUID)) {
             throw PreconditionsFailedException("Conference already started or finished")
+        }
 
-        if (conferenceDAO.cancelRegistration(participantUUID) == 0) {
+        if (conferenceDAO.cancelRegistration(participant.validationUUID) == 0) {
             throw PreconditionsFailedException("Validation uuid isn't valid")
         }
 

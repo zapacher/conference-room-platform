@@ -9,4 +9,4 @@ data class FeedbackRequest(
 
     @Schema(example = "Simple text")
     val feedback: String
-) : Request()
+)

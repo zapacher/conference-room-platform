@@ -9,4 +9,4 @@ data class AvailableConferenceRequest(
 
     @Schema(example = "2024-12-28T12:00:00")
     val until: LocalDateTime
-) : Request()
+)

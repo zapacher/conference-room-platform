@@ -25,6 +25,6 @@ data class AvailableConferenceListResponse(
         val until: LocalDateTime,
 
         @Schema(example = "Info about conference")
-        val info: String? = null
+        var info: String? = null
     )
 }

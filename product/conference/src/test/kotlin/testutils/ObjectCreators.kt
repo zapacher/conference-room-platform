@@ -24,7 +24,7 @@ class ObjectCreators {
 
         fun createRegistrationCancelRequest(validationUUID: UUID?): RegistrationCancelRequest {
             return RegistrationCancelRequest(
-                validationUUID = validationUUID
+                validationUUID = validationUUID!!
             )
         }
 

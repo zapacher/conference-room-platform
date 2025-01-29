@@ -244,7 +244,7 @@ class TestsUnitConferenceController : TestContainer() {
 
     private fun mockConferenceForCancel() {
         whenever(conferenceDAO.isAvailableForCancel(any()))
-            .thenReturn(Conference().apply {conferenceUUID = UUID.randomUUID()})
+            .thenReturn(true)
     }
 
     private fun mockConferenceForCancelThrow() {

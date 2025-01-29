@@ -130,7 +130,6 @@ class TestsMvcConference : TestContainer() {
 
         registrationCancelRequest = createRegistrationCancelRequest(participantValidationUUID)
         registrationCancelResponse = performMvc("/conference/registration/cancel", registrationCancelRequest, RegistrationCancelResponse::class.java)
-
         assertAll("Registration cancel success",
             { assertNotNull(registrationCancelResponse, "Response") },
             { assertEquals(registrationCancelRequest!!.validationUUID, registrationCancelResponse!!.validationUUID, "validationUUID") },
@@ -208,7 +207,7 @@ class TestsMvcConference : TestContainer() {
         availableConferenceRequest = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(65))
         availableConferenceListResponse = performMvc("/conference/available", availableConferenceRequest, AvailableConferenceListResponse::class.java)
 
-        assertAll("Available conferences Fail",
+        assertAll("Available conferences",
             { assertNotNull(availableConferenceListResponse, "Response") },
             { assertEquals(conferenceListSize, availableConferenceListResponse!!.conferenceAvailableList?.size, "conferenceAvailableList") }
         )
@@ -272,7 +271,7 @@ class TestsMvcConference : TestContainer() {
 
     private fun mockConferenceForCancel() {
         whenever(conferenceDAO.isAvailableForCancel(any()))
-            .thenReturn(Conference().apply {conferenceUUID = UUID.randomUUID() })
+            .thenReturn(true)
     }
 
     private fun mockConferenceForCancelThrow() {

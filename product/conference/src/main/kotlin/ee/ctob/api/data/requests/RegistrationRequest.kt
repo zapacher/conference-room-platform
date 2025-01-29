@@ -27,4 +27,4 @@ data class RegistrationRequest(
 
     @Schema(example = "af7c1fe6-d669-414e-b066-e9733f0de7a8")
     val conferenceUUID: UUID,
-) : Request()
+)

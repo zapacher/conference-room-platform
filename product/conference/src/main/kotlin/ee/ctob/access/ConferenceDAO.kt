@@ -14,15 +14,16 @@ import java.util.*
 interface ConferenceDAO : BaseConferenceDAO {
 
     @Query(
-        value = "SELECT * FROM backoffice.conferences " +
-                "WHERE NOW() < booked_from " +
-                "AND id = ( " +
-                "   SELECT conference_id FROM backoffice.conference_participants " +
-                "   WHERE participant_uuid = ?1 " +
+        value = "SELECT EXISTS ( " +
+                "   SELECT 1 " +
+                "   FROM backoffice.conferences c " +
+                "   JOIN backoffice.conference_participants cp ON c.id = cp.conference_id " +
+                "   WHERE cp.participant_uuid = ?1 " +
+                "   AND c.booked_from > NOW() " +
                 ") ",
         nativeQuery = true
     )
-    fun isAvailableForCancel(participantUUID: UUID): Conference?
+    fun isAvailableForCancel(participantUUID: UUID): Boolean
 
     @Modifying
     @Query(

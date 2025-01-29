@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RestController
     consumes = [MediaType.APPLICATION_JSON_VALUE]
 )
 class ConferenceController(
-    private var participantService: ParticipantService,
-    private var participantMapper: ParticipantMapper = Mappers.getMapper(ParticipantMapper::class.java)
+    private val participantService: ParticipantService,
+    private val participantMapper: ParticipantMapper = Mappers.getMapper(ParticipantMapper::class.java)
 ) {
 
     @Operation(summary = "Register new participant to conference")
@@ -39,7 +39,6 @@ class ConferenceController(
         ApiResponse(responseCode = "400", description = "If required values will be null/empty/format")])
     @PostMapping("/registration/create")
     fun registration(@RequestBody request: RegistrationRequest): RegistrationResponse {
-        println("we are IN")
         val responseDTO = participantService.registration(participantMapper.toDTO(request))
         return participantMapper.toRegistrationResponse(responseDTO)
     }
