@@ -7,6 +7,6 @@ CREATE TABLE participants (
     last_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     gender VARCHAR(255) NOT NULL,
-    date_of_birth DATE WITHOUT TIME ZONE NOT NULL,
+    date_of_birth DATE NOT NULL,
     feedback TEXT
 );
