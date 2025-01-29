@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -30,6 +31,6 @@ public class Participant {
     String email;
     @Enumerated(EnumType.STRING)
     Gender gender;
-    LocalDateTime dateOfBirth;
+    LocalDate dateOfBirth;
     String feedback;
 }

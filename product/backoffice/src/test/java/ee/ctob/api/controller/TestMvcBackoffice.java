@@ -40,7 +40,7 @@ import static testutils.ObjectCreators.*;
 @Testcontainers
 @AutoConfigureMockMvc
 @SpringBootTest
-public class TestsMvcBackoffice extends TestContainer {
+public class TestMvcBackoffice extends TestContainer {
 
     @Autowired
     RoomDAO roomDAO;

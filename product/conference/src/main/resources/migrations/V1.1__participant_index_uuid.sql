@@ -1,0 +1,1 @@
+CREATE INDEX idx_participant_uuid ON backoffice.conference_participants (participant_uuid);

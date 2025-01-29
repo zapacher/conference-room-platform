@@ -3,13 +3,18 @@ package ee.ctob.controller
 import ee.ctob.access.ConferenceDAO
 import ee.ctob.access.ParticipantDAO
 import ee.ctob.access.RoomDAO
-import ee.ctob.api.Request
-import ee.ctob.api.Response
 import ee.ctob.api.controller.ConferenceController
+import ee.ctob.api.data.requests.AvailableConferenceRequest
+import ee.ctob.api.data.requests.FeedbackRequest
+import ee.ctob.api.data.requests.RegistrationCancelRequest
+import ee.ctob.api.data.requests.RegistrationRequest
+import ee.ctob.api.data.responses.AvailableConferenceListResponse
+import ee.ctob.api.data.responses.FeedbackResponse
+import ee.ctob.api.data.responses.RegistrationCancelResponse
+import ee.ctob.api.data.responses.RegistrationResponse
 import ee.ctob.api.error.BadRequestException
 import ee.ctob.api.error.ErrorResponse
 import ee.ctob.api.error.PreconditionsFailedException
-import ee.ctob.data.Conference
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -46,33 +51,39 @@ class TestsUnitConferenceController : TestContainer() {
     @Autowired
     lateinit var controller: ConferenceController
 
-    private var request: Request? = null
-    private var response: Response? = null
+    private var registrationRequest: RegistrationRequest? = null
+    private var registrationCancelRequest: RegistrationCancelRequest? = null
+    private var feedbackRequest: FeedbackRequest? = null
+    private var conferenceAvailableRequest: AvailableConferenceRequest? = null
+    private var registrationResponse: RegistrationResponse? = null
+    private var registrationCancelResponse: RegistrationCancelResponse? = null
+    private var feedbackResponse: FeedbackResponse? = null
+    private var availableConferenceListResponse: AvailableConferenceListResponse? = null
     private var errorResponse: ErrorResponse? = null
     private var participantValidationUUID: UUID? = null
 
     @Test
     fun registration() {
-        request = createRegistrationRequest(UUID.randomUUID())
+        registrationRequest = createRegistrationRequest(UUID.randomUUID())
         mockRegistration()
-        response = controller.registration(request!!)
+        registrationResponse = controller.registration(registrationRequest!!)
 
         assertAll("Registration Success",
-            { assertNotNull(response, "Response") },
-            { assertNotNull(response?.validationUUID, "validationUUID") }
+            { assertNotNull(registrationResponse, "Response") },
+            { assertNotNull(registrationResponse!!.validationUUID, "validationUUID") }
         )
 
-        participantValidationUUID = response?.validationUUID
+        participantValidationUUID = registrationResponse?.validationUUID
     }
 
     @Test
     fun registrationFail() {
-        request = createRegistrationRequest(UUID.randomUUID())
-        errorResponse = assertThrows(PreconditionsFailedException::class.java) { controller.registration(request!!) }.error
+        registrationRequest = createRegistrationRequest(UUID.randomUUID())
+        errorResponse = assertThrows(PreconditionsFailedException::class.java) { controller.registration(registrationRequest!!) }.error
         assertAll("Registration Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(100, errorResponse?.code, "error code") },
-            { assertEquals("Registration isn't available for this conference", errorResponse?.message, "error message") }
+            { assertEquals(100, errorResponse!!.code, "error code") },
+            { assertEquals("Registration isn't available for this conference", errorResponse!!.message, "error message") }
         )
     }
 
@@ -83,13 +94,13 @@ class TestsUnitConferenceController : TestContainer() {
         mockConferenceForCancel()
         mockParticipantForCancel(1)
 
-        request = createRegistrationCancelRequest(participantValidationUUID)
-        response = controller.registrationCancel(request!!)
+        registrationCancelRequest = createRegistrationCancelRequest(participantValidationUUID)
+        registrationCancelResponse = controller.registrationCancel(registrationCancelRequest!!)
 
         assertAll("Registration cancel success",
-            { assertNotNull(response, "Response") },
-            { assertNull(response?.validationUUID, "validationUUID") },
-            { assertTrue(response?.registrationCancel!!, "registrationCancel") }
+            { assertNotNull(registrationCancelResponse, "Response") },
+            { assertEquals(registrationCancelRequest!!.validationUUID, registrationCancelResponse!!.validationUUID, "validationUUID") },
+            { assertTrue(registrationCancelResponse!!.registrationCancel, "registrationCancel") }
         )
     }
 
@@ -97,35 +108,35 @@ class TestsUnitConferenceController : TestContainer() {
     fun registrationCancelFail() {
         registration()
 
-        request = createRegistrationCancelRequest(UUID.randomUUID())
+        registrationCancelRequest = createRegistrationCancelRequest(UUID.randomUUID())
 
-        errorResponse = assertThrows(PreconditionsFailedException::class.java) { controller.registrationCancel(request!!) }.error
+        errorResponse = assertThrows(PreconditionsFailedException::class.java) { controller.registrationCancel(registrationCancelRequest!!) }.error
         assertAll("Registration cancel Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(100, errorResponse?.code, "error code") },
-            { assertEquals("Participant with this validation doesn't exists", errorResponse?.message, "error message") }
+            { assertEquals(100, errorResponse!!.code, "error code") },
+            { assertEquals("Participant with this validation doesn't exists", errorResponse!!.message, "error message") }
         )
 
-        request = createRegistrationCancelRequest(participantValidationUUID)
+        registrationCancelRequest = createRegistrationCancelRequest(participantValidationUUID)
         mockConferenceForCancelThrow()
 
-        errorResponse = assertThrows(PreconditionsFailedException::class.java) { controller.registrationCancel(request!!) }.error
+        errorResponse = assertThrows(PreconditionsFailedException::class.java) { controller.registrationCancel(registrationCancelRequest!!) }.error
         assertAll("Registration cancel Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(100, errorResponse?.code, "error code") },
-            { assertEquals("Conference already started or finished", errorResponse?.message, "error message") }
+            { assertEquals(100, errorResponse!!.code, "error code") },
+            { assertEquals("Conference already started or finished", errorResponse!!.message, "error message") }
         )
 
 
-        request = createRegistrationCancelRequest(participantValidationUUID)
+        registrationCancelRequest = createRegistrationCancelRequest(participantValidationUUID)
         mockConferenceForCancelThrow()
         mockParticipantForCancel(0)
 
-        errorResponse = assertThrows(PreconditionsFailedException::class.java) { controller.registrationCancel(request!!) }.error
+        errorResponse = assertThrows(PreconditionsFailedException::class.java) { controller.registrationCancel(registrationCancelRequest!!) }.error
         assertAll("Registration cancel Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(100, errorResponse?.code, "error code") },
-            { assertEquals("Conference already started or finished", errorResponse?.message, "error message") }
+            { assertEquals(100, errorResponse!!.code, "error code") },
+            { assertEquals("Conference already started or finished", errorResponse!!.message, "error message") }
         )
     }
 
@@ -133,14 +144,14 @@ class TestsUnitConferenceController : TestContainer() {
     fun feedback() {
         registration()
 
-        request = createFeedbackRequest(participantValidationUUID, "Any text for feedback")
+        feedbackRequest = createFeedbackRequest(participantValidationUUID, "Any text for feedback")
         mockFeedback(1)
-        response = controller.feedback(request!!)
+        feedbackResponse = controller.feedback(feedbackRequest!!)
 
         assertAll("Feedback Success",
-            { assertNotNull(response, "Response") },
-            { assertEquals(participantValidationUUID, response?.validationUUID, "validationUUID") },
-            { assertTrue(response?.feedbackResult!!, "feedbackResult") }
+            { assertNotNull(feedbackResponse, "Response") },
+            { assertEquals(participantValidationUUID, feedbackResponse!!.validationUUID, "validationUUID") },
+            { assertTrue(feedbackResponse!!.feedbackResult, "feedbackResult") }
         )
     }
 
@@ -148,13 +159,13 @@ class TestsUnitConferenceController : TestContainer() {
     fun feedbackFail() {
         registration()
 
-        request = createFeedbackRequest(participantValidationUUID, "Any text for feedback")
+        feedbackRequest = createFeedbackRequest(participantValidationUUID, "Any text for feedback")
         mockFeedback(0)
-        errorResponse = assertThrows(PreconditionsFailedException::class.java) { controller.feedback(request!!) }.error
+        errorResponse = assertThrows(PreconditionsFailedException::class.java) { controller.feedback(feedbackRequest!!) }.error
         assertAll("Feeback Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(100, errorResponse?.code, "error code") },
-            { assertEquals("Feedback already exists or conference isn't finished", errorResponse?.message, "error message")}
+            { assertEquals(100, errorResponse!!.code, "error code") },
+            { assertEquals("Feedback already exists or conference isn't finished", errorResponse!!.message, "error message")}
         )
     }
 
@@ -162,18 +173,18 @@ class TestsUnitConferenceController : TestContainer() {
     fun availableConferences() {
         registration()
 
-        mockConferenceList()
+        val conferenceListSize = mockConferenceList()
         mockLocation()
 
-        request = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(65))
-        response = controller.availableConferences(request!!)
+        conferenceAvailableRequest = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(65))
+        availableConferenceListResponse = controller.availableConferences(conferenceAvailableRequest!!)
 
         assertAll("Available conferences",
-            { assertNotNull(response, "Response") },
-            { assertEquals(5, response?.conferenceAvailableList?.size, "conferenceAvailableList") }
+            { assertNotNull(availableConferenceListResponse, "Response") },
+            { assertEquals(conferenceListSize, availableConferenceListResponse!!.conferenceAvailableList?.size, "conferenceAvailableList") }
         )
 
-        for (conference in response?.conferenceAvailableList!!) {
+        for (conference in availableConferenceListResponse!!.conferenceAvailableList!!) {
             assertAll("Conference from availableList",
                 { assertNotNull(conference.conferenceUUID, "conferenceUUID") },
                 { assertNotNull(conference.participantsAmount, "participantsAmount") },
@@ -189,34 +200,36 @@ class TestsUnitConferenceController : TestContainer() {
     fun availableConferencesFail() {
         registration()
 
-        request = createRequestForConferences(LocalDateTime.now().plusHours(40), LocalDateTime.now().plusHours(45))
-        errorResponse = assertThrows(PreconditionsFailedException::class.java) { controller.availableConferences(request!!) }.error
+        conferenceAvailableRequest = createRequestForConferences(LocalDateTime.now().plusHours(40), LocalDateTime.now().plusHours(45))
+        errorResponse = assertThrows(PreconditionsFailedException::class.java) { controller.availableConferences(conferenceAvailableRequest!!) }.error
         assertAll("Available conferences Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(100, errorResponse?.code, "error code") },
-            { assertEquals("No conferences are available at this time period", errorResponse?.message, "error message") }
+            { assertEquals(100, errorResponse!!.code, "error code") },
+            { assertEquals("No conferences are available at this time period", errorResponse!!.message, "error message") }
         )
 
-        request = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(59))
-        errorResponse = assertThrows(BadRequestException::class.java) { controller.availableConferences(request!!) }.error
+        conferenceAvailableRequest = createRequestForConferences(LocalDateTime.now().plusHours(60), LocalDateTime.now().plusHours(59))
+        errorResponse = assertThrows(BadRequestException::class.java) { controller.availableConferences(conferenceAvailableRequest!!) }.error
         assertAll("Available conferences Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(400, errorResponse?.code, "error code") },
-            { assertEquals("Requested time isn't logical", errorResponse?.message, "error message") }
+            { assertEquals(400, errorResponse!!.code, "error code") },
+            { assertEquals("Requested time isn't logical", errorResponse!!.message, "error message") }
         )
 
-        request = createRequestForConferences(LocalDateTime.now().minusHours(60), LocalDateTime.now().plusHours(65))
-        errorResponse = assertThrows(BadRequestException::class.java) { controller.availableConferences(request!!) }.error
+        conferenceAvailableRequest = createRequestForConferences(LocalDateTime.now().minusHours(60), LocalDateTime.now().plusHours(65))
+        errorResponse = assertThrows(BadRequestException::class.java) { controller.availableConferences(conferenceAvailableRequest!!) }.error
         assertAll("Available conferences Fail",
             { assertNotNull(errorResponse, "ErrorResponse") },
-            { assertEquals(400, errorResponse?.code, "error code") },
-            { assertEquals("Requested time isn't logical", errorResponse?.message, "error message") }
+            { assertEquals(400, errorResponse!!.code, "error code") },
+            { assertEquals("Requested time isn't logical", errorResponse!!.message, "error message") }
         )
     }
 
-    private fun mockConferenceList() {
+    private fun mockConferenceList(): Int {
+        val conferenceList = getConferenceList()
         whenever(conferenceDAO.findAllAvailableBetween(any(), any()))
-            .thenReturn(getConferenceList())
+            .thenReturn(conferenceList)
+        return conferenceList.size
     }
 
     private fun mockLocation() {
@@ -230,7 +243,7 @@ class TestsUnitConferenceController : TestContainer() {
 
     private fun mockConferenceForCancel() {
         whenever(conferenceDAO.isAvailableForCancel(any()))
-            .thenReturn(Conference.builder().conferenceUUID(UUID.randomUUID()).build())
+            .thenReturn(true)
     }
 
     private fun mockConferenceForCancelThrow() {
