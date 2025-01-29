@@ -21,7 +21,6 @@ data class RegistrationRequest(
 
     @Schema(example = "1940-04-10")
     @Past
-    @JsonFormat(pattern = "yyyy-MM-dd")
     val dateOfBirth: LocalDate,
 
     @Schema(example = "chuck.norris@gmail.com")

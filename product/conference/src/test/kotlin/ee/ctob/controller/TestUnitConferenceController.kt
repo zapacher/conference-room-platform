@@ -15,7 +15,6 @@ import ee.ctob.api.data.responses.RegistrationResponse
 import ee.ctob.api.error.BadRequestException
 import ee.ctob.api.error.ErrorResponse
 import ee.ctob.api.error.PreconditionsFailedException
-import ee.ctob.data.Conference
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
