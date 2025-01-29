@@ -1,6 +1,7 @@
 package ee.ctob.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import ee.ctob.access.ConferenceDAO
@@ -16,7 +17,6 @@ import ee.ctob.api.data.responses.RegistrationCancelResponse
 import ee.ctob.api.data.responses.RegistrationResponse
 import ee.ctob.api.error.ErrorResponse
 import ee.ctob.api.error.PreconditionsFailedException
-import ee.ctob.data.Conference
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -293,6 +293,8 @@ class TestsMvcConference : TestContainer() {
             registerModule(JavaTimeModule())
             registerModule(KotlinModule())
         }
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+
         val responseMvc: String
         try {
             responseMvc = mockMvc.perform(

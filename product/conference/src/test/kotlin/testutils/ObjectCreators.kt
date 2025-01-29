@@ -6,6 +6,7 @@ import ee.ctob.api.data.requests.RegistrationCancelRequest
 import ee.ctob.api.data.requests.RegistrationRequest
 import ee.ctob.data.Conference
 import ee.ctob.data.enums.Gender
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -17,7 +18,7 @@ class ObjectCreators {
                 lastName = "Norris",
                 gender = Gender.MALE,
                 email = "chuck.norris@hot.me",
-                dateOfBirth = LocalDateTime.parse("1940-04-10T00:00:00"),
+                dateOfBirth = LocalDate.of(1940 ,4,10),
                 conferenceUUID = conferenceUUID!!
             )
         }

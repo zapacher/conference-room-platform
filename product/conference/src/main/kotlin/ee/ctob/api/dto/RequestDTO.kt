@@ -1,6 +1,7 @@
 package ee.ctob.api.dto
 
 import ee.ctob.data.enums.Gender
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -17,7 +18,7 @@ data class RequestDTO(
 
     var email: String? = null,
 
-    var dateOfBirth: LocalDateTime? = null,
+    var dateOfBirth: LocalDate? = null,
 
     var conferenceUUID: UUID? = null,
 

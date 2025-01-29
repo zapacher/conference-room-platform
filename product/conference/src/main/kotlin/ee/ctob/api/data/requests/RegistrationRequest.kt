@@ -1,7 +1,9 @@
 package ee.ctob.api.data.requests
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import ee.ctob.data.enums.Gender
 import io.swagger.v3.oas.annotations.media.Schema
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 import javax.validation.constraints.Email
@@ -17,9 +19,10 @@ data class RegistrationRequest(
     @Schema(example = "MALE")
     val gender: Gender,
 
-    @Schema(example = "1940-04-10T0:00:00")
+    @Schema(example = "1940-04-10")
     @Past
-    val dateOfBirth: LocalDateTime,
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    val dateOfBirth: LocalDate,
 
     @Schema(example = "chuck.norris@gmail.com")
     @Email
