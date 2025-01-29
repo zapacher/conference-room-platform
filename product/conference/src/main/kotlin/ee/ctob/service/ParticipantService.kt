@@ -19,7 +19,6 @@ class ParticipantService (
     private val conferenceDAO: ConferenceDAO,
     private val roomDAO: RoomDAO
 ) {
-
     fun registration(requestDTO: RequestDTO): ResponseDTO {
         val newParticipantUUID = UUID.randomUUID()
         if (conferenceDAO.registerParticipant(newParticipantUUID, requestDTO.conferenceUUID!!) == 0) {
@@ -45,8 +44,8 @@ class ParticipantService (
     }
 
     fun registrationCancel(requestDTO: RequestDTO): ResponseDTO {
-        val participant = participantDAO.getParticipant(requestDTO.validationUUID!!) ?:
-            throw PreconditionsFailedException("Participant with this validation doesn't exists")
+        val participant = participantDAO.getParticipant(requestDTO.validationUUID!!)
+            ?: throw PreconditionsFailedException("Participant with this validation doesn't exists")
 
         if (!conferenceDAO.isAvailableForCancel(participant.validationUUID)) {
             throw PreconditionsFailedException("Conference already started or finished")
